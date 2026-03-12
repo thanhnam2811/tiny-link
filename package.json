@@ -1,0 +1,17 @@
+{
+	"name": "tiny-link",
+	"private": true,
+	"version": "1.0.0",
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"start:server": "pnpm --filter @tiny-link/server start",
+		"build": "pnpm --recursive run build"
+	},
+	"devDependencies": {
+		"@types/node": "^25.4.0",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"name": "@tiny-link/server",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"@tiny-link/shared": "workspace:*",
+		"dotenv": "^17.3.1",
+		"fastify": "^5.8.2",
+		"pino": "^10.3.1",
+		"pino-pretty": "^13.1.3"
+	}
+}
