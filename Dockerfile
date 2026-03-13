@@ -1,49 +1,32 @@
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS base
 
-WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
-# Copy only manifests first for better layer caching
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json tsconfig.base.json ./
-COPY packages/server/package.json packages/server/package.json
-COPY packages/shared/package.json packages/shared/package.json
-
-RUN pnpm install --frozen-lockfile
-
-FROM deps AS builder
+FROM base AS build
 
 WORKDIR /app
 
 COPY . .
 
-# Build workspace packages and generate Prisma client in Alpine env
-RUN pnpm --filter @tiny-link/shared build
-RUN pnpm --filter @tiny-link/server build
+# Use BuildKit cache mount for pnpm store to speed up rebuilds.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
 RUN pnpm --filter @tiny-link/server exec prisma generate
+RUN pnpm build
 
-FROM builder AS pack
+# Create a deployable, symlink-safe production tree for only the server package.
+RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
 
-WORKDIR /app
+FROM base AS runner
 
-# Produce a symlink-safe runtime tree for the server package
-RUN pnpm deploy --filter @tiny-link/server --prod /app/out
-
-FROM node:22-alpine AS runner
-
-WORKDIR /app
-
-RUN corepack enable
+WORKDIR /prod/server
 
 ENV NODE_ENV=production
 
-# Symlink-safe production dependency tree from pnpm deploy
-COPY --from=pack /app/out ./
-
-# Ensure built artifacts and Prisma schema/migrations exist in runtime image
-COPY --from=builder /app/packages/server/dist ./packages/server/dist
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder /app/packages/server/prisma ./packages/server/prisma
+COPY --from=build /prod/server /prod/server
 
 COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
 import { PrismaClient } from '@prisma/client';
@@ -14,7 +14,7 @@ describe('Rate Limiting & Caching', () => {
 		app = server;
 		await app.ready();
 		// Access the decorated redis client from the server instance
-		redis = (app as any).redis as Redis;
+		redis = app.redis as Redis;
 	});
 
 	afterAll(async () => {

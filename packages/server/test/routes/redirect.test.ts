@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
 import { PrismaClient } from '@prisma/client';
+import { AnalyticsManager } from '../../src/modules/analytics/analytics_manager';
 
 describe('GET /:code Redirect API', () => {
 	let app: FastifyInstance;
 	const prisma = new PrismaClient();
 
-	let analyticsManager: any;
+	let analyticsManager: AnalyticsManager;
 
 	beforeAll(async () => {
 		const { server, analyticsManager: manager } = await buildServer();

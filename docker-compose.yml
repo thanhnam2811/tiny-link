@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   postgres:
     image: postgres:17-alpine
@@ -51,7 +51,11 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/ >/dev/null 2>&1 || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O - http://localhost:3000/ >/dev/null 2>&1 || exit 1",
+        ]
       interval: 10s
       timeout: 3s
       retries: 10

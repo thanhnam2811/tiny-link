@@ -28,8 +28,8 @@ _Goal: Ensure system stability and data integrity._
 
 _Goal: Deploy to the cloud with $0 cost._
 
-- [ ] Dockerize the application (Multi-stage build for minimal image size).
-- [ ] Setup **GitHub Actions**: Automated Linting, Testing, and Image Building.
+- [x] Dockerize the application (Multi-stage build for minimal image size).
+- [x] Setup **GitHub Actions**: Automated Linting, Testing, and Image Building.
 - [ ] Deploy to **Fly.io** or **Render**.
 - [ ] Setup **Health-check** and **JSON Logging** (Pino) for remote debugging.
 

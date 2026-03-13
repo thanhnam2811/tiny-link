@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-tsc/
 build/
+
 # Environment variables
 .env
 .env.*
@@ -12,3 +13,4 @@ coverage/
 .pnpm-debug.log*
 .npm
 *.log
+tsconfig.tsbuildinfo

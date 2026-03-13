@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 
-npx --yes prisma@6.4.1 migrate deploy --schema=packages/server/prisma/schema.prisma
+npx --yes prisma@6.4.1 migrate deploy --schema=prisma/schema.prisma
 
-exec node packages/server/dist/index.js
+exec node dist/index.js
