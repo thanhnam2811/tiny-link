@@ -46,3 +46,23 @@ export const LinkStatsResponseSchema = Type.Object({
 });
 
 export type LinkStatsResponseType = Static<typeof LinkStatsResponseSchema>;
+
+export const ErrorResponseSchema = Type.Object({
+	statusCode: Type.Number(),
+	error: Type.String(),
+	code: Type.String(),
+	message: Type.String(),
+});
+
+export const ValidationErrorResponseSchema = Type.Object({
+	statusCode: Type.Number(),
+	error: Type.String(),
+	code: Type.String(),
+	message: Type.String(),
+	details: Type.Array(
+		Type.Object({
+			field: Type.String(),
+			message: Type.String(),
+		}),
+	),
+});

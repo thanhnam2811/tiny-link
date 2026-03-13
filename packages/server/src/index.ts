@@ -6,6 +6,7 @@ import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
 import { linkRoutes } from './modules/link/link.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
+import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 
 export const buildServer = async () => {
 	const prisma = new PrismaClient();
@@ -21,6 +22,9 @@ export const buildServer = async () => {
 						},
 					},
 	}).withTypeProvider<TypeBoxTypeProvider>();
+
+	server.setErrorHandler(globalErrorHandler);
+	server.setNotFoundHandler(notFoundHandler);
 
 	// Register Redis plugin
 	await server.register(fastifyRedis, {

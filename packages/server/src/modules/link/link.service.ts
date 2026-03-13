@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { LinkRepository } from './link.repository';
 import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
+import { AppError } from '../../shared/app-error';
 
 // Sentinel value used to distinguish "not found" from "cache miss"
 // This protects against Cache Penetration attacks
@@ -37,9 +38,11 @@ export class LinkService {
 				if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
 					if (customCode) {
 						// If custom code is taken, throw immediately
-						const err = new Error(`The custom code '${customCode}' is already in use.`, { cause: error });
-						(err as { statusCode?: number }).statusCode = 409;
-						throw err;
+						throw new AppError(
+							409,
+							'LINK_CODE_CONFLICT',
+							`The custom code '${customCode}' is already in use.`,
+						);
 					} else {
 						// Auto-generated collision, retry
 						shortCode = undefined;
@@ -67,9 +70,7 @@ export class LinkService {
 		if (cached !== null) {
 			// Cache Penetration guard: hit but it's a "not found" sentinel
 			if (cached === NOT_FOUND_SENTINEL) {
-				const err = new Error('Link not found or inactive');
-				(err as any).statusCode = 404;
-				throw err;
+				throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found or inactive');
 			}
 
 			// Cache HIT (valid link): always track analytics even on cache hit
@@ -82,9 +83,7 @@ export class LinkService {
 		if (this.inflightRequests.has(code)) {
 			const originalUrl = await this.inflightRequests.get(code)!;
 			if (!originalUrl) {
-				const err = new Error('Link not found or inactive');
-				(err as any).statusCode = 404;
-				throw err;
+				throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found or inactive');
 			}
 			return originalUrl;
 		}
@@ -107,9 +106,7 @@ export class LinkService {
 		try {
 			const originalUrl = await dbQuery;
 			if (!originalUrl) {
-				const err = new Error('Link not found or inactive');
-				(err as any).statusCode = 404;
-				throw err;
+				throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found or inactive');
 			}
 
 			// Track analytics on miss too (we now have the link data)
@@ -129,9 +126,7 @@ export class LinkService {
 		const linkData = await this.linkRepository.getStats(code);
 
 		if (!linkData) {
-			const err = new Error('Link not found');
-			(err as any).statusCode = 404;
-			throw err;
+			throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found');
 		}
 
 		return {

@@ -1,10 +1,16 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { PrismaClient } from '@prisma/client';
-import { CreateLinkBodySchema, LinkResponseSchema, RedirectParamsSchema, LinkStatsResponseSchema } from './link.schema';
+import {
+	CreateLinkBodySchema,
+	LinkResponseSchema,
+	RedirectParamsSchema,
+	LinkStatsResponseSchema,
+	ErrorResponseSchema,
+	ValidationErrorResponseSchema,
+} from './link.schema';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
 import { LinkController } from './link.controller';
-import { Type } from '@sinclair/typebox';
 import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
 
@@ -34,16 +40,8 @@ export const linkRoutes = (
 					body: CreateLinkBodySchema,
 					response: {
 						201: LinkResponseSchema,
-						400: Type.Object({
-							statusCode: Type.Number(),
-							error: Type.String(),
-							message: Type.String(),
-						}),
-						409: Type.Object({
-							statusCode: Type.Number(),
-							error: Type.String(),
-							message: Type.String(),
-						}),
+						400: ValidationErrorResponseSchema,
+						409: ErrorResponseSchema,
 					},
 				},
 			},

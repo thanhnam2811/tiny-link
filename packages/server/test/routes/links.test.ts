@@ -96,5 +96,6 @@ describe('POST /api/links', () => {
 
 		expect(response2.statusCode).toBe(409);
 		expect(response2.json().message).toContain('already in use');
+		expect(response2.json().code).toBe('LINK_CODE_CONFLICT');
 	});
 });
