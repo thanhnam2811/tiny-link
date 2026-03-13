@@ -8,7 +8,8 @@ describe('POST /api/links', () => {
 	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
-		app = buildServer();
+		const { server } = buildServer();
+		app = server;
 		await app.ready();
 	});
 

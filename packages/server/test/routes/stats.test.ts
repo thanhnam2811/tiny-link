@@ -8,7 +8,8 @@ describe('GET /api/stats/:code Stats API', () => {
 	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
-		app = buildServer();
+		const { server } = buildServer();
+		app = server;
 		await app.ready();
 	});
 
@@ -44,6 +45,12 @@ describe('GET /api/stats/:code Stats API', () => {
 				{ linkId: link.id, userAgent: 'test-2', ipAddress: '2.2.2.2' },
 				{ linkId: link.id, userAgent: 'test-3', ipAddress: '3.3.3.3' },
 			],
+		});
+
+		// 2b. Manually update clicksCount since we are bypassing the application logic (AnalyticsManager)
+		await prisma.link.update({
+			where: { id: link.id },
+			data: { clicksCount: 3 },
 		});
 
 		// 3. Call Stats API

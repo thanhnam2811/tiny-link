@@ -17,6 +17,7 @@ model Link {
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
   isActive     Boolean   @default(true)
+  clicksCount  Int       @default(0)
   clicks       Click[]
 
   @@index([shortCode]) // Optimize lookup

@@ -3,8 +3,12 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { sharedConfig } from '@tiny-link/shared';
 import { PrismaClient } from '@prisma/client';
 import { linkRoutes } from './modules/link/link.routes';
+import { AnalyticsManager } from './modules/analytics/analytics_manager';
 
 export const buildServer = () => {
+	const prisma = new PrismaClient();
+	const analyticsManager = new AnalyticsManager(prisma);
+
 	const server = fastify({
 		logger:
 			process.env.NODE_ENV === 'test'
@@ -16,19 +20,21 @@ export const buildServer = () => {
 					},
 	}).withTypeProvider<TypeBoxTypeProvider>();
 
-	const prisma = new PrismaClient();
-
 	server.get('/', async (_request, _reply) => {
 		return { hello: `Welcome to ${sharedConfig.appName} API!` };
 	});
 
-	server.register(linkRoutes(prisma));
+	server.register(linkRoutes(prisma, analyticsManager));
 
-	return server;
+	return { server, analyticsManager, prisma };
 };
 
 const start = async () => {
-	const server = buildServer();
+	const { server, analyticsManager, prisma } = buildServer();
+
+	// 0. Start Analytics Manager
+	analyticsManager.start();
+
 	try {
 		const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 		await server.listen({ port, host: '0.0.0.0' });
@@ -37,6 +43,35 @@ const start = async () => {
 		server.log.error(err);
 		process.exit(1);
 	}
+
+	// GRACEFUL SHUTDOWN (4 Steps)
+	const shutdown = async (signal: string) => {
+		server.log.info(`Received ${signal}. Starting graceful shutdown...`);
+
+		try {
+			// 1. Stop Ingress (Stop receiving new requests)
+			await server.close();
+			server.log.info('HTTP server closed.');
+
+			// 2. Wait for Inflight - handled by server.close() in Fastify
+
+			// 3. Final Flush of Analytics Queue
+			await analyticsManager.shutdown();
+			server.log.info('Analytics queue flushed.');
+
+			// 4. Cleanup (Close DB connections)
+			await prisma.$disconnect();
+			server.log.info('Database connection closed.');
+
+			process.exit(0);
+		} catch (err) {
+			server.log.error({ err }, 'Error during graceful shutdown');
+			process.exit(1);
+		}
+	};
+
+	process.on('SIGTERM', () => shutdown('SIGTERM'));
+	process.on('SIGINT', () => shutdown('SIGINT'));
 };
 
 // Only start the server if not in a test environment

@@ -1,8 +1,12 @@
 import { nanoid } from 'nanoid';
 import { LinkRepository } from './link.repository';
+import { AnalyticsManager } from '../analytics/analytics_manager';
 
 export class LinkService {
-	constructor(private readonly linkRepository: LinkRepository) {}
+	constructor(
+		private readonly linkRepository: LinkRepository,
+		private readonly analyticsManager: AnalyticsManager,
+	) {}
 
 	async createShortLink(originalUrl: string, customCode?: string) {
 		let shortCode = customCode;
@@ -51,12 +55,11 @@ export class LinkService {
 			throw err;
 		}
 
-		// Analytics: Fire-and-forget
-		// Attach .catch to avoid Unhandled Promise Rejection
-		this.linkRepository.trackClick(link.id, ipAddress, userAgent).catch((err) => {
-			if (logger && typeof logger.error === 'function') {
-				logger.error({ err, linkId: link.id }, 'Failed to track link click');
-			}
+		// Analytics: Memory Queue (Phase 2)
+		this.analyticsManager.push({
+			linkId: link.id,
+			ipAddress,
+			userAgent,
 		});
 
 		return link.originalUrl;
@@ -74,7 +77,7 @@ export class LinkService {
 		return {
 			originalUrl: linkData.originalUrl,
 			shortCode: linkData.shortCode,
-			totalClicks: linkData._count.clicks,
+			totalClicks: linkData.clicksCount,
 			createdAt: linkData.createdAt,
 		};
 	}

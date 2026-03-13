@@ -5,11 +5,12 @@ import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
 import { LinkController } from './link.controller';
 import { Type } from '@sinclair/typebox';
+import { AnalyticsManager } from '../analytics/analytics_manager';
 
 // This is where we wire up our dependencies (IoC)
-export const linkRoutes = (prisma: PrismaClient): FastifyPluginAsyncTypebox => {
+export const linkRoutes = (prisma: PrismaClient, analyticsManager: AnalyticsManager): FastifyPluginAsyncTypebox => {
 	const repository = new LinkRepository(prisma);
-	const service = new LinkService(repository);
+	const service = new LinkService(repository, analyticsManager);
 	const controller = new LinkController(service);
 
 	return async (server) => {

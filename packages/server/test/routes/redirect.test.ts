@@ -7,8 +7,12 @@ describe('GET /:code Redirect API', () => {
 	let app: FastifyInstance;
 	const prisma = new PrismaClient();
 
+	let analyticsManager: any;
+
 	beforeAll(async () => {
-		app = buildServer();
+		const { server, analyticsManager: manager } = buildServer();
+		app = server;
+		analyticsManager = manager;
 		await app.ready();
 	});
 
@@ -41,8 +45,9 @@ describe('GET /:code Redirect API', () => {
 		expect(response.statusCode).toBe(302);
 		expect(response.headers.location).toBe('https://vitest.dev');
 
-		// Flaky Test Trap Resolution: wait for the fire-and-forget Promise to resolve
-		await new Promise((resolve) => setTimeout(resolve, 500));
+		// Wait for the background tracking (Fire-and-forget in service)
+		// Since we use AnalyticsManager with queue, we need to manually flush for test
+		await analyticsManager.flush();
 
 		// Assert Analytics logic
 		const clicks = await prisma.click.findMany({
