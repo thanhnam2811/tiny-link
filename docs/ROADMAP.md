@@ -12,7 +12,7 @@ _Goal: Complete the basic shortening and redirection flow._
 - [x] Design Database Schema (Postgres): `links` and `clicks` tables.
 - [x] API: `POST /api/links` (Link creation with collision handling).
 - [x] API: `GET /:code` (Simple 302 Redirect).
-- [ ] API: `GET /api/stats/:code` (Raw stats from DB).
+- [x] API: `GET /api/stats/:code` (Raw stats from DB).
 
 ### 🟡 Phase 2: Reliability & Performance (The Middle-level Touch)
 

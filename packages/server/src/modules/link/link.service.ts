@@ -61,4 +61,21 @@ export class LinkService {
 
 		return link.originalUrl;
 	}
+
+	async getLinkStats(code: string) {
+		const linkData = await this.linkRepository.getStats(code);
+
+		if (!linkData) {
+			const err = new Error('Link not found');
+			(err as any).statusCode = 404;
+			throw err;
+		}
+
+		return {
+			originalUrl: linkData.originalUrl,
+			shortCode: linkData.shortCode,
+			totalClicks: linkData._count.clicks,
+			createdAt: linkData.createdAt,
+		};
+	}
 }

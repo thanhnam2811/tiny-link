@@ -27,4 +27,15 @@ export class LinkRepository {
 			},
 		});
 	}
+
+	async getStats(shortCode: string) {
+		return this.prisma.link.findUnique({
+			where: { shortCode },
+			include: {
+				_count: {
+					select: { clicks: true },
+				},
+			},
+		});
+	}
 }

@@ -37,3 +37,12 @@ export const RedirectParamsSchema = Type.Object({
 });
 
 export type RedirectParamsType = Static<typeof RedirectParamsSchema>;
+
+export const LinkStatsResponseSchema = Type.Object({
+	originalUrl: Type.String(),
+	shortCode: Type.String(),
+	totalClicks: Type.Number(),
+	createdAt: Type.String({ format: 'date-time' }),
+});
+
+export type LinkStatsResponseType = Static<typeof LinkStatsResponseSchema>;

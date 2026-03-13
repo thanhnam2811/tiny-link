@@ -1,6 +1,6 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { PrismaClient } from '@prisma/client';
-import { CreateLinkBodySchema, LinkResponseSchema, RedirectParamsSchema } from './link.schema';
+import { CreateLinkBodySchema, LinkResponseSchema, RedirectParamsSchema, LinkStatsResponseSchema } from './link.schema';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
 import { LinkController } from './link.controller';
@@ -46,6 +46,20 @@ export const linkRoutes = (prisma: PrismaClient): FastifyPluginAsyncTypebox => {
 				},
 			},
 			controller.redirect,
+		);
+
+		// Stats API Route
+		server.get(
+			'/api/stats/:code',
+			{
+				schema: {
+					params: RedirectParamsSchema,
+					response: {
+						200: LinkStatsResponseSchema,
+					},
+				},
+			},
+			controller.getStats,
 		);
 	};
 };

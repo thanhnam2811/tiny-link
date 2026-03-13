@@ -49,6 +49,21 @@ export class LinkController {
 				return reply.callNotFound(); // Triggers the default 404 handler
 			}
 
+			throw error;
+		}
+	};
+
+	getStats = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
+		const { code } = request.params;
+
+		try {
+			const stats = await this.linkService.getLinkStats(code);
+			return reply.status(200).send(stats);
+		} catch (error: unknown) {
+			if (typeof error === 'object' && error !== null && 'statusCode' in error && error.statusCode === 404) {
+				return reply.callNotFound();
+			}
+
 			request.log.error(error);
 			throw error;
 		}
