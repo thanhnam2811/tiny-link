@@ -1,0 +1,17 @@
+.git
+.gitignore
+.husky
+.vscode
+node_modules
+**/node_modules
+dist
+**/dist
+.env
+.env.*
+packages/server/.env
+packages/server/.env.*
+coverage
+**/coverage
+test
+**/test
+*.log
