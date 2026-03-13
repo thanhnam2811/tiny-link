@@ -8,8 +8,8 @@ This project is divided into 4 phases, moving from core building blocks to produ
 
 _Goal: Complete the basic shortening and redirection flow._
 
-- [ ] Initialize project with **Fastify** and **TypeScript**.
-- [ ] Design Database Schema (Postgres): `links` and `clicks` tables.
+- [x] Initialize project with **Fastify** and **TypeScript**.
+- [x] Design Database Schema (Postgres): `links` and `clicks` tables.
 - [ ] API: `POST /api/links` (Link creation with collision handling).
 - [ ] API: `GET /:code` (Simple 302 Redirect).
 - [ ] API: `GET /api/stats/:code` (Raw stats from DB).

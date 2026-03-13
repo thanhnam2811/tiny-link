@@ -1,0 +1,36 @@
+// packages/server/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Link {
+  id           String    @id @default(uuid())
+  originalUrl  String
+  shortCode    String    @unique
+  redirectType Int       @default(302) // 301 or 302
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  clicks       Click[]
+
+  @@index([shortCode]) // Optimize lookup
+}
+
+model Click {
+  id         String   @id @default(uuid())
+  linkId     String
+  link       Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  ipAddress  String?
+  userAgent  String?
+  country    String?
+  city       String?
+  clickedAt  DateTime @default(now())
+
+  @@index([linkId, clickedAt]) // Optimize stats queries
+}
