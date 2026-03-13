@@ -34,7 +34,6 @@ const start = async () => {
 
 	// 0. Start Analytics Manager
 	analyticsManager.start();
-
 	try {
 		const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 		await server.listen({ port, host: '0.0.0.0' });

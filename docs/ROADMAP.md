@@ -18,8 +18,8 @@ _Goal: Complete the basic shortening and redirection flow._
 
 _Goal: Ensure system stability and data integrity._
 
-- [ ] Implement **Memory Queue**: Temporary storage for click events.
-- [ ] Implement **Batch Insert**: Automatically flush data from Queue to DB periodically.
+- [x] Implement **Memory Queue**: Temporary storage for click events.
+- [x] Implement **Batch Insert**: Automatically flush data from Queue to DB periodically.
 - [ ] Integrate **Rate Limiter**: Use `fastify-rate-limit` to block IP-based spam.
 - [ ] **Error Handling**: Professional handling for expired or non-existent links.
 
