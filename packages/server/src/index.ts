@@ -22,7 +22,7 @@ export const buildServer = () => {
 		return { hello: `Welcome to ${sharedConfig.appName} API!` };
 	});
 
-	server.register(linkRoutes(prisma), { prefix: '/api' });
+	server.register(linkRoutes(prisma));
 
 	return server;
 };

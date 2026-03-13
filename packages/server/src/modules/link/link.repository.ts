@@ -17,4 +17,14 @@ export class LinkRepository {
 			where: { shortCode },
 		});
 	}
+
+	async trackClick(linkId: string, ipAddress?: string, userAgent?: string): Promise<void> {
+		await this.prisma.click.create({
+			data: {
+				linkId,
+				ipAddress,
+				userAgent,
+			},
+		});
+	}
 }

@@ -35,4 +35,22 @@ export class LinkController {
 			throw error;
 		}
 	};
+
+	redirect = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
+		const { code } = request.params;
+		const ip = request.ip;
+		const userAgent = request.headers['user-agent'];
+
+		try {
+			const originalUrl = await this.linkService.getOriginalUrlAndTrack(code, ip, userAgent, request.log);
+			return reply.redirect(originalUrl);
+		} catch (error: unknown) {
+			if (typeof error === 'object' && error !== null && 'statusCode' in error && error.statusCode === 404) {
+				return reply.callNotFound(); // Triggers the default 404 handler
+			}
+
+			request.log.error(error);
+			throw error;
+		}
+	};
 }

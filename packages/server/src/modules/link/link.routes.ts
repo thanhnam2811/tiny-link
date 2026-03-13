@@ -1,6 +1,6 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { PrismaClient } from '@prisma/client';
-import { CreateLinkBodySchema, LinkResponseSchema } from './link.schema';
+import { CreateLinkBodySchema, LinkResponseSchema, RedirectParamsSchema } from './link.schema';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
 import { LinkController } from './link.controller';
@@ -13,8 +13,9 @@ export const linkRoutes = (prisma: PrismaClient): FastifyPluginAsyncTypebox => {
 	const controller = new LinkController(service);
 
 	return async (server) => {
+		// API Route: Create Short Link
 		server.post(
-			'/links', // Sub-route, will be prefixed when registered
+			'/api/links',
 			{
 				schema: {
 					body: CreateLinkBodySchema,
@@ -34,6 +35,17 @@ export const linkRoutes = (prisma: PrismaClient): FastifyPluginAsyncTypebox => {
 				},
 			},
 			controller.createLink,
+		);
+
+		// Redirect Route: Root level
+		server.get(
+			'/:code',
+			{
+				schema: {
+					params: RedirectParamsSchema,
+				},
+			},
+			controller.redirect,
 		);
 	};
 };

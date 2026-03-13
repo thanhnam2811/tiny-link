@@ -41,4 +41,24 @@ export class LinkService {
 
 		throw new Error('Failed to create short link due to unknown error.');
 	}
+
+	async getOriginalUrlAndTrack(code: string, ipAddress?: string, userAgent?: string, logger?: any): Promise<string> {
+		const link = await this.linkRepository.findByShortCode(code);
+
+		if (!link || !link.isActive) {
+			const err = new Error('Link not found or inactive');
+			(err as any).statusCode = 404;
+			throw err;
+		}
+
+		// Analytics: Fire-and-forget
+		// Attach .catch to avoid Unhandled Promise Rejection
+		this.linkRepository.trackClick(link.id, ipAddress, userAgent).catch((err) => {
+			if (logger && typeof logger.error === 'function') {
+				logger.error({ err, linkId: link.id }, 'Failed to track link click');
+			}
+		});
+
+		return link.originalUrl;
+	}
 }

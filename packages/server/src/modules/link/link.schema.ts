@@ -27,3 +27,13 @@ export const LinkResponseSchema = Type.Object({
 });
 
 export type LinkResponseType = Static<typeof LinkResponseSchema>;
+
+export const RedirectParamsSchema = Type.Object({
+	code: Type.String({
+		minLength: 3,
+		maxLength: 30,
+		description: 'The short code to redirect',
+	}),
+});
+
+export type RedirectParamsType = Static<typeof RedirectParamsSchema>;
