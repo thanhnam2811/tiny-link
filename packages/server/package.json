@@ -6,17 +6,21 @@
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
 		"start": "node dist/index.js",
+		"pretest": "dotenv -e .env.test -- prisma db push --accept-data-loss --skip-generate",
 		"test": "dotenv -e .env.test -- vitest run",
 		"test:watch": "dotenv -e .env.test -- vitest"
 	},
 	"license": "MIT",
 	"dependencies": {
+		"@fastify/rate-limit": "^10.3.0",
+		"@fastify/redis": "^7.2.0",
 		"@fastify/type-provider-typebox": "^6.1.0",
 		"@prisma/client": "^6.4.1",
 		"@sinclair/typebox": "^0.34.48",
 		"@tiny-link/shared": "workspace:*",
 		"dotenv": "^17.3.1",
 		"fastify": "^5.8.2",
+		"ioredis": "^5.10.0",
 		"nanoid": "^5.1.6",
 		"pino": "^10.3.1",
 		"pino-pretty": "^13.1.3"
