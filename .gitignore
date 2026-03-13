@@ -2,7 +2,11 @@ node_modules/
 dist/
 dist-tsc/
 build/
+# Environment variables
 .env
+.env.*
+!.env.example
+
 .DS_Store
 coverage/
 .pnpm-debug.log*
