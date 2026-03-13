@@ -1,11 +1,23 @@
 import { nanoid } from 'nanoid';
 import { LinkRepository } from './link.repository';
 import { AnalyticsManager } from '../analytics/analytics_manager';
+import { Redis } from 'ioredis';
+
+// Sentinel value used to distinguish "not found" from "cache miss"
+// This protects against Cache Penetration attacks
+const NOT_FOUND_SENTINEL = '__NOT_FOUND__';
+const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24 hours for valid links
+const NOT_FOUND_TTL_SECONDS = 60 * 3; // 3 minutes for invalid codes (negative caching)
 
 export class LinkService {
+	// Promise Coalescing (Singleflight): prevents Cache Stampede
+	// Maps a shortCode -> in-flight DB promise to deduplicate concurrent misses
+	private readonly inflightRequests = new Map<string, Promise<string | null>>();
+
 	constructor(
 		private readonly linkRepository: LinkRepository,
 		private readonly analyticsManager: AnalyticsManager,
+		private readonly redis: Redis,
 	) {}
 
 	async createShortLink(originalUrl: string, customCode?: string) {
@@ -46,23 +58,71 @@ export class LinkService {
 		throw new Error('Failed to create short link due to unknown error.');
 	}
 
-	async getOriginalUrlAndTrack(code: string, ipAddress?: string, userAgent?: string, logger?: any): Promise<string> {
-		const link = await this.linkRepository.findByShortCode(code);
+	async getOriginalUrlAndTrack(code: string, ipAddress?: string, userAgent?: string): Promise<string> {
+		const cacheKey = `link:${code}`;
 
-		if (!link || !link.isActive) {
-			const err = new Error('Link not found or inactive');
-			(err as any).statusCode = 404;
-			throw err;
+		// Step 1: Check Redis cache first
+		const cached = await this.redis.get(cacheKey);
+
+		if (cached !== null) {
+			// Cache Penetration guard: hit but it's a "not found" sentinel
+			if (cached === NOT_FOUND_SENTINEL) {
+				const err = new Error('Link not found or inactive');
+				(err as any).statusCode = 404;
+				throw err;
+			}
+
+			// Cache HIT (valid link): always track analytics even on cache hit
+			this.analyticsManager.push({ linkId: cached.split(':')[0], ipAddress, userAgent });
+			return cached.split(':').slice(1).join(':'); // url stored as "id:originalUrl"
 		}
 
-		// Analytics: Memory Queue (Phase 2)
-		this.analyticsManager.push({
-			linkId: link.id,
-			ipAddress,
-			userAgent,
+		// Step 2: Cache MISS — use Promise Coalescing to prevent Stampede
+		// If there's already an in-flight DB query for this code, wait for it
+		if (this.inflightRequests.has(code)) {
+			const originalUrl = await this.inflightRequests.get(code)!;
+			if (!originalUrl) {
+				const err = new Error('Link not found or inactive');
+				(err as any).statusCode = 404;
+				throw err;
+			}
+			return originalUrl;
+		}
+
+		// Step 3: First request for this code — query DB (and register in-flight)
+		const dbQuery = this.linkRepository.findByShortCode(code).then(async (link) => {
+			if (!link || !link.isActive) {
+				// Negative Caching: cache NOT_FOUND to block future Penetration attempts
+				await this.redis.set(cacheKey, NOT_FOUND_SENTINEL, 'EX', NOT_FOUND_TTL_SECONDS);
+				return null;
+			}
+			// Cache the valid entry: store as "id:url" so we have both pieces
+			const cacheValue = `${link.id}:${link.originalUrl}`;
+			await this.redis.set(cacheKey, cacheValue, 'EX', CACHE_TTL_SECONDS);
+			return link.originalUrl;
 		});
 
-		return link.originalUrl;
+		this.inflightRequests.set(code, dbQuery);
+
+		try {
+			const originalUrl = await dbQuery;
+			if (!originalUrl) {
+				const err = new Error('Link not found or inactive');
+				(err as any).statusCode = 404;
+				throw err;
+			}
+
+			// Track analytics on miss too (we now have the link data)
+			const cached2 = await this.redis.get(cacheKey);
+			if (cached2 && cached2 !== NOT_FOUND_SENTINEL) {
+				this.analyticsManager.push({ linkId: cached2.split(':')[0], ipAddress, userAgent });
+			}
+
+			return originalUrl;
+		} finally {
+			// Always clean up the in-flight map
+			this.inflightRequests.delete(code);
+		}
 	}
 
 	async getLinkStats(code: string) {

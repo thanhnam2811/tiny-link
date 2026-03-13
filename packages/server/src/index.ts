@@ -2,10 +2,12 @@ import fastify from 'fastify';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { sharedConfig } from '@tiny-link/shared';
 import { PrismaClient } from '@prisma/client';
+import fastifyRedis from '@fastify/redis';
+import fastifyRateLimit from '@fastify/rate-limit';
 import { linkRoutes } from './modules/link/link.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 
-export const buildServer = () => {
+export const buildServer = async () => {
 	const prisma = new PrismaClient();
 	const analyticsManager = new AnalyticsManager(prisma);
 
@@ -20,17 +22,31 @@ export const buildServer = () => {
 					},
 	}).withTypeProvider<TypeBoxTypeProvider>();
 
+	// Register Redis plugin
+	await server.register(fastifyRedis, {
+		url: process.env.REDIS_URL || 'redis://localhost:6379',
+		closeClient: true,
+	});
+
+	// Register Rate Limit plugin (uses Redis store for distributed limiting)
+	await server.register(fastifyRateLimit, {
+		global: true,
+		max: 100,
+		timeWindow: '1 minute',
+		redis: server.redis,
+	});
+
 	server.get('/', async (_request, _reply) => {
 		return { hello: `Welcome to ${sharedConfig.appName} API!` };
 	});
 
-	server.register(linkRoutes(prisma, analyticsManager));
+	server.register(linkRoutes(prisma, analyticsManager, server.redis));
 
 	return { server, analyticsManager, prisma };
 };
 
 const start = async () => {
-	const { server, analyticsManager, prisma } = buildServer();
+	const { server, analyticsManager, prisma } = await buildServer();
 
 	// 0. Start Analytics Manager
 	analyticsManager.start();

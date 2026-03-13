@@ -20,7 +20,8 @@ _Goal: Ensure system stability and data integrity._
 
 - [x] Implement **Memory Queue**: Temporary storage for click events.
 - [x] Implement **Batch Insert**: Automatically flush data from Queue to DB periodically.
-- [ ] Integrate **Rate Limiter**: Use `fastify-rate-limit` to block IP-based spam.
+- [x] Integrate **Rate Limiter**: Use `fastify-rate-limit` with Redis store for distributed limiting.
+- [x] Implement **Redis Caching**: Negative caching, Promise Coalescing, Ghost Click protection.
 - [ ] **Error Handling**: Professional handling for expired or non-existent links.
 
 ### 🔵 Phase 3: DevOps & Deployment (The Nomad Way)

@@ -42,7 +42,7 @@ export class LinkController {
 		const userAgent = request.headers['user-agent'];
 
 		try {
-			const originalUrl = await this.linkService.getOriginalUrlAndTrack(code, ip, userAgent, request.log);
+			const originalUrl = await this.linkService.getOriginalUrlAndTrack(code, ip, userAgent);
 			return reply.redirect(originalUrl);
 		} catch (error: unknown) {
 			if (typeof error === 'object' && error !== null && 'statusCode' in error && error.statusCode === 404) {

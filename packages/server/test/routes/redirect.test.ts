@@ -10,7 +10,7 @@ describe('GET /:code Redirect API', () => {
 	let analyticsManager: any;
 
 	beforeAll(async () => {
-		const { server, analyticsManager: manager } = buildServer();
+		const { server, analyticsManager: manager } = await buildServer();
 		app = server;
 		analyticsManager = manager;
 		await app.ready();

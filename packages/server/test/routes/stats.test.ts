@@ -8,7 +8,7 @@ describe('GET /api/stats/:code Stats API', () => {
 	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
-		const { server } = buildServer();
+		const { server } = await buildServer();
 		app = server;
 		await app.ready();
 	});
