@@ -4,23 +4,31 @@ import { sharedConfig } from '@tiny-link/shared';
 import { PrismaClient } from '@prisma/client';
 import { linkRoutes } from './modules/link/link.routes';
 
-const server = fastify({
-	logger: {
-		transport: {
-			target: 'pino-pretty',
-		},
-	},
-}).withTypeProvider<TypeBoxTypeProvider>();
+export const buildServer = () => {
+	const server = fastify({
+		logger:
+			process.env.NODE_ENV === 'test'
+				? false
+				: {
+						transport: {
+							target: 'pino-pretty',
+						},
+					},
+	}).withTypeProvider<TypeBoxTypeProvider>();
 
-const prisma = new PrismaClient();
+	const prisma = new PrismaClient();
 
-server.get('/', async (_request, _reply) => {
-	return { hello: `Welcome to ${sharedConfig.appName} API!` };
-});
+	server.get('/', async (_request, _reply) => {
+		return { hello: `Welcome to ${sharedConfig.appName} API!` };
+	});
 
-server.register(linkRoutes(prisma), { prefix: '/api' });
+	server.register(linkRoutes(prisma), { prefix: '/api' });
+
+	return server;
+};
 
 const start = async () => {
+	const server = buildServer();
 	try {
 		const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 		await server.listen({ port, host: '0.0.0.0' });
@@ -31,4 +39,7 @@ const start = async () => {
 	}
 };
 
-start();
+// Only start the server if not in a test environment
+if (process.env.NODE_ENV !== 'test') {
+	start();
+}

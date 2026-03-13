@@ -10,7 +10,7 @@ _Goal: Complete the basic shortening and redirection flow._
 
 - [x] Initialize project with **Fastify** and **TypeScript**.
 - [x] Design Database Schema (Postgres): `links` and `clicks` tables.
-- [ ] API: `POST /api/links` (Link creation with collision handling).
+- [x] API: `POST /api/links` (Link creation with collision handling).
 - [ ] API: `GET /:code` (Simple 302 Redirect).
 - [ ] API: `GET /api/stats/:code` (Raw stats from DB).
 
