@@ -1,5 +1,8 @@
 import fastify from 'fastify';
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { sharedConfig } from '@tiny-link/shared';
+import { PrismaClient } from '@prisma/client';
+import { linkRoutes } from './modules/link/link.routes';
 
 const server = fastify({
 	logger: {
@@ -7,11 +10,15 @@ const server = fastify({
 			target: 'pino-pretty',
 		},
 	},
-});
+}).withTypeProvider<TypeBoxTypeProvider>();
+
+const prisma = new PrismaClient();
 
 server.get('/', async (_request, _reply) => {
 	return { hello: `Welcome to ${sharedConfig.appName} API!` };
 });
+
+server.register(linkRoutes(prisma), { prefix: '/api' });
 
 const start = async () => {
 	try {
