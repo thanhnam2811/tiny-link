@@ -6,6 +6,8 @@
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
 		"start": "node dist/index.js",
+		"db:push": "prisma db push",
+		"db:studio": "prisma studio",
 		"pretest": "dotenv -e .env.test -- prisma db push --accept-data-loss --skip-generate",
 		"test": "dotenv -e .env.test -- vitest run",
 		"test:watch": "dotenv -e .env.test -- vitest"

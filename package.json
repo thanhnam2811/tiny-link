@@ -8,6 +8,12 @@
 		"packages/*"
 	],
 	"scripts": {
+		"docker:up": "docker compose up -d postgres redis",
+		"docker:down": "docker compose down",
+		"server:dev": "pnpm --filter @tiny-link/server dev",
+		"server:start": "pnpm --filter @tiny-link/server start",
+		"server:db:push": "pnpm --filter @tiny-link/server run db:push",
+		"server:db:studio": "pnpm --filter @tiny-link/server run db:studio",
 		"clean": "rimraf --glob \"packages/*/{dist,*.tsbuildinfo}\"",
 		"clean:all": "rimraf --glob \"packages/*/{dist,node_modules,*.tsbuildinfo}\" node_modules pnpm-lock.yaml",
 		"prebuild": "pnpm run clean && pnpm --filter @tiny-link/shared run build",
