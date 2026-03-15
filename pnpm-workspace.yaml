@@ -1,13 +1,13 @@
 packages:
-  - packages/*
+    - packages/*
 
 onlyBuiltDependencies:
-  - "@prisma/client"
-  - "@prisma/engines"
-  - esbuild
-  - prisma
+    - '@prisma/client'
+    - '@prisma/engines'
+    - esbuild
+    - prisma
 
 syncInjectedDepsAfterScripts:
-  - build
+    - build
 
 injectWorkspacePackages: true

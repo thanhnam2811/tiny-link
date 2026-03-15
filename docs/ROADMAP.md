@@ -30,8 +30,8 @@ _Goal: Deploy to the cloud with $0 cost._
 
 - [x] Dockerize the application (Multi-stage build for minimal image size).
 - [x] Setup **GitHub Actions**: Automated Linting, Testing, and Image Building.
-- [ ] Deploy to **Fly.io** or **Render**.
-- [ ] Setup **Health-check** and **JSON Logging** (Pino) for remote debugging.
+- [x] Deploy to **Render**.
+- [x] Setup **Health-check** and **JSON Logging** (Pino) for remote debugging.
 
 ### 🟣 Phase 4: Enhancements (The Extra Miles)
 

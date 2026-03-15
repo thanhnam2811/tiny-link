@@ -16,11 +16,9 @@ export const buildServer = async () => {
 		logger:
 			process.env.NODE_ENV === 'test'
 				? false
-				: {
-						transport: {
-							target: 'pino-pretty',
-						},
-					},
+				: process.env.NODE_ENV === 'development'
+					? { transport: { target: 'pino-pretty' } }
+					: true,
 	}).withTypeProvider<TypeBoxTypeProvider>();
 
 	server.setErrorHandler(globalErrorHandler);
@@ -39,6 +37,9 @@ export const buildServer = async () => {
 		timeWindow: '1 minute',
 		redis: server.redis,
 	});
+
+	// Health check – exempt from rate limit so Render LB never gets blocked
+	server.get('/healthz', { config: { rateLimit: { skip: () => true } } }, async () => ({ status: 'ok' }));
 
 	server.get('/', async (_request, _reply) => {
 		return { hello: `Welcome to ${sharedConfig.appName} API!` };
