@@ -37,7 +37,7 @@ _Goal: Deploy to the cloud with $0 cost._
 
 _Goal: Add "cool" features to stand out in your portfolio._
 
-- [ ] **Self-destruct links**: Links that expire after N clicks or X time.
-- [ ] **Password Protection**: Require a password to access specific links.
+- [x] **Self-destruct links**: Links that expire after N clicks or X time.
+- [x] **Password Protection**: Require a password to access specific links.
 - [ ] **Geo-analytics**: Parse IP addresses for Country/City data (using lightweight libs or free APIs).
 - [ ] **Simple Dashboard**: A minimal static HTML/JS page for link management and click charts (Chart.js).
