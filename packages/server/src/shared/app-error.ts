@@ -1,5 +1,6 @@
 export type AppErrorCode =
 	| 'LINK_NOT_FOUND'
+	| 'LINK_GONE'
 	| 'LINK_CODE_CONFLICT'
 	| 'RATE_LIMIT_EXCEEDED'
 	| 'VALIDATION_ERROR'
