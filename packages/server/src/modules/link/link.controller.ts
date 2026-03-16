@@ -6,13 +6,14 @@ export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
 
 	createLink = async (request: FastifyRequest<{ Body: CreateLinkBodyType }>, reply: FastifyReply) => {
-		const { originalUrl, customCode, maxClicks, expiresAt } = request.body;
+		const { originalUrl, customCode, maxClicks, expiresAt, password } = request.body;
 
 		const link = await this.linkService.createShortLink(
 			originalUrl,
 			customCode,
 			maxClicks,
 			expiresAt ? new Date(expiresAt) : undefined,
+			password,
 		);
 
 		const host = request.headers.host || 'localhost:3000';
@@ -44,5 +45,20 @@ export class LinkController {
 
 		const stats = await this.linkService.getLinkStats(code);
 		return reply.status(200).send(stats);
+	};
+
+	verifyPassword = async (
+		request: FastifyRequest<{ Params: { code: string }; Body: { password?: string } }>,
+		reply: FastifyReply,
+	) => {
+		const { code } = request.params;
+		const { password } = request.body;
+
+		if (!password) {
+			return reply.status(400).send({ message: 'Password is required' });
+		}
+
+		const originalUrl = await this.linkService.verifyPassword(code, password);
+		return reply.status(200).send({ originalUrl });
 	};
 }

@@ -48,6 +48,7 @@ describe('GET /:code Redirect API', () => {
 
 		// Wait for the background tracking (Fire-and-forget in service)
 		// Since we use AnalyticsManager with queue, we need to manually flush for test
+		await new Promise((resolve) => setTimeout(resolve, 50));
 		await analyticsManager.flush();
 
 		// Assert Analytics logic

@@ -3,13 +3,20 @@ import { PrismaClient, Link } from '@prisma/client';
 export class LinkRepository {
 	constructor(private readonly prisma: PrismaClient) {}
 
-	async create(originalUrl: string, shortCode: string, maxClicks?: number, expiresAt?: Date): Promise<Link> {
+	async create(
+		originalUrl: string,
+		shortCode: string,
+		maxClicks?: number,
+		expiresAt?: Date,
+		passwordHash?: string,
+	): Promise<Link> {
 		return this.prisma.link.create({
 			data: {
 				originalUrl,
 				shortCode,
 				maxClicks,
 				expiresAt,
+				passwordHash,
 			},
 		});
 	}
