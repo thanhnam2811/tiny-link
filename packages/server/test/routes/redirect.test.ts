@@ -38,7 +38,7 @@ describe('GET /:code Redirect API', () => {
 			remoteAddress: '10.0.0.1', // The Proxy's IP
 			headers: {
 				'user-agent': 'vitest-test-agent',
-				'X-Forwarded-For': '192.168.1.100', // The real client IP
+				'X-Forwarded-For': '8.8.8.8', // The real client IP (Google DNS -> US)
 			},
 		});
 
@@ -56,8 +56,9 @@ describe('GET /:code Redirect API', () => {
 			where: { linkId: testLink.id },
 		});
 		expect(clicks.length).toBe(1);
-		expect(clicks[0].ipAddress).toBe('10.0.0.1'); // Matches the mock remoteAddress
+		expect(clicks[0].ipAddress).toBe('8.8.8.8'); // Handled by trustProxy
 		expect(clicks[0].userAgent).toBe('vitest-test-agent');
+		expect(clicks[0].country).toBe('US'); // Handled by geoip-lite in AnalyticsManager
 	});
 
 	it('should return 404 for a non-existent short code', async () => {

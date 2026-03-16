@@ -79,6 +79,10 @@ export const LinkStatsResponseSchema = Type.Object({
 	shortCode: Type.String(),
 	totalClicks: Type.Number(),
 	createdAt: Type.String({ format: 'date-time' }),
+	geo: Type.Object({
+		countries: Type.Record(Type.String(), Type.Number()),
+		cities: Type.Record(Type.String(), Type.Number()),
+	}),
 });
 
 export type LinkStatsResponseType = Static<typeof LinkStatsResponseSchema>;
