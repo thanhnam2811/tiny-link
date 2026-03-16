@@ -39,5 +39,5 @@ _Goal: Add "cool" features to stand out in your portfolio._
 
 - [x] **Self-destruct links**: Links that expire after N clicks or X time.
 - [x] **Password Protection**: Require a password to access specific links.
-- [ ] **Geo-analytics**: Parse IP addresses for Country/City data (using lightweight libs or free APIs).
-- [ ] **Simple Dashboard**: A minimal static HTML/JS page for link management and click charts (Chart.js).
+- [x] **Geo-analytics**: Parse IP addresses for Country/City data (using lightweight libs or free APIs).
+- [x] **Simple Dashboard**: A minimal static HTML/JS page for link management and click charts (Chart.js).

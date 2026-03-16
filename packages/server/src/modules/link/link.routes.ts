@@ -51,8 +51,9 @@ export const linkRoutes = (
 		);
 
 		// Redirect Route: Root level
+		// Regex constraint ensures it only matches alphanumeric codes (no dots, preventing static file conflicts like .css)
 		server.get(
-			'/:code',
+			'/:code(^[a-zA-Z0-9-]+$)',
 			{
 				schema: {
 					params: RedirectParamsSchema,
