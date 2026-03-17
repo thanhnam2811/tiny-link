@@ -1,6 +1,6 @@
 # 🗺 TinyLink Development Roadmap
 
-This project is divided into 4 phases, moving from core building blocks to production-level optimization.
+This project is divided into 7 phases, moving from core building blocks to production-level optimization and frontend expansion.
 
 ---
 
@@ -41,3 +41,42 @@ _Goal: Add "cool" features to stand out in your portfolio._
 - [x] **Password Protection**: Require a password to access specific links.
 - [x] **Geo-analytics**: Parse IP addresses for Country/City data (using lightweight libs or free APIs).
 - [x] **Simple Dashboard**: A minimal static HTML/JS page for link management and click charts (Chart.js).
+
+### 🟠 Phase 5: Code Refactoring & Optimization
+
+_Goal: Improve code quality, maintainability, and design patterns._
+
+- [ ] Remove magic strings and numbers across the codebase.
+- [ ] Optimize and standardize design patterns.
+- [ ] Improve general code structure and readability.
+- [ ] **API Documentation**: Integrate Swagger / OpenAPI for auto-generated, visually appealing API docs.
+
+### 🔴 Phase 6: Client Application (NextJS/ReactJS)
+
+_Goal: Build a modern, user-facing application for creating and managing short links._
+
+- [ ] **Project Setup**: Initialize a `client` package (NextJS or ReactJS + Vite) inside the monorepo workspace. Share `types` and validation schemas between backend and frontend.
+- [ ] **UI/UX Foundation**: Setup TailwindCSS (or similar) and a component library (e.g., shadcn/ui or Radix).
+- [ ] **Core Pages**:
+    - [ ] Landing Page (Hero section, value proposition).
+    - [ ] Main input form to paste long URLs and get short URLs.
+- [ ] **Features (Guest)**: Create basic short links without an account.
+- [ ] **Features (Authenticated - Optional later)**: Login/Register, view history of generated links.
+- [ ] **API Integration**: Connect to the Fastify backend for link creation and status checks.
+
+### ⚫ Phase 7: Admin Dashboard (NextJS/ReactJS)
+
+_Goal: Build a dedicated dashboard for system administration and detailed analytics._
+
+- [ ] **Project Setup**: Initialize an `admin` package (NextJS or static React) inside the monorepo workspace.
+- [ ] **Authentication**: Implement secure admin login (JWT/Session).
+- [ ] **Dashboard Overview**:
+    - [ ] Total links created, total clicks across the system.
+    - [ ] System health metrics (if available).
+- [ ] **Link Management**:
+    - [ ] Table view of all links with search, sort, and pagination.
+    - [ ] Ability to disable/delete malicious or reported links.
+- [ ] **Detailed Analytics**:
+    - [ ] Visual charts for click trends over time (using Chart.js or Recharts).
+    - [ ] Geographic distribution of clicks (re-using Geo-Analytics data from Phase 4).
+    - [ ] Operating system & browser statistics.
