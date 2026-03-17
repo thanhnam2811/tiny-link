@@ -9,7 +9,7 @@ import {
 	ValidationErrorResponseSchema,
 	VerifyPasswordBodySchema,
 	VerifyPasswordResponseSchema,
-} from './link.schema';
+} from '@tiny-link/shared';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
 import { LinkController } from './link.controller';

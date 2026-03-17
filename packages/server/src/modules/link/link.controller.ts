@@ -1,7 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { LinkService } from './link.service';
-import { CreateLinkBodyType } from './link.schema';
-import { HTTP_STATUS } from '@tiny-link/shared';
+import { HTTP_STATUS, CreateLinkBodyType } from '@tiny-link/shared';
 
 export class LinkController {
 	constructor(private readonly linkService: LinkService) {}

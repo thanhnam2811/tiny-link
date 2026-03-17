@@ -4,3 +4,4 @@ dist-tsc/
 build/
 coverage/
 pnpm-lock.yaml
+.next/

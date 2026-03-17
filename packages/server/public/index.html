@@ -1,178 +1,341 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TinyLink Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            brand: { 500: '#3B82F6', 600: '#2563EB' },
-            accent: { 500: '#8B5CF6' }
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-  <script src="/app.js" defer></script>
-  <style type="text/tailwindcss">
-    @layer components {
-      .btn-primary {
-        @apply w-full bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-600 hover:to-violet-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-brand-500/25 transition-all duration-300 transform active:scale-[0.98] flex justify-center items-center relative overflow-hidden;
-      }
-      .btn-primary:disabled {
-        @apply opacity-70 cursor-not-allowed transform-none;
-      }
-      .tab-btn {
-        @apply flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-colors duration-300 outline-none;
-      }
-      .tab-btn.active {
-        @apply text-brand-500 border-brand-500;
-      }
-      .input-base {
-        @apply w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all;
-      }
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-slate-950 text-slate-200 font-sans flex items-center justify-center p-4 relative overflow-x-hidden">
-  
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>TinyLink Dashboard</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: { sans: ['Inter', 'sans-serif'] },
+						colors: {
+							brand: { 500: '#3B82F6', 600: '#2563EB' },
+							accent: { 500: '#8B5CF6' },
+						},
+					},
+				},
+			};
+		</script>
+		<link rel="stylesheet" href="/style.css" />
+		<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+		<script src="/app.js" defer></script>
+		<style type="text/tailwindcss">
+			@layer components {
+				.btn-primary {
+					@apply w-full bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-600 hover:to-violet-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-brand-500/25 transition-all duration-300 transform active:scale-[0.98] flex justify-center items-center relative overflow-hidden;
+				}
+				.btn-primary:disabled {
+					@apply opacity-70 cursor-not-allowed transform-none;
+				}
+				.tab-btn {
+					@apply flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-colors duration-300 outline-none;
+				}
+				.tab-btn.active {
+					@apply text-brand-500 border-brand-500;
+				}
+				.input-base {
+					@apply w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all;
+				}
+			}
+		</style>
+	</head>
+	<body
+		class="min-h-screen bg-slate-950 text-slate-200 font-sans flex items-center justify-center p-4 relative overflow-x-hidden"
+	>
+		<div class="blob blob-1"></div>
+		<div class="blob blob-2"></div>
 
-  <div class="relative z-10 w-full max-w-3xl glass-panel rounded-[2rem] p-6 sm:p-10">
-    <header class="text-center mb-8">
-      <h1 class="text-4xl font-extrabold tracking-tight mb-2"><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-accent-500">Tiny</span>Link</h1>
-      <p class="text-slate-400 text-sm sm:text-base">Premium URL Shortener & Analytics</p>
-    </header>
+		<div class="relative z-10 w-full max-w-3xl glass-panel rounded-[2rem] p-6 sm:p-10">
+			<header class="text-center mb-8">
+				<h1 class="text-4xl font-extrabold tracking-tight mb-2">
+					<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-accent-500">Tiny</span
+					>Link
+				</h1>
+				<p class="text-slate-400 text-sm sm:text-base">Premium URL Shortener & Analytics</p>
+			</header>
 
-    <nav class="flex mb-8 border-b border-slate-800">
-      <button class="tab-btn active" data-tab="create">Create Link</button>
-      <button class="tab-btn" data-tab="analytics">Analytics</button>
-    </nav>
+			<nav class="flex mb-8 border-b border-slate-800">
+				<button class="tab-btn active" data-tab="create">Create Link</button>
+				<button class="tab-btn" data-tab="analytics">Analytics</button>
+			</nav>
 
-    <main>
-      <!-- Create Link Section -->
-      <section id="create" class="tab-content block">
-        <form id="create-form" class="space-y-6" autocomplete="off">
-          <div class="space-y-2">
-            <label for="originalUrl" class="block text-sm font-medium text-slate-300">Destination URL *</label>
-            <input type="url" id="originalUrl" class="input-base" placeholder="https://example.com/very-long-url" required autocomplete="off">
-          </div>
-          
-          <div class="space-y-2">
-            <label for="customCode" class="block text-sm font-medium text-slate-300">Custom Alias (Optional)</label>
-            <div class="flex rounded-xl overflow-hidden border border-slate-700/50 bg-slate-800/50 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition-all">
-              <span class="prefix bg-slate-800/80 px-4 py-3 text-slate-400 text-sm flex items-center border-r border-slate-700/50 font-mono"></span>
-              <input type="text" id="customCode" class="flex-1 bg-transparent px-4 py-3 text-slate-100 placeholder-slate-500 outline-none" placeholder="my-custom-event" autocomplete="off">
-            </div>
-          </div>
+			<main>
+				<!-- Create Link Section -->
+				<section id="create" class="tab-content block">
+					<form id="create-form" class="space-y-6" autocomplete="off">
+						<div class="space-y-2">
+							<label for="originalUrl" class="block text-sm font-medium text-slate-300"
+								>Destination URL *</label
+							>
+							<input
+								type="url"
+								id="originalUrl"
+								class="input-base"
+								placeholder="https://example.com/very-long-url"
+								required
+								autocomplete="off"
+							/>
+						</div>
 
-          <div class="cursor-pointer flex items-center text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors select-none group w-max" id="advanced-toggle">
-            <span class="mr-2 group-hover:text-brand-400 transition-colors">⚙️ Advanced Options</span>
-            <svg class="w-4 h-4 transform transition-transform duration-300" id="advanced-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </div>
+						<div class="space-y-2">
+							<label for="customCode" class="block text-sm font-medium text-slate-300"
+								>Custom Alias (Optional)</label
+							>
+							<div
+								class="flex rounded-xl overflow-hidden border border-slate-700/50 bg-slate-800/50 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition-all"
+							>
+								<span
+									class="prefix bg-slate-800/80 px-4 py-3 text-slate-400 text-sm flex items-center border-r border-slate-700/50 font-mono"
+								></span>
+								<input
+									type="text"
+									id="customCode"
+									class="flex-1 bg-transparent px-4 py-3 text-slate-100 placeholder-slate-500 outline-none"
+									placeholder="my-custom-event"
+									autocomplete="off"
+								/>
+							</div>
+						</div>
 
-          <div class="hidden space-y-6 pt-4 border-t border-slate-800/50" id="advanced-settings">
-            <div class="space-y-2">
-              <label for="password" class="block text-sm font-medium text-slate-300">Password Protection</label>
-              <input type="password" id="password" class="input-base" placeholder="Leave blank for public" autocomplete="new-password">
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label for="maxClicks" class="block text-sm font-medium text-slate-300">Max Expiration Clicks</label>
-                <input type="number" id="maxClicks" min="1" class="input-base" placeholder="e.g. 100" autocomplete="off">
-              </div>
-              <div class="space-y-2">
-                <label for="expiresAt" class="block text-sm font-medium text-slate-300">Expiration Date</label>
-                <input type="datetime-local" id="expiresAt" class="input-base text-slate-400" autocomplete="off">
-              </div>
-            </div>
-          </div>
+						<div
+							class="cursor-pointer flex items-center text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors select-none group w-max"
+							id="advanced-toggle"
+						>
+							<span class="mr-2 group-hover:text-brand-400 transition-colors">⚙️ Advanced Options</span>
+							<svg
+								class="w-4 h-4 transform transition-transform duration-300"
+								id="advanced-chevron"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 9l-7 7-7-7"
+								></path>
+							</svg>
+						</div>
 
-          <button type="submit" class="btn-primary mt-2" id="create-btn">
-            <span>Shorten Magic 🌟</span>
-            <svg class="spinner hidden animate-spin ml-2 h-5 w-5 text-white" id="create-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </button>
-        </form>
+						<div class="hidden space-y-6 pt-4 border-t border-slate-800/50" id="advanced-settings">
+							<div class="space-y-2">
+								<label for="password" class="block text-sm font-medium text-slate-300"
+									>Password Protection</label
+								>
+								<input
+									type="password"
+									id="password"
+									class="input-base"
+									placeholder="Leave blank for public"
+									autocomplete="new-password"
+								/>
+							</div>
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+								<div class="space-y-2">
+									<label for="maxClicks" class="block text-sm font-medium text-slate-300"
+										>Max Expiration Clicks</label
+									>
+									<input
+										type="number"
+										id="maxClicks"
+										min="1"
+										class="input-base"
+										placeholder="e.g. 100"
+										autocomplete="off"
+									/>
+								</div>
+								<div class="space-y-2">
+									<label for="expiresAt" class="block text-sm font-medium text-slate-300"
+										>Expiration Date</label
+									>
+									<input
+										type="datetime-local"
+										id="expiresAt"
+										class="input-base text-slate-400"
+										autocomplete="off"
+									/>
+								</div>
+							</div>
+						</div>
 
-        <div id="result-card" class="hidden mt-8 p-6 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-center animate-[fadeIn_0.5s_ease-out]">
-          <p class="text-brand-300 font-medium mb-4">Your TinyLink is ready!</p>
-          <div class="flex items-center justify-center gap-3 max-w-full">
-            <a href="#" id="result-link" target="_blank" class="truncate text-xl sm:text-2xl font-bold text-emerald-400 hover:text-emerald-300 transition-colors"></a>
-            <button id="copy-btn" class="shrink-0 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg font-medium text-sm transition-colors border border-slate-700">Copy</button>
-          </div>
-          <div id="result-password-msg" class="hidden mt-4 text-sm text-emerald-400 flex items-center justify-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            This link is password protected
-          </div>
-        </div>
-      </section>
+						<button type="submit" class="btn-primary mt-2" id="create-btn">
+							<span>Shorten Magic 🌟</span>
+							<svg
+								class="spinner hidden animate-spin ml-2 h-5 w-5 text-white"
+								id="create-spinner"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
+							</svg>
+						</button>
+					</form>
 
-      <!-- Analytics Section -->
-      <section id="analytics" class="tab-content hidden">
-        <div class="flex flex-col sm:flex-row gap-4 mb-10">
-          <div class="flex-1 flex rounded-xl overflow-hidden border border-slate-700/50 bg-slate-800/50 focus-within:ring-2 focus-within:ring-brand-500 transition-all">
-             <span class="prefix bg-slate-800/80 px-4 py-3 text-slate-400 text-sm flex items-center border-r border-slate-700/50 font-mono"></span>
-             <input type="text" id="stats-code" class="flex-1 bg-transparent px-4 py-3 text-slate-100 placeholder-slate-500 outline-none" placeholder="Enter short code...">
-          </div>
-          <button id="fetch-stats-btn" class="sm:w-auto w-full bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors border border-slate-700/50">View Stats</button>
-        </div>
+					<div
+						id="result-card"
+						class="hidden mt-8 p-6 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-center animate-[fadeIn_0.5s_ease-out]"
+					>
+						<p class="text-brand-300 font-medium mb-4">Your TinyLink is ready!</p>
+						<div class="flex items-center justify-center gap-3 max-w-full">
+							<a
+								href="#"
+								id="result-link"
+								target="_blank"
+								class="truncate text-xl sm:text-2xl font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
+							></a>
+							<button
+								id="copy-btn"
+								class="shrink-0 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg font-medium text-sm transition-colors border border-slate-700"
+							>
+								Copy
+							</button>
+						</div>
+						<div
+							id="result-password-msg"
+							class="hidden mt-4 text-sm text-emerald-400 flex items-center justify-center gap-1"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+								></path>
+							</svg>
+							This link is password protected
+						</div>
+					</div>
+				</section>
 
-        <div id="stats-loading" class="hidden flex justify-center py-12">
-          <svg class="animate-spin h-10 w-10 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
+				<!-- Analytics Section -->
+				<section id="analytics" class="tab-content hidden">
+					<div class="flex flex-col sm:flex-row gap-4 mb-10">
+						<div
+							class="flex-1 flex rounded-xl overflow-hidden border border-slate-700/50 bg-slate-800/50 focus-within:ring-2 focus-within:ring-brand-500 transition-all"
+						>
+							<span
+								class="prefix bg-slate-800/80 px-4 py-3 text-slate-400 text-sm flex items-center border-r border-slate-700/50 font-mono"
+							></span>
+							<input
+								type="text"
+								id="stats-code"
+								class="flex-1 bg-transparent px-4 py-3 text-slate-100 placeholder-slate-500 outline-none"
+								placeholder="Enter short code..."
+							/>
+						</div>
+						<button
+							id="fetch-stats-btn"
+							class="sm:w-auto w-full bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors border border-slate-700/50"
+						>
+							View Stats
+						</button>
+					</div>
 
-        <div id="stats-dashboard" class="hidden animate-[fadeIn_0.5s_ease-out]">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/30 rounded-2xl p-6 border border-slate-700/50 mb-8">
-            <div class="mb-4 sm:mb-0 max-w-full overflow-hidden">
-               <h2 id="stats-title" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-accent-400 mb-1"></h2>
-               <a href="#" id="stats-original" target="_blank" class="text-slate-400 hover:text-slate-300 text-sm truncate block max-w-xs sm:max-w-md"></a>
-            </div>
-            <div class="text-left sm:text-right">
-              <span class="block text-sm text-slate-400 mb-1 uppercase tracking-wider font-semibold">Total Clicks</span>
-              <span class="text-4xl font-black text-white drop-shadow-lg" id="stats-clicks">0</span>
-            </div>
-          </div>
+					<div id="stats-loading" class="hidden flex justify-center py-12">
+						<svg
+							class="animate-spin h-10 w-10 text-brand-500"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
+						</svg>
+					</div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-slate-800/40 rounded-2xl p-6 border border-slate-700/50">
-              <h3 class="text-lg font-semibold text-slate-200 mb-6 flex items-center gap-2">🌍 Traffic by Country</h3>
-              <div class="relative h-64 flex justify-center">
-                <canvas id="countryChart"></canvas>
-              </div>
-            </div>
-            <div class="bg-slate-800/40 rounded-2xl p-6 border border-slate-700/50">
-              <h3 class="text-lg font-semibold text-slate-200 mb-6 flex items-center gap-2">🏙️ Traffic by City</h3>
-              <div class="relative h-64">
-                <canvas id="cityChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-  
-  <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"></div>
-  
-  <style>
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
-</body>
+					<div id="stats-dashboard" class="hidden animate-[fadeIn_0.5s_ease-out]">
+						<div
+							class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/30 rounded-2xl p-6 border border-slate-700/50 mb-8"
+						>
+							<div class="mb-4 sm:mb-0 max-w-full overflow-hidden">
+								<h2
+									id="stats-title"
+									class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-accent-400 mb-1"
+								></h2>
+								<a
+									href="#"
+									id="stats-original"
+									target="_blank"
+									class="text-slate-400 hover:text-slate-300 text-sm truncate block max-w-xs sm:max-w-md"
+								></a>
+							</div>
+							<div class="text-left sm:text-right">
+								<span class="block text-sm text-slate-400 mb-1 uppercase tracking-wider font-semibold"
+									>Total Clicks</span
+								>
+								<span class="text-4xl font-black text-white drop-shadow-lg" id="stats-clicks">0</span>
+							</div>
+						</div>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div class="bg-slate-800/40 rounded-2xl p-6 border border-slate-700/50">
+								<h3 class="text-lg font-semibold text-slate-200 mb-6 flex items-center gap-2">
+									🌍 Traffic by Country
+								</h3>
+								<div class="relative h-64 flex justify-center">
+									<canvas id="countryChart"></canvas>
+								</div>
+							</div>
+							<div class="bg-slate-800/40 rounded-2xl p-6 border border-slate-700/50">
+								<h3 class="text-lg font-semibold text-slate-200 mb-6 flex items-center gap-2">
+									🏙️ Traffic by City
+								</h3>
+								<div class="relative h-64">
+									<canvas id="cityChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>
+		</div>
+
+		<div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"></div>
+
+		<style>
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+		</style>
+	</body>
 </html>

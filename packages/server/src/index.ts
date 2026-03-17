@@ -7,6 +7,7 @@ import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import fastifyCors from '@fastify/cors';
 import { linkRoutes } from './modules/link/link.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
@@ -28,6 +29,12 @@ export const buildServer = async () => {
 
 	server.setErrorHandler(globalErrorHandler);
 	server.setNotFoundHandler(notFoundHandler);
+
+	// Register CORS (Allow Next.js client to call the API)
+	await server.register(fastifyCors, {
+		origin: process.env.CORS_ORIGIN || true, // Allow all origins by default or specify via ENV
+		credentials: true,
+	});
 
 	// Register Redis plugin
 	await server.register(fastifyRedis, {

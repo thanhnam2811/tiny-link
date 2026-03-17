@@ -4,3 +4,4 @@ export const sharedConfig = {
 };
 
 export * from './constants';
+export * from './schemas';

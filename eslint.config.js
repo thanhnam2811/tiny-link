@@ -11,6 +11,7 @@ export default tseslint.config(
 			'**/node_modules/**',
 			'**/coverage/**',
 			'**/.pnpm-store/**',
+			'**/.next/**',
 			'eslint.config.js',
 			'**/public/**',
 		],

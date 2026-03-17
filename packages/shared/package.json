@@ -4,7 +4,11 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"lint": "eslint ."
 	},
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+		"@sinclair/typebox": "^0.34.48"
+	}
 }
