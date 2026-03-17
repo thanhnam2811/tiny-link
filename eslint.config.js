@@ -6,7 +6,14 @@ export default tseslint.config(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
 	{
-		ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**', '**/.pnpm-store/**', 'eslint.config.js'],
+		ignores: [
+			'**/dist/**',
+			'**/node_modules/**',
+			'**/coverage/**',
+			'**/.pnpm-store/**',
+			'eslint.config.js',
+			'**/public/**',
+		],
 	},
 	{
 		languageOptions: {

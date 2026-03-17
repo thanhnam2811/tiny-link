@@ -1,6 +1,7 @@
 import fastify from 'fastify';
+import path from 'path';
+import fastifyStatic from '@fastify/static';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { sharedConfig } from '@tiny-link/shared';
 import { PrismaClient } from '@prisma/client';
 import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
@@ -39,11 +40,17 @@ export const buildServer = async () => {
 		redis: server.redis,
 	});
 
+	// Register Static Server
+	await server.register(fastifyStatic, {
+		root: path.join(process.cwd(), 'public'),
+	});
+
 	// Health check – exempt from rate limit so Render LB never gets blocked
 	server.get('/healthz', { config: { rateLimit: { skip: () => true } } }, async () => ({ status: 'ok' }));
 
-	server.get('/', async (_request, _reply) => {
-		return { hello: `Welcome to ${sharedConfig.appName} API!` };
+	// Explicitly serve index.html at the root to prevent the `/:code` regex from intercepting empty paths
+	server.get('/', async (_request, reply) => {
+		return reply.sendFile('index.html');
 	});
 
 	server.register(linkRoutes(prisma, analyticsManager, server.redis));
