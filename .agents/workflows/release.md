@@ -11,7 +11,7 @@ This workflow executes a safe monorepo version bump and creates a Git Tag. The f
 Set the new version explicitly for all sub-packages without triggering NPM's workspace locking errors.
 
 ```bash
-node -e "const fs = require('fs'); const version = '1.3.0'; /* UPDATE THIS TO TARGET VERSION */ ['packages/client/package.json', 'packages/server/package.json', 'packages/shared/package.json'].forEach(p => { const file = fs.readFileSync(p, 'utf8'); const updated = file.replace(/(\"version\":\s*\")[^\"]+(\")/, '\$1' + version + '\$2'); fs.writeFileSync(p, updated); })"
+node scripts/bump-version.mjs 1.3.0 # UPDATE THIS TO TARGET VERSION
 ```
 
 ## 2. Stage Changes
