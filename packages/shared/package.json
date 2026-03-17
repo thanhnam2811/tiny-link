@@ -4,7 +4,6 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"prebuild": "node -e \"const fs = require('fs'); const pkg = require(process.cwd() + '/package.json'); fs.writeFileSync(process.cwd() + '/src/version.ts', 'export const APP_VERSION = \\'' + pkg.version + '\\';\\n');\"",
 		"build": "tsc",
 		"lint": "eslint ."
 	},
