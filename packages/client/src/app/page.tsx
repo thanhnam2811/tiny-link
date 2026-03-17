@@ -18,6 +18,7 @@ import {
 	Eye,
 	EyeOff,
 	LinkIcon,
+	Loader2,
 	Minus,
 	Plus,
 	PlusCircle,
@@ -66,6 +67,7 @@ export default function Home() {
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
 	const [host, setHost] = useState('');
+	const [serverStatus, setServerStatus] = useState<'warming' | 'ready' | 'error'>('warming');
 
 	const { handleSubmit, control, watch, reset, setFocus } = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -88,6 +90,63 @@ export default function Home() {
 			setHost(window.location.host);
 		}
 	}, []);
+
+	// Server Warmup Polling Logic
+	useEffect(() => {
+		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+		const healthUrl = `${apiUrl.replace(/\/api\/?$/, '')}/healthz`;
+		let attempts = 0;
+		const maxAttempts = 30; // 30 attempts * 2s = 60s max
+		const abortController = new AbortController();
+
+		const pingServer = async () => {
+			try {
+				const response = await fetch(healthUrl, {
+					signal: abortController.signal,
+					// Ensure we're not getting a cached response
+					headers: { 'Cache-Control': 'no-cache' },
+				});
+				if (response.ok) {
+					setServerStatus('ready');
+					return true;
+				}
+			} catch (err) {
+				// Avoid throwing on AbortError, it's expected on cleanup
+				if (err instanceof Error && err.name === 'AbortError') return false;
+			}
+			return false;
+		};
+
+		const poll = setInterval(async () => {
+			if (serverStatus === 'ready' || serverStatus === 'error') {
+				clearInterval(poll);
+				return;
+			}
+
+			attempts++;
+			if (attempts >= maxAttempts) {
+				setServerStatus('error');
+				clearInterval(poll);
+				return;
+			}
+
+			const isReady = await pingServer();
+			if (isReady) {
+				clearInterval(poll);
+			}
+		}, 2000);
+
+		// Initial ping
+		pingServer().then((isReady) => {
+			if (isReady) clearInterval(poll);
+		});
+
+		// Cleanup function to clear interval and abort pending fetch
+		return () => {
+			clearInterval(poll);
+			abortController.abort();
+		};
+	}, [serverStatus]);
 
 	const onSubmit = async (values: FormValues) => {
 		setLoading(true);
@@ -148,10 +207,48 @@ export default function Home() {
 				</p>
 			</div>
 
-			<Card className="w-full max-w-2xl border-border bg-card shadow-sm rounded-2xl overflow-hidden">
+			<Card className="w-full max-w-2xl border-border bg-card shadow-sm rounded-2xl overflow-hidden relative">
 				<CardContent className="p-6 sm:p-8">
+					{serverStatus !== 'ready' && !shortUrl && (
+						<div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-2xl animate-in fade-in duration-300">
+							<div className="bg-background border border-border/50 shadow-lg rounded-xl p-6 flex flex-col items-center gap-3 max-w-[280px] text-center">
+								{serverStatus === 'warming' ? (
+									<>
+										<Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+										<p className="text-sm font-medium text-foreground">Waking up server...</p>
+										<p className="text-xs text-muted-foreground leading-relaxed">
+											This might take a few seconds as the free-tier backend spins up.
+										</p>
+									</>
+								) : (
+									<>
+										<div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-1">
+											<Minus className="w-5 h-5" />
+										</div>
+										<p className="text-sm font-medium text-foreground">Server Unavailable</p>
+										<p className="text-xs text-muted-foreground leading-relaxed">
+											Server is undergoing maintenance. Please try again later.
+										</p>
+										<Button
+											variant="outline"
+											size="sm"
+											className="mt-2 w-full h-8 text-xs"
+											onClick={() => {
+												setServerStatus('warming');
+											}}
+										>
+											Retry
+										</Button>
+									</>
+								)}
+							</div>
+						</div>
+					)}
 					{!shortUrl ? (
-						<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+						<form
+							onSubmit={handleSubmit(onSubmit)}
+							className={`flex flex-col gap-6 transition-opacity duration-300 ${serverStatus !== 'ready' ? 'opacity-40 pointer-events-none select-none' : ''}`}
+						>
 							<Controller
 								name="url"
 								control={control}

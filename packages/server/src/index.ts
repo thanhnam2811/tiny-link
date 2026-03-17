@@ -32,7 +32,21 @@ export const buildServer = async () => {
 
 	// Register CORS (Allow Next.js client to call the API)
 	await server.register(fastifyCors, {
-		origin: process.env.CORS_ORIGIN || true, // Allow all origins by default or specify via ENV
+		origin: (origin, cb) => {
+			// During testing, allow all origins
+			if (process.env.NODE_ENV === ENV_NAMES.TEST) {
+				cb(null, true);
+				return;
+			}
+			const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+			// Allow if no origin (e.g. server-to-server), or if it matches client_url exactly,
+			// or if it matches a vercel preview URL pattern.
+			if (!origin || origin === clientUrl || /\.vercel\.app$/.test(origin)) {
+				cb(null, true);
+				return;
+			}
+			cb(new Error('Not allowed by CORS'), false);
+		},
 		credentials: true,
 	});
 
@@ -58,9 +72,10 @@ export const buildServer = async () => {
 	// Health check – exempt from rate limit so Render LB never gets blocked
 	server.get('/healthz', { config: { rateLimit: { skip: () => true } } }, async () => ({ status: 'ok' }));
 
-	// explicit serve index.html logic
+	// redirect root to client url
 	server.get('/', async (_request, reply) => {
-		return reply.sendFile('index.html');
+		const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+		return reply.code(301).redirect(clientUrl);
 	});
 
 	// Register Swagger Plugins
