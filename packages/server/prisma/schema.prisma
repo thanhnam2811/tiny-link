@@ -17,6 +17,7 @@ model Link {
   redirectType Int       @default(302) // 301 or 302
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
+  maxClicks    Int?
   isActive     Boolean   @default(true)
   clicksCount  Int       @default(0)
   clicks       Click[]

@@ -6,9 +6,14 @@ export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
 
 	createLink = async (request: FastifyRequest<{ Body: CreateLinkBodyType }>, reply: FastifyReply) => {
-		const { originalUrl, customCode } = request.body;
+		const { originalUrl, customCode, maxClicks, expiresAt } = request.body;
 
-		const link = await this.linkService.createShortLink(originalUrl, customCode);
+		const link = await this.linkService.createShortLink(
+			originalUrl,
+			customCode,
+			maxClicks,
+			expiresAt ? new Date(expiresAt) : undefined,
+		);
 
 		const host = request.headers.host || 'localhost:3000';
 		const protocol = request.protocol || 'http';
@@ -20,6 +25,8 @@ export class LinkController {
 			shortCode: link.shortCode,
 			shortUrl,
 			createdAt: link.createdAt.toISOString(),
+			maxClicks: link.maxClicks ?? undefined,
+			expiresAt: link.expiresAt?.toISOString() ?? undefined,
 		});
 	};
 

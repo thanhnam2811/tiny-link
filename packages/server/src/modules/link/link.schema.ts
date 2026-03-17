@@ -14,6 +14,18 @@ export const CreateLinkBodySchema = Type.Object({
 			description: 'Optional custom alias (e.g. "my-event")',
 		}),
 	),
+	maxClicks: Type.Optional(
+		Type.Number({
+			minimum: 1,
+			description: 'Maximum number of times this link can be clicked before it self-destructs',
+		}),
+	),
+	expiresAt: Type.Optional(
+		Type.String({
+			format: 'date-time',
+			description: 'ISO 8601 date string when this link self-destructs',
+		}),
+	),
 });
 
 export type CreateLinkBodyType = Static<typeof CreateLinkBodySchema>;
@@ -24,6 +36,8 @@ export const LinkResponseSchema = Type.Object({
 	shortCode: Type.String(),
 	shortUrl: Type.String(),
 	createdAt: Type.String({ format: 'date-time' }),
+	maxClicks: Type.Optional(Type.Number()),
+	expiresAt: Type.Optional(Type.String({ format: 'date-time' })),
 });
 
 export type LinkResponseType = Static<typeof LinkResponseSchema>;

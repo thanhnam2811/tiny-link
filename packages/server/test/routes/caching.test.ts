@@ -63,8 +63,8 @@ describe('Rate Limiting & Caching', () => {
 			expect(res1.statusCode).toBe(404);
 
 			// Verify the sentinel is in Redis
-			const cached = await redis.get(`link:${code}`);
-			expect(cached).toBe('__NOT_FOUND__');
+			const cached = await redis.hgetall(`link:${code}`);
+			expect(cached.status).toBe('__NOT_FOUND__');
 
 			// Second request: should be served from cache (no DB hit needed)
 			const res2 = await app.inject({ method: 'GET', url: `/${code}` });
@@ -87,10 +87,10 @@ describe('Rate Limiting & Caching', () => {
 			expect(res1.headers.location).toBe('https://cached.example.com');
 
 			// Verify the entry is now in Redis
-			const cached = await redis.get(`link:${link.shortCode}`);
-			expect(cached).not.toBeNull();
-			expect(cached).not.toBe('__NOT_FOUND__');
-			expect(cached).toContain('https://cached.example.com');
+			const cached = await redis.hgetall(`link:${link.shortCode}`);
+			expect(cached).toBeDefined();
+			expect(cached.status).toBeUndefined(); // Should not have a NOT_FOUND or GONE status
+			expect(cached.originalUrl).toBe('https://cached.example.com');
 
 			// Second request: should be served from cache
 			const res2 = await app.inject({ method: 'GET', url: `/${link.shortCode}` });
