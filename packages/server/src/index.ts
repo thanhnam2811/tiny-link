@@ -13,6 +13,7 @@ export const buildServer = async () => {
 	const analyticsManager = new AnalyticsManager(prisma);
 
 	const server = fastify({
+		trustProxy: true,
 		logger:
 			process.env.NODE_ENV === 'test'
 				? false

@@ -42,4 +42,23 @@ export class LinkRepository {
 			where: { shortCode },
 		});
 	}
+
+	async getGeoStats(linkId: string) {
+		const [countryStats, cityStats] = await Promise.all([
+			this.prisma.click.groupBy({
+				by: ['country'],
+				_count: { _all: true },
+				where: { linkId, country: { not: null } },
+				orderBy: { _count: { country: 'desc' } },
+			}),
+			this.prisma.click.groupBy({
+				by: ['city'],
+				_count: { _all: true },
+				where: { linkId, city: { not: null } },
+				orderBy: { _count: { city: 'desc' } },
+			}),
+		]);
+
+		return { countryStats, cityStats };
+	}
 }

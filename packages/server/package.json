@@ -23,6 +23,7 @@
 		"argon2": "^0.44.0",
 		"dotenv": "^17.3.1",
 		"fastify": "^5.8.2",
+		"geoip-lite": "^2.0.0",
 		"ioredis": "^5.10.0",
 		"nanoid": "^5.1.6",
 		"pino": "^10.3.1",
@@ -31,6 +32,7 @@
 	},
 	"devDependencies": {
 		"@types/argon2": "^0.15.4",
+		"@types/geoip-lite": "^1.4.4",
 		"dotenv-cli": "^11.0.0",
 		"vitest": "^4.1.0"
 	}

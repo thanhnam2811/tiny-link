@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import geoip from 'geoip-lite';
 
 export interface ClickEvent {
 	linkId: string;
@@ -79,11 +80,26 @@ export class AnalyticsManager {
 		await this.prisma.$transaction(async (tx) => {
 			// 3. Batch Insert raw click data
 			await tx.click.createMany({
-				data: events.map((e) => ({
-					linkId: e.linkId,
-					ipAddress: e.ipAddress,
-					userAgent: e.userAgent,
-				})),
+				data: events.map((e) => {
+					let country = 'Unknown';
+					let city = 'Unknown';
+
+					if (e.ipAddress) {
+						const geo = geoip.lookup(e.ipAddress);
+						if (geo) {
+							country = geo.country || 'Unknown';
+							city = geo.city || 'Unknown';
+						}
+					}
+
+					return {
+						linkId: e.linkId,
+						ipAddress: e.ipAddress,
+						userAgent: e.userAgent,
+						country,
+						city,
+					};
+				}),
 			});
 
 			// 4. Update Link counters (Aggregation results)

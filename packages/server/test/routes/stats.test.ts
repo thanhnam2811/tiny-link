@@ -41,9 +41,9 @@ describe('GET /api/stats/:code Stats API', () => {
 		// 2. Direct Seeding: Insert 3 clicks via Prisma
 		await prisma.click.createMany({
 			data: [
-				{ linkId: link.id, userAgent: 'test-1', ipAddress: '1.1.1.1' },
-				{ linkId: link.id, userAgent: 'test-2', ipAddress: '2.2.2.2' },
-				{ linkId: link.id, userAgent: 'test-3', ipAddress: '3.3.3.3' },
+				{ linkId: link.id, userAgent: 'test-1', ipAddress: '1.1.1.1', country: 'US', city: 'Los Angeles' },
+				{ linkId: link.id, userAgent: 'test-2', ipAddress: '2.2.2.2', country: 'US', city: 'New York' },
+				{ linkId: link.id, userAgent: 'test-3', ipAddress: '3.3.3.3', country: 'VN', city: 'Ho Chi Minh City' },
 			],
 		});
 
@@ -66,5 +66,12 @@ describe('GET /api/stats/:code Stats API', () => {
 		expect(body.totalClicks).toBe(3);
 		expect(body.originalUrl).toBe('https://example.com/stats');
 		expect(body.createdAt).toBeTypeOf('string');
+
+		// Assert Geo Stats
+		expect(body.geo.countries['US']).toBe(2);
+		expect(body.geo.countries['VN']).toBe(1);
+		expect(body.geo.cities['Los Angeles']).toBe(1);
+		expect(body.geo.cities['New York']).toBe(1);
+		expect(body.geo.cities['Ho Chi Minh City']).toBe(1);
 	});
 });

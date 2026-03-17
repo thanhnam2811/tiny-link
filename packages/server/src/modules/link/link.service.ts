@@ -225,11 +225,34 @@ export class LinkService {
 			throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found');
 		}
 
+		const geoStatsRaw = await this.linkRepository.getGeoStats(linkData.id);
+
+		// Format into a clean dictionary
+		const countries = geoStatsRaw.countryStats.reduce(
+			(acc, curr) => {
+				if (curr.country) acc[curr.country] = curr._count._all;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		const cities = geoStatsRaw.cityStats.reduce(
+			(acc, curr) => {
+				if (curr.city) acc[curr.city] = curr._count._all;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
 		return {
 			originalUrl: linkData.originalUrl,
 			shortCode: linkData.shortCode,
 			totalClicks: linkData.clicksCount,
 			createdAt: linkData.createdAt,
+			geo: {
+				countries,
+				cities,
+			},
 		};
 	}
 
