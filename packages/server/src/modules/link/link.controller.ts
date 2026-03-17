@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { LinkService } from './link.service';
 import { CreateLinkBodyType } from './link.schema';
+import { HTTP_STATUS } from '@tiny-link/shared';
 
 export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
@@ -20,7 +21,7 @@ export class LinkController {
 		const protocol = request.protocol || 'http';
 		const shortUrl = `${protocol}://${host}/${link.shortCode}`;
 
-		return reply.status(201).send({
+		return reply.status(HTTP_STATUS.CREATED).send({
 			id: link.id,
 			originalUrl: link.originalUrl,
 			shortCode: link.shortCode,
@@ -44,7 +45,7 @@ export class LinkController {
 		const { code } = request.params;
 
 		const stats = await this.linkService.getLinkStats(code);
-		return reply.status(200).send(stats);
+		return reply.status(HTTP_STATUS.OK).send(stats);
 	};
 
 	verifyPassword = async (
@@ -55,10 +56,10 @@ export class LinkController {
 		const { password } = request.body;
 
 		if (!password) {
-			return reply.status(400).send({ message: 'Password is required' });
+			return reply.status(HTTP_STATUS.BAD_REQUEST).send({ message: 'Password is required' });
 		}
 
 		const originalUrl = await this.linkService.verifyPassword(code, password);
-		return reply.status(200).send({ originalUrl });
+		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
 	};
 }

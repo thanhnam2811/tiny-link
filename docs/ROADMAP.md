@@ -46,10 +46,10 @@ _Goal: Add "cool" features to stand out in your portfolio._
 
 _Goal: Improve code quality, maintainability, and design patterns._
 
-- [ ] Remove magic strings and numbers across the codebase.
-- [ ] Optimize and standardize design patterns.
-- [ ] Improve general code structure and readability.
-- [ ] **API Documentation**: Integrate Swagger / OpenAPI for auto-generated, visually appealing API docs.
+- [x] Remove magic strings and numbers across the codebase.
+- [x] Optimize and standardize design patterns.
+- [x] Improve general code structure and readability.
+- [x] **API Documentation**: Integrate Swagger / OpenAPI for auto-generated, visually appealing API docs.
 
 ### 🔴 Phase 6: Client Application (NextJS/ReactJS)
 

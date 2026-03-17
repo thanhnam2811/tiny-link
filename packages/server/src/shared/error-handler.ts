@@ -1,14 +1,15 @@
 import http from 'node:http';
 import { FastifyError, FastifyReply, FastifyRequest, FastifySchemaValidationError } from 'fastify';
 import { AppError } from './app-error';
+import { HTTP_STATUS, ERROR_MESSAGES } from '@tiny-link/shared';
 
 export const globalErrorHandler = (error: FastifyError | Error, request: FastifyRequest, reply: FastifyReply) => {
 	// 429 — Rate limit (headers already set on reply by @fastify/rate-limit)
-	if ('statusCode' in error && error.statusCode === 429) {
-		return reply.status(429).send({
-			statusCode: 429,
+	if ('statusCode' in error && error.statusCode === HTTP_STATUS.TOO_MANY_REQUESTS) {
+		return reply.status(HTTP_STATUS.TOO_MANY_REQUESTS).send({
+			statusCode: HTTP_STATUS.TOO_MANY_REQUESTS,
 			error: 'Too Many Requests',
-			code: 'RATE_LIMIT_EXCEEDED',
+			code: ERROR_MESSAGES.RATE_LIMIT_EXCEEDED,
 			message: error.message,
 		});
 	}
@@ -23,10 +24,10 @@ export const globalErrorHandler = (error: FastifyError | Error, request: Fastify
 			message: v.message ?? 'Invalid value',
 		}));
 
-		return reply.status(400).send({
-			statusCode: 400,
+		return reply.status(HTTP_STATUS.BAD_REQUEST).send({
+			statusCode: HTTP_STATUS.BAD_REQUEST,
 			error: 'Bad Request',
-			code: 'VALIDATION_ERROR',
+			code: ERROR_MESSAGES.VALIDATION_ERROR,
 			message: 'Validation failed',
 			details,
 		});
@@ -44,19 +45,19 @@ export const globalErrorHandler = (error: FastifyError | Error, request: Fastify
 
 	// Unknown / unexpected error — log full details, mask from client
 	request.log.error(error);
-	return reply.status(500).send({
-		statusCode: 500,
+	return reply.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({
+		statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
 		error: 'Internal Server Error',
-		code: 'INTERNAL_ERROR',
+		code: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
 		message: 'An unexpected error occurred',
 	});
 };
 
 export const notFoundHandler = (_request: FastifyRequest, reply: FastifyReply) => {
-	return reply.status(404).send({
-		statusCode: 404,
+	return reply.status(HTTP_STATUS.NOT_FOUND).send({
+		statusCode: HTTP_STATUS.NOT_FOUND,
 		error: 'Not Found',
-		code: 'NOT_FOUND',
+		code: ERROR_MESSAGES.ROUTE_NOT_FOUND,
 		message: 'Route not found',
 	});
 };

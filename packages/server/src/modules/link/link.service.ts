@@ -4,13 +4,12 @@ import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
 import { AppError } from '../../shared/app-error';
 import * as argon2 from 'argon2';
+import { SYSTEM_CONFIG, HTTP_STATUS, ERROR_MESSAGES } from '@tiny-link/shared';
 
 // Sentinel values used to distinguish edge cases from "cache miss"
 // This protects against Cache Penetration attacks
 const NOT_FOUND_SENTINEL = '__NOT_FOUND__';
 const GONE_SENTINEL = '__GONE_SENTINEL__';
-const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24 hours for valid links
-const NOT_FOUND_TTL_SECONDS = 60 * 3; // 3 minutes for invalid codes (negative caching)
 
 export class LinkService {
 	// Promise Coalescing (Singleflight): prevents Cache Stampede
@@ -31,7 +30,7 @@ export class LinkService {
 		password?: string,
 	) {
 		let shortCode = customCode;
-		const maxRetries = 3;
+		const maxRetries = SYSTEM_CONFIG.SHORT_LINK_MAX_RETRIES;
 
 		let passwordHash: string | undefined = undefined;
 		if (password) {
@@ -40,7 +39,7 @@ export class LinkService {
 
 		for (let attempt = 1; attempt <= maxRetries; attempt++) {
 			if (!shortCode) {
-				shortCode = nanoid(7);
+				shortCode = nanoid(SYSTEM_CONFIG.SHORT_LINK_LENGTH);
 			}
 
 			try {
@@ -58,8 +57,8 @@ export class LinkService {
 					if (customCode) {
 						// If custom code is taken, throw immediately
 						throw new AppError(
-							409,
-							'LINK_CODE_CONFLICT',
+							HTTP_STATUS.CONFLICT,
+							ERROR_MESSAGES.LINK_CODE_CONFLICT,
 							`The custom code '${customCode}' is already in use.`,
 						);
 					} else {
@@ -89,25 +88,33 @@ export class LinkService {
 		if (cachedLink && Object.keys(cachedLink).length > 0) {
 			// Cache Penetration guard: hit but it's a "not found" or "gone" sentinel
 			if (cachedLink.status === NOT_FOUND_SENTINEL) {
-				throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found or inactive');
+				throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found or inactive');
 			}
 			if (cachedLink.status === GONE_SENTINEL) {
-				throw new AppError(410, 'LINK_GONE', 'Link has self-destructed');
+				throw new AppError(HTTP_STATUS.GONE, ERROR_MESSAGES.LINK_GONE, 'Link has self-destructed');
 			}
 
 			// Valid Link Check
 			if (cachedLink.originalUrl) {
 				// Password Requirement Check
 				if (cachedLink.isProtected === 'true') {
-					throw new AppError(401, 'LINK_UNAUTHORIZED', 'This link is password protected.');
+					throw new AppError(
+						HTTP_STATUS.UNAUTHORIZED,
+						ERROR_MESSAGES.LINK_UNAUTHORIZED,
+						'This link is password protected.',
+					);
 				}
 				// Enforce expiration
 				if (cachedLink.expiresAt) {
 					const expiresAt = new Date(cachedLink.expiresAt);
 					if (expiresAt < new Date()) {
 						await this.redis.hset(cacheKey, 'status', GONE_SENTINEL);
-						await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-						throw new AppError(410, 'LINK_GONE', 'Link has self-destructed due to expiration');
+						await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+						throw new AppError(
+							HTTP_STATUS.GONE,
+							ERROR_MESSAGES.LINK_GONE,
+							'Link has self-destructed due to expiration',
+						);
 					}
 				}
 
@@ -118,8 +125,12 @@ export class LinkService {
 
 					if (currentClicks > maxClicks) {
 						await this.redis.hset(cacheKey, 'status', GONE_SENTINEL);
-						await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-						throw new AppError(410, 'LINK_GONE', 'Link has self-destructed due to reaching max clicks');
+						await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+						throw new AppError(
+							HTTP_STATUS.GONE,
+							ERROR_MESSAGES.LINK_GONE,
+							'Link has self-destructed due to reaching max clicks',
+						);
 					}
 				}
 
@@ -142,21 +153,32 @@ export class LinkService {
 		const dbQuery = this.linkRepository.findByShortCode(code).then(async (link) => {
 			if (!link || !link.isActive) {
 				await this.redis.hset(cacheKey, 'status', NOT_FOUND_SENTINEL);
-				await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-				return;
+				await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+				throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found or inactive');
 			}
 
 			// Calculate early self-destruction to prevent saving invalid stuff
 			if (link.expiresAt && link.expiresAt < new Date()) {
 				await this.redis.hset(cacheKey, 'status', GONE_SENTINEL);
-				await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-				return;
+				await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+				throw new AppError(
+					HTTP_STATUS.GONE,
+					ERROR_MESSAGES.LINK_GONE,
+					'Link has self-destructed due to expiration',
+				);
 			}
 
+			// If link is already maxed out
 			if (link.maxClicks && link.clicksCount >= link.maxClicks) {
 				await this.redis.hset(cacheKey, 'status', GONE_SENTINEL);
-				await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-				return;
+				await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+				// MUST THROW HERE!
+				// The previous code had a bug where it just returned undefined, resulting in NO response!
+				throw new AppError(
+					HTTP_STATUS.GONE,
+					ERROR_MESSAGES.LINK_GONE,
+					'Link has self-destructed due to reaching max clicks',
+				);
 			}
 
 			// Block Redirect if password protected (Cache MISS initial load)
@@ -173,10 +195,14 @@ export class LinkService {
 						currentClicks: link.clicksCount.toString(),
 					}),
 				});
-				await this.redis.expire(cacheKey, CACHE_TTL_SECONDS);
+				await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_CACHE_TTL_SECONDS);
 
 				// Throw immediately so this specific request doesn't leak the URL
-				throw new AppError(401, 'LINK_UNAUTHORIZED', 'This link is password protected.');
+				throw new AppError(
+					HTTP_STATUS.UNAUTHORIZED,
+					ERROR_MESSAGES.LINK_UNAUTHORIZED,
+					'This link is password protected.',
+				);
 			}
 
 			// Store metadata in Redis Hash
@@ -200,7 +226,7 @@ export class LinkService {
 
 			// We only reach here if the link is NOT password protected
 			await this.redis.hset(cacheKey, hashData);
-			await this.redis.expire(cacheKey, CACHE_TTL_SECONDS);
+			await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_CACHE_TTL_SECONDS);
 		});
 
 		this.inflightRequests.set(code, dbQuery);
@@ -222,7 +248,7 @@ export class LinkService {
 		const linkData = await this.linkRepository.getStats(code);
 
 		if (!linkData) {
-			throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found');
+			throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found');
 		}
 
 		const geoStatsRaw = await this.linkRepository.getGeoStats(linkData.id);
@@ -259,7 +285,7 @@ export class LinkService {
 	async verifyPassword(code: string, password: string): Promise<string> {
 		const link = await this.linkRepository.findByShortCode(code);
 		if (!link || !link.isActive) {
-			throw new AppError(404, 'LINK_NOT_FOUND', 'Link not found');
+			throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found');
 		}
 
 		if (!link.passwordHash) {
@@ -269,7 +295,7 @@ export class LinkService {
 
 		const isMatch = await argon2.verify(link.passwordHash, password);
 		if (!isMatch) {
-			throw new AppError(401, 'LINK_UNAUTHORIZED', 'Incorrect password');
+			throw new AppError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.LINK_UNAUTHORIZED, 'Incorrect password');
 		}
 
 		// Proceed to run the standard original URL fetch & track which handles HINCRBY maxClicks, etc.
@@ -290,13 +316,21 @@ export class LinkService {
 
 			if (currentClicks > maxClicks) {
 				await this.redis.hset(cacheKey, 'status', GONE_SENTINEL);
-				await this.redis.expire(cacheKey, NOT_FOUND_TTL_SECONDS);
-				throw new AppError(410, 'LINK_GONE', 'Link has self-destructed due to reaching max clicks');
+				await this.redis.expire(cacheKey, SYSTEM_CONFIG.REDIS_NOT_FOUND_TTL_SECONDS);
+				throw new AppError(
+					HTTP_STATUS.GONE,
+					ERROR_MESSAGES.LINK_GONE,
+					'Link has self-destructed due to reaching max clicks',
+				);
 			}
 		}
 
 		if (link.expiresAt && link.expiresAt < new Date()) {
-			throw new AppError(410, 'LINK_GONE', 'Link has self-destructed due to expiration');
+			throw new AppError(
+				HTTP_STATUS.GONE,
+				ERROR_MESSAGES.LINK_GONE,
+				'Link has self-destructed due to expiration',
+			);
 		}
 
 		return link.originalUrl;

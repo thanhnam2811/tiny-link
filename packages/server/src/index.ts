@@ -5,9 +5,12 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { PrismaClient } from '@prisma/client';
 import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 import { linkRoutes } from './modules/link/link.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
+import { SYSTEM_CONFIG, ENV_NAMES } from '@tiny-link/shared';
 
 export const buildServer = async () => {
 	const prisma = new PrismaClient();
@@ -16,9 +19,9 @@ export const buildServer = async () => {
 	const server = fastify({
 		trustProxy: true,
 		logger:
-			process.env.NODE_ENV === 'test'
+			process.env.NODE_ENV === ENV_NAMES.TEST
 				? false
-				: process.env.NODE_ENV === 'development'
+				: process.env.NODE_ENV === ENV_NAMES.DEVELOPMENT
 					? { transport: { target: 'pino-pretty' } }
 					: true,
 	}).withTypeProvider<TypeBoxTypeProvider>();
@@ -35,8 +38,8 @@ export const buildServer = async () => {
 	// Register Rate Limit plugin (uses Redis store for distributed limiting)
 	await server.register(fastifyRateLimit, {
 		global: true,
-		max: 100,
-		timeWindow: '1 minute',
+		max: SYSTEM_CONFIG.RATE_LIMIT_GLOBAL,
+		timeWindow: SYSTEM_CONFIG.RATE_LIMIT_WINDOW,
 		redis: server.redis,
 	});
 
@@ -48,9 +51,37 @@ export const buildServer = async () => {
 	// Health check – exempt from rate limit so Render LB never gets blocked
 	server.get('/healthz', { config: { rateLimit: { skip: () => true } } }, async () => ({ status: 'ok' }));
 
-	// Explicitly serve index.html at the root to prevent the `/:code` regex from intercepting empty paths
+	// explicit serve index.html logic
 	server.get('/', async (_request, reply) => {
 		return reply.sendFile('index.html');
+	});
+
+	// Register Swagger Plugins
+	await server.register(fastifySwagger, {
+		openapi: {
+			info: {
+				title: 'TinyLink API',
+				description: 'API documentation for TinyLink backend operations',
+				version: '1.0.0',
+			},
+			components: {
+				securitySchemes: {
+					bearerAuth: {
+						type: 'http',
+						scheme: 'bearer',
+						bearerFormat: 'JWT',
+					},
+				},
+			},
+		},
+	});
+
+	await server.register(fastifySwaggerUi, {
+		routePrefix: '/api/docs',
+		uiConfig: {
+			docExpansion: 'list',
+			deepLinking: false,
+		},
 	});
 
 	server.register(linkRoutes(prisma, analyticsManager, server.redis));
@@ -103,6 +134,6 @@ const start = async () => {
 };
 
 // Only start the server if not in a test environment
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== ENV_NAMES.TEST) {
 	start();
 }

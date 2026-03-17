@@ -15,6 +15,7 @@ describe('GET /:code Redirect API', () => {
 		app = server;
 		analyticsManager = manager;
 		await app.ready();
+		await app.redis.flushall();
 	});
 
 	afterAll(async () => {
@@ -94,6 +95,25 @@ describe('GET /:code Redirect API', () => {
 		expect(response3.json().message).toBe('Link has self-destructed due to reaching max clicks');
 	});
 
+	it('should allow exactly 1 redirect when maxClicks is 1', async () => {
+		// Mock a link in DB with maxClicks = 1
+		const testLink = await prisma.link.create({
+			data: {
+				originalUrl: 'https://strict-limit-1.dev',
+				shortCode: 'limited-link-1',
+				maxClicks: 1,
+			},
+		});
+
+		// 1st request -> Success
+		const response1 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		expect(response1.statusCode).toBe(302);
+
+		// 2nd request -> Should be 410 Gone
+		const response2 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		expect(response2.statusCode).toBe(410);
+	});
+
 	it('should return 410 Gone when a link expires based on expiresAt', async () => {
 		// Mock an expired link in DB
 		const pastDate = new Date();
@@ -110,7 +130,7 @@ describe('GET /:code Redirect API', () => {
 		// 1st request -> Should be 410 Gone immediately
 		const response1 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
 		expect(response1.statusCode).toBe(410);
-		expect(response1.json().message).toBe('Link has self-destructed');
+		expect(response1.json().message).toBe('Link has self-destructed due to expiration');
 
 		// 2nd request -> Should still be 410 Gone (Negative Caching test)
 		const response2 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });

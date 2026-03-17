@@ -15,6 +15,7 @@ import { LinkService } from './link.service';
 import { LinkController } from './link.controller';
 import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
+import { SYSTEM_CONFIG, HTTP_STATUS } from '@tiny-link/shared';
 
 // This is where we wire up our dependencies (IoC)
 export const linkRoutes = (
@@ -34,16 +35,20 @@ export const linkRoutes = (
 			{
 				config: {
 					rateLimit: {
-						max: 10,
-						timeWindow: '1 minute',
+						max: SYSTEM_CONFIG.RATE_LIMIT_CREATE_LINK,
+						timeWindow: SYSTEM_CONFIG.RATE_LIMIT_WINDOW,
 					},
 				},
 				schema: {
+					tags: ['Links'],
+					summary: 'Create a Short Link',
+					description:
+						'Creates a new short link, optionally with custom code, password, and expiration settings.',
 					body: CreateLinkBodySchema,
 					response: {
-						201: LinkResponseSchema,
-						400: ValidationErrorResponseSchema,
-						409: ErrorResponseSchema,
+						[HTTP_STATUS.CREATED]: LinkResponseSchema,
+						[HTTP_STATUS.BAD_REQUEST]: ValidationErrorResponseSchema,
+						[HTTP_STATUS.CONFLICT]: ErrorResponseSchema,
 					},
 				},
 			},
@@ -56,6 +61,9 @@ export const linkRoutes = (
 			'/:code(^[a-zA-Z0-9-]+$)',
 			{
 				schema: {
+					tags: ['Redirects'],
+					summary: 'Redirect to Original URL',
+					description: 'Redirects the user to the original URL and tracks the click anonymously.',
 					params: RedirectParamsSchema,
 				},
 			},
@@ -68,18 +76,22 @@ export const linkRoutes = (
 			{
 				config: {
 					rateLimit: {
-						max: 5,
-						timeWindow: '1 minute',
+						max: SYSTEM_CONFIG.RATE_LIMIT_VERIFY_PASSWORD,
+						timeWindow: SYSTEM_CONFIG.RATE_LIMIT_WINDOW,
 					},
 				},
 				schema: {
+					tags: ['Links'],
+					summary: 'Verify Password',
+					description:
+						'Verifies the password for a protected link and returns the original URL upon success.',
 					params: RedirectParamsSchema,
 					body: VerifyPasswordBodySchema,
 					response: {
-						200: VerifyPasswordResponseSchema,
-						401: ErrorResponseSchema,
-						404: ErrorResponseSchema,
-						410: ErrorResponseSchema,
+						[HTTP_STATUS.OK]: VerifyPasswordResponseSchema,
+						[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+						[HTTP_STATUS.GONE]: ErrorResponseSchema,
 					},
 				},
 			},
@@ -91,9 +103,13 @@ export const linkRoutes = (
 			'/api/stats/:code',
 			{
 				schema: {
+					tags: ['Analytics'],
+					summary: 'Get Link Analytics',
+					description:
+						'Retrieves aggregated click analytics and geographic distribution for a specific link.',
 					params: RedirectParamsSchema,
 					response: {
-						200: LinkStatsResponseSchema,
+						[HTTP_STATUS.OK]: LinkStatsResponseSchema,
 					},
 				},
 			},

@@ -11,6 +11,7 @@ describe('Password Protected Links API', () => {
 		const { server } = await buildServer();
 		app = server;
 		await app.ready();
+		await app.redis.flushall();
 	});
 
 	afterAll(async () => {
@@ -26,6 +27,7 @@ describe('Password Protected Links API', () => {
 				originalUrl: 'https://secret.dev',
 				password: 'my-super-secret-password',
 			},
+			remoteAddress: '127.0.0.2',
 		});
 
 		expect(response.statusCode).toBe(201);
@@ -43,6 +45,7 @@ describe('Password Protected Links API', () => {
 			method: 'POST',
 			url: '/api/links',
 			payload: { originalUrl: 'https://secret2.dev', password: 'test' },
+			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
 
@@ -63,6 +66,7 @@ describe('Password Protected Links API', () => {
 			method: 'POST',
 			url: '/api/links',
 			payload: { originalUrl: 'https://verify-me.dev', password: 'correct-horse-battery-staple' },
+			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
 
@@ -91,6 +95,7 @@ describe('Password Protected Links API', () => {
 			method: 'POST',
 			url: '/api/links',
 			payload: { originalUrl: 'https://brute.dev', password: 'brute' },
+			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
 

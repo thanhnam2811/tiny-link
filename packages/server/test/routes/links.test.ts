@@ -25,6 +25,7 @@ describe('POST /api/links', () => {
 			payload: {
 				originalUrl: 'https://github.com/fastify',
 			},
+			remoteAddress: '127.0.0.3',
 		});
 
 		expect(response.statusCode).toBe(201);
@@ -50,6 +51,7 @@ describe('POST /api/links', () => {
 			payload: {
 				originalUrl: 'not-a-url',
 			},
+			remoteAddress: '127.0.0.3',
 		});
 
 		expect(response.statusCode).toBe(400);
@@ -64,6 +66,7 @@ describe('POST /api/links', () => {
 				originalUrl: 'https://example.com/event',
 				customCode,
 			},
+			remoteAddress: '127.0.0.3',
 		});
 
 		expect(response.statusCode).toBe(201);
@@ -82,6 +85,7 @@ describe('POST /api/links', () => {
 				originalUrl: 'https://example.com/one',
 				customCode,
 			},
+			remoteAddress: '127.0.0.3',
 		});
 
 		// 2. Attempt to create another link with the exact same custom code
@@ -92,6 +96,7 @@ describe('POST /api/links', () => {
 				originalUrl: 'https://example.com/two',
 				customCode,
 			},
+			remoteAddress: '127.0.0.3',
 		});
 
 		expect(response2.statusCode).toBe(409);
