@@ -64,7 +64,22 @@ _Goal: Build a modern, user-facing application for creating and managing short l
 - [ ] **Features (Authenticated - Optional later)**: Login/Register, view history of generated links.
 - [x] **API Integration**: Connect to the Fastify backend for link creation and status checks.
 
-### ⚫ Phase 7: Admin Dashboard (NextJS/ReactJS)
+### ⚫ Phase 7: Hybrid Rendering & Traffic Routing
+
+_Goal: Intelligently route traffic between static metadata for bots and an interactive Next.js application for real users to maximize social previews and monetization._
+
+- [ ] **Next.js Edge Middleware**: Implement middleware to intercept short link requests, analyzing the `User-Agent` header natively at the Edge.
+- [ ] **Bot Traffic Flow (Social Previews)**:
+    - [ ] Identify crawler signatures (Facebook, Zalo, Discord, Twitter, Googlebot, etc).
+    - [ ] Execute accelerated server-to-server metadata fetches directly against Fastify without starting a React lifecycle.
+    - [ ] Return a barebones, JS-free HTML response injecting purely OpenGraph (`<meta property="og:...">`) tag content.
+- [ ] **Human Traffic Flow (Interactive & Monetization)**:
+    - [ ] Allow React/Next.js to render the full Application client.
+    - [ ] Implement an Interstitial Ads screen accompanied by a forced countdown timer (e.g., 5 seconds) before redirection.
+    - [ ] Incorporate interactive Challenge Forms strictly on the client (e.g., password challenges, robot captchas).
+    - [ ] Dispatch background analytics telemetry (Timezone, Device Resolution, User Interaction) silently before final redirection logic activates (`window.location.href`).
+
+### ⚪ Phase 8: Admin Dashboard (NextJS/ReactJS)
 
 _Goal: Build a dedicated dashboard for system administration and detailed analytics._
 
