@@ -20,11 +20,13 @@
 		"prepare": "husky"
 	},
 	"lint-staged": {
-		"*.{js,ts}": [
-			"eslint --fix",
-			"prettier --write"
+		"packages/server/**/*.{js,ts}": [
+			"pnpm --filter @tiny-link/server exec eslint --fix"
 		],
-		"*.{json,md}": [
+		"packages/client/**/*.{js,jsx,ts,tsx}": [
+			"pnpm --filter @tiny-link/client exec eslint --fix"
+		],
+		"*.{js,jsx,ts,tsx,json,md}": [
 			"prettier --write"
 		]
 	},
