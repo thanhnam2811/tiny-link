@@ -41,7 +41,7 @@ describe('Rate Limiting & Caching', () => {
 
 			// At least one of the 11 requests should be rate-limited with 429
 			expect(statusCodes).toContain(429);
-		});
+		}, 15000); // Increased timeout to account for DB latency on 11 concurrent requests
 	});
 
 	// ─── Negative Caching Tests ──────────────────────────────────────────────

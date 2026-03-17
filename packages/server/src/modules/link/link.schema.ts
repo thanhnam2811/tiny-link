@@ -26,6 +26,13 @@ export const CreateLinkBodySchema = Type.Object({
 			description: 'ISO 8601 date string when this link self-destructs',
 		}),
 	),
+	password: Type.Optional(
+		Type.String({
+			minLength: 4,
+			maxLength: 100,
+			description: 'Optional password to protect this link',
+		}),
+	),
 });
 
 export type CreateLinkBodyType = Static<typeof CreateLinkBodySchema>;
@@ -51,6 +58,21 @@ export const RedirectParamsSchema = Type.Object({
 });
 
 export type RedirectParamsType = Static<typeof RedirectParamsSchema>;
+
+export const VerifyPasswordBodySchema = Type.Object({
+	password: Type.String({
+		minLength: 1,
+		description: 'The password to unlock the link',
+	}),
+});
+
+export type VerifyPasswordBodyType = Static<typeof VerifyPasswordBodySchema>;
+
+export const VerifyPasswordResponseSchema = Type.Object({
+	originalUrl: Type.String(),
+});
+
+export type VerifyPasswordResponseType = Static<typeof VerifyPasswordResponseSchema>;
 
 export const LinkStatsResponseSchema = Type.Object({
 	originalUrl: Type.String(),

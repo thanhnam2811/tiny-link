@@ -7,6 +7,8 @@ import {
 	LinkStatsResponseSchema,
 	ErrorResponseSchema,
 	ValidationErrorResponseSchema,
+	VerifyPasswordBodySchema,
+	VerifyPasswordResponseSchema,
 } from './link.schema';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
@@ -57,6 +59,30 @@ export const linkRoutes = (
 				},
 			},
 			controller.redirect,
+		);
+
+		// Verify Password Route (Strict Rate Limit: 5 per minute)
+		server.post(
+			'/api/links/:code/verify',
+			{
+				config: {
+					rateLimit: {
+						max: 5,
+						timeWindow: '1 minute',
+					},
+				},
+				schema: {
+					params: RedirectParamsSchema,
+					body: VerifyPasswordBodySchema,
+					response: {
+						200: VerifyPasswordResponseSchema,
+						401: ErrorResponseSchema,
+						404: ErrorResponseSchema,
+						410: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.verifyPassword,
 		);
 
 		// Stats API Route
