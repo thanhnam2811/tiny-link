@@ -55,14 +55,14 @@ _Goal: Improve code quality, maintainability, and design patterns._
 
 _Goal: Build a modern, user-facing application for creating and managing short links._
 
-- [ ] **Project Setup**: Initialize a `client` package (NextJS or ReactJS + Vite) inside the monorepo workspace. Share `types` and validation schemas between backend and frontend.
-- [ ] **UI/UX Foundation**: Setup TailwindCSS (or similar) and a component library (e.g., shadcn/ui or Radix).
-- [ ] **Core Pages**:
-    - [ ] Landing Page (Hero section, value proposition).
-    - [ ] Main input form to paste long URLs and get short URLs.
-- [ ] **Features (Guest)**: Create basic short links without an account.
+- [x] **Project Setup**: Initialize a `client` package (NextJS or ReactJS + Vite) inside the monorepo workspace. Share `types` and validation schemas between backend and frontend.
+- [x] **UI/UX Foundation**: Setup TailwindCSS (or similar) and a component library (e.g., shadcn/ui or Radix).
+- [x] **Core Pages**:
+    - [x] Landing Page (Hero section, value proposition).
+    - [x] Main input form to paste long URLs and get short URLs.
+- [x] **Features (Guest)**: Create basic short links without an account.
 - [ ] **Features (Authenticated - Optional later)**: Login/Register, view history of generated links.
-- [ ] **API Integration**: Connect to the Fastify backend for link creation and status checks.
+- [x] **API Integration**: Connect to the Fastify backend for link creation and status checks.
 
 ### ⚫ Phase 7: Admin Dashboard (NextJS/ReactJS)
 

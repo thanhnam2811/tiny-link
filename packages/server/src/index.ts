@@ -11,7 +11,7 @@ import fastifyCors from '@fastify/cors';
 import { linkRoutes } from './modules/link/link.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
-import { SYSTEM_CONFIG, ENV_NAMES } from '@tiny-link/shared';
+import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION } from '@tiny-link/shared';
 
 export const buildServer = async () => {
 	const prisma = new PrismaClient();
@@ -69,7 +69,7 @@ export const buildServer = async () => {
 			info: {
 				title: 'TinyLink API',
 				description: 'API documentation for TinyLink backend operations',
-				version: '1.0.0',
+				version: APP_VERSION,
 			},
 			components: {
 				securitySchemes: {

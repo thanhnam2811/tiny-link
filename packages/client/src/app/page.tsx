@@ -3,8 +3,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { api, ApiError } from '@/lib/api';
-import { ERROR_MESSAGES, CreateLinkBodyType } from '@tiny-link/shared';
+import { ERROR_MESSAGES, CreateLinkBodyType, APP_VERSION } from '@tiny-link/shared';
 import { ArrowRight, Copy, LinkIcon } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
@@ -13,6 +14,9 @@ import { toast } from 'sonner';
 export default function Home() {
 	const [url, setUrl] = useState('');
 	const [customCode, setCustomCode] = useState('');
+	const [password, setPassword] = useState('');
+	const [expiresAt, setExpiresAt] = useState('');
+	const [maxClicks, setMaxClicks] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [shortUrl, setShortUrl] = useState<string | null>(null);
 
@@ -25,6 +29,14 @@ export default function Home() {
 
 		const payload: CreateLinkBodyType = { originalUrl: url };
 		if (customCode.trim()) payload.customCode = customCode.trim();
+		if (password.trim()) payload.password = password.trim();
+		if (maxClicks) {
+			const clicks = parseInt(maxClicks, 10);
+			if (!isNaN(clicks) && clicks > 0) payload.maxClicks = clicks;
+		}
+		if (expiresAt) {
+			payload.expiresAt = new Date(expiresAt).toISOString();
+		}
 
 		try {
 			const response = await api.links.create(payload);
@@ -65,7 +77,7 @@ export default function Home() {
 			<div className="z-10 w-full max-w-2xl flex flex-col items-center gap-8 text-center mb-12">
 				<div className="inline-flex items-center rounded-full border border-border bg-background/50 backdrop-blur-sm px-3 py-1 text-sm font-medium text-muted-foreground">
 					<span className="flex h-2 w-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
-					TinyLink v1.1.0 is Live
+					TinyLink v{APP_VERSION} is Live
 				</div>
 				<h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
 					Shorten. Manage. <br className="hidden sm:block" />
@@ -107,6 +119,57 @@ export default function Home() {
 										autoComplete="off"
 									/>
 								</div>
+							</div>
+
+							<div className="px-1 border border-border/50 rounded-lg bg-muted/20">
+								<Accordion className="w-full">
+									<AccordionItem value="advanced" className="border-b-0">
+										<AccordionTrigger className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:no-underline">
+											<span className="flex items-center gap-2">Advanced Options</span>
+										</AccordionTrigger>
+										<AccordionContent className="px-3 pb-4 flex flex-col gap-4">
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+												<div className="space-y-2">
+													<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														Password Protection
+													</label>
+													<Input
+														type="password"
+														placeholder="Secure with password..."
+														value={password}
+														onChange={(e) => setPassword(e.target.value)}
+														className="h-10 border-border bg-background"
+														autoComplete="new-password"
+													/>
+												</div>
+												<div className="space-y-2">
+													<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														Max Clicks Limit
+													</label>
+													<Input
+														type="number"
+														min="1"
+														placeholder="e.g. 100"
+														value={maxClicks}
+														onChange={(e) => setMaxClicks(e.target.value)}
+														className="h-10 border-border bg-background"
+													/>
+												</div>
+												<div className="space-y-2 sm:col-span-2">
+													<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														Expiration Date & Time
+													</label>
+													<Input
+														type="datetime-local"
+														value={expiresAt}
+														onChange={(e) => setExpiresAt(e.target.value)}
+														className="h-10 border-border max-w-sm block bg-background"
+													/>
+												</div>
+											</div>
+										</AccordionContent>
+									</AccordionItem>
+								</Accordion>
 							</div>
 							<Button
 								type="submit"
@@ -162,6 +225,9 @@ export default function Home() {
 									setShortUrl(null);
 									setUrl('');
 									setCustomCode('');
+									setPassword('');
+									setMaxClicks('');
+									setExpiresAt('');
 								}}
 							>
 								Create Another Link
