@@ -6,12 +6,20 @@ description: Release Workflow Process
 
 This workflow executes a safe monorepo version bump and creates a Git Tag. The final GitHub release **MUST** adhere to the Title and Content structure defined in `docs/RELEASE_TEMPLATE.md`.
 
-## 1. Bump Workspace Packages Silently
+## 1. Automated Testing (Mandatory Gate)
+
+Ensure that all monorepo test suites pass fully before executing a release bypass. If tests fail, abort the workflow immediately.
+
+```bash
+pnpm test
+```
+
+## 2. Bump Workspace Packages Silently
 
 Set the new version explicitly for all sub-packages without triggering NPM's workspace locking errors.
 
 ```bash
-node scripts/bump-version.mjs 1.3.0 # UPDATE THIS TO TARGET VERSION
+node scripts/bump-version.mjs 1.4.0 # UPDATE THIS TO TARGET VERSION
 ```
 
 ## 2. Stage Changes
@@ -34,40 +42,21 @@ npm version <patch|minor|major> --force -m "chore(release): v%s"
 git push --follow-tags
 ```
 
-## 5. Write GitHub Release Notes (Follow Template Strict Requirement)
+## 5. Auto-Draft GitHub Release
 
-When publishing the drafted release on GitHub, you **MUST** format it based on `docs/RELEASE_TEMPLATE.md`.
-No extra styling or missing sections are allowed.
+Use the GitHub CLI (`gh`) to automatically create a drafted release including the markdown template contents so the user only has to review and publish it on GitHub.
 
-**Title**: MUST strictly be the semantic version number (e.g., `v1.3.0`)
+First, write the structured release notes to a temporary file (e.g., `/tmp/release_notes.md`), then execute the `gh release create` command.
 
-**Content**: MUST replicate this structure:
-
-```markdown
-### 🚀 What's New
-
-A brief 1-2 sentence summary covering the main theme of this release. What phase or major milestone does this wrap up?
-
-### ✨ Features
-
-- **[Feature Component Name]**: Description of the new feature or capability added. _(e.g., **OpenAPI & Swagger UI**: Fully integrated @fastify/swagger.)_
-- **[Another Feature]**: What value does this bring to the user?
-
-### 🐛 Bug Fixes & Edge Cases Squashed
-
-- **[Component Name]**: Description of the defect and how it was fixed. _(e.g., **maxClicks Edge Case**: Fixed a critical bug where links configured with maxClicks=1 would fail to redirect.)_
-- **[Another Fix]**: What was the impact of the bug?
-
-### 🛠 Refactoring & Chores
-
-- **[Improvement Area]**: Details about internal code quality improvements or technical debt reduction. _(e.g., **Zero Magic Strings**: Centralized all environment variables...)_
-- **[Dependencies]**: Note any major dependency bumps if relevant.
-
-### 🧪 Validation & Stability Highlights
-
-- Briefly mention test coverage, build success metrics, or structural integrity proofs to instill confidence in the release. _(e.g., 100% strict TypeScript compilation across the monorepo workspace. 19/19 Unit Tests passing flawlessly.)_
-
----
-
-**Full Changelog**: https://github.com/thanhnam2811/tiny-link/commits/vX.X.X
+```bash
+gh release create <tag> --draft --title "<tag>" --notes-file /tmp/release_notes.md
 ```
+
+Note: Make sure the generated `release_notes.md` strictly adheres to the `docs/RELEASE_TEMPLATE.md` structure:
+
+- `### 🚀 What's New`
+- `### ✨ Features`
+- `### 🐛 Bug Fixes & Edge Cases Squashed`
+- `### 🛠 Refactoring & Chores`
+- `### 🧪 Validation & Stability Highlights`
+- `---` followed by `**Full Changelog**: https://github.com/thanhnam2811/tiny-link/commits/vX.X.X`

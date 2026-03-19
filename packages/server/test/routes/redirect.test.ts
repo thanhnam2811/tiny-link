@@ -4,7 +4,7 @@ import { buildServer } from '../../src/index';
 import { PrismaClient } from '@prisma/client';
 import { AnalyticsManager } from '../../src/modules/analytics/analytics_manager';
 
-describe('GET /:code Redirect API', () => {
+describe('POST /api/links/:code/track API', () => {
 	let app: FastifyInstance;
 	const prisma = new PrismaClient();
 
@@ -34,8 +34,8 @@ describe('GET /:code Redirect API', () => {
 
 		// Execute redirect
 		const response = await app.inject({
-			method: 'GET',
-			url: `/${testLink.shortCode}`,
+			method: 'POST',
+			url: `/api/links/${testLink.shortCode}/track`,
 			remoteAddress: '10.0.0.1', // The Proxy's IP
 			headers: {
 				'user-agent': 'vitest-test-agent',
@@ -44,8 +44,8 @@ describe('GET /:code Redirect API', () => {
 		});
 
 		// Assert Redirect logic
-		expect(response.statusCode).toBe(302);
-		expect(response.headers.location).toBe('https://vitest.dev');
+		expect(response.statusCode).toBe(200);
+		expect(response.json().originalUrl).toBe('https://vitest.dev');
 
 		// Wait for the background tracking (Fire-and-forget in service)
 		// Since we use AnalyticsManager with queue, we need to manually flush for test
@@ -64,8 +64,8 @@ describe('GET /:code Redirect API', () => {
 
 	it('should return 404 for a non-existent short code', async () => {
 		const response = await app.inject({
-			method: 'GET',
-			url: '/not-found-code',
+			method: 'POST',
+			url: '/api/links/not-found-code/track',
 		});
 
 		expect(response.statusCode).toBe(404);
@@ -82,15 +82,15 @@ describe('GET /:code Redirect API', () => {
 		});
 
 		// 1st request -> Success
-		const response1 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
-		expect(response1.statusCode).toBe(302);
+		const response1 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
+		expect(response1.statusCode).toBe(200);
 
 		// 2nd request -> Success
-		const response2 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
-		expect(response2.statusCode).toBe(302);
+		const response2 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
+		expect(response2.statusCode).toBe(200);
 
 		// 3rd request -> Should be 410 Gone
-		const response3 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		const response3 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
 		expect(response3.statusCode).toBe(410);
 		expect(response3.json().message).toBe('Link has self-destructed due to reaching max clicks');
 	});
@@ -106,11 +106,11 @@ describe('GET /:code Redirect API', () => {
 		});
 
 		// 1st request -> Success
-		const response1 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
-		expect(response1.statusCode).toBe(302);
+		const response1 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
+		expect(response1.statusCode).toBe(200);
 
 		// 2nd request -> Should be 410 Gone
-		const response2 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		const response2 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
 		expect(response2.statusCode).toBe(410);
 	});
 
@@ -128,12 +128,12 @@ describe('GET /:code Redirect API', () => {
 		});
 
 		// 1st request -> Should be 410 Gone immediately
-		const response1 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		const response1 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
 		expect(response1.statusCode).toBe(410);
 		expect(response1.json().message).toBe('Link has self-destructed due to expiration');
 
 		// 2nd request -> Should still be 410 Gone (Negative Caching test)
-		const response2 = await app.inject({ method: 'GET', url: `/${testLink.shortCode}` });
+		const response2 = await app.inject({ method: 'POST', url: `/api/links/${testLink.shortCode}/track` });
 		expect(response2.statusCode).toBe(410);
 		expect(response2.json().message).toBe('Link has self-destructed');
 	});

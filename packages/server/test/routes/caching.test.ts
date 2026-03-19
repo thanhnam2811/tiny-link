@@ -46,11 +46,11 @@ describe('Rate Limiting & Caching', () => {
 
 	// ─── Negative Caching Tests ──────────────────────────────────────────────
 
-	describe('GET /:code - Negative Caching (Cache Penetration protection)', () => {
+	describe('POST /api/links/:code/track - Negative Caching (Cache Penetration protection)', () => {
 		it('should return 404 for a non-existent code', async () => {
 			const response = await app.inject({
-				method: 'GET',
-				url: '/definitely-does-not-exist',
+				method: 'POST',
+				url: '/api/links/definitely-does-not-exist/track',
 			});
 			expect(response.statusCode).toBe(404);
 		});
@@ -59,7 +59,7 @@ describe('Rate Limiting & Caching', () => {
 			const code = 'ghost-code-test';
 
 			// First request: cache miss, DB returns 404, sentinel cached
-			const res1 = await app.inject({ method: 'GET', url: `/${code}` });
+			const res1 = await app.inject({ method: 'POST', url: `/api/links/${code}/track` });
 			expect(res1.statusCode).toBe(404);
 
 			// Verify the sentinel is in Redis
@@ -67,14 +67,14 @@ describe('Rate Limiting & Caching', () => {
 			expect(cached.status).toBe('__NOT_FOUND__');
 
 			// Second request: should be served from cache (no DB hit needed)
-			const res2 = await app.inject({ method: 'GET', url: `/${code}` });
+			const res2 = await app.inject({ method: 'POST', url: `/api/links/${code}/track` });
 			expect(res2.statusCode).toBe(404);
 		});
 	});
 
 	// ─── Cache Hit Tests ─────────────────────────────────────────────────────
 
-	describe('GET /:code - Cache Hit', () => {
+	describe('POST /api/links/:code/track - Cache Hit', () => {
 		it('should cache a valid link and return it on subsequent requests', async () => {
 			// Seed a link in DB
 			const link = await prisma.link.create({
@@ -82,9 +82,9 @@ describe('Rate Limiting & Caching', () => {
 			});
 
 			// First request: cache miss, fetches from DB, caches it
-			const res1 = await app.inject({ method: 'GET', url: `/${link.shortCode}` });
-			expect(res1.statusCode).toBe(302);
-			expect(res1.headers.location).toBe('https://cached.example.com');
+			const res1 = await app.inject({ method: 'POST', url: `/api/links/${link.shortCode}/track` });
+			expect(res1.statusCode).toBe(200);
+			expect(res1.json().originalUrl).toBe('https://cached.example.com');
 
 			// Verify the entry is now in Redis
 			const cached = await redis.hgetall(`link:${link.shortCode}`);
@@ -93,9 +93,9 @@ describe('Rate Limiting & Caching', () => {
 			expect(cached.originalUrl).toBe('https://cached.example.com');
 
 			// Second request: should be served from cache
-			const res2 = await app.inject({ method: 'GET', url: `/${link.shortCode}` });
-			expect(res2.statusCode).toBe(302);
-			expect(res2.headers.location).toBe('https://cached.example.com');
+			const res2 = await app.inject({ method: 'POST', url: `/api/links/${link.shortCode}/track` });
+			expect(res2.statusCode).toBe(200);
+			expect(res2.json().originalUrl).toBe('https://cached.example.com');
 		});
 	});
 });

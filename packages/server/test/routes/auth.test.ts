@@ -51,8 +51,8 @@ describe('Password Protected Links API', () => {
 
 		// 2. Attempt redirect
 		const response = await app.inject({
-			method: 'GET',
-			url: `/${shortCode}`,
+			method: 'POST',
+			url: `/api/links/${shortCode}/track`,
 		});
 
 		// 3. Expect 401 Unauthorized
