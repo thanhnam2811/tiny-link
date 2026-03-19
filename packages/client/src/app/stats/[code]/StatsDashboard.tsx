@@ -61,11 +61,11 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 
 	// Auto-fetch ONLY if not locked. If locked, await user submittal.
 	useEffect(() => {
-		if (!isLocked) {
+		if (!isLocked && !stats) {
 			fetchStats();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isLocked]);
+	}, [isLocked, stats]);
 
 	const handlePasswordSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
