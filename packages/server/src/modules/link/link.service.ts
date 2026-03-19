@@ -255,14 +255,29 @@ export class LinkService {
 		return await this.getOriginalUrlAndTrack(code, ipAddress, userAgent);
 	}
 
-	async getLinkStats(code: string) {
+	async getLinkStats(code: string, password?: string) {
 		const linkData = await this.linkRepository.getStats(code);
 
 		if (!linkData) {
 			throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found');
 		}
 
+		if (linkData.passwordHash) {
+			if (!password) {
+				throw new AppError(
+					HTTP_STATUS.UNAUTHORIZED,
+					ERROR_MESSAGES.LINK_UNAUTHORIZED,
+					'Password required to view statistics',
+				);
+			}
+			const isMatch = await argon2.verify(linkData.passwordHash, password);
+			if (!isMatch) {
+				throw new AppError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.LINK_UNAUTHORIZED, 'Incorrect password');
+			}
+		}
+
 		const geoStatsRaw = await this.linkRepository.getGeoStats(linkData.id);
+		const timeSeriesRaw = await this.linkRepository.getTimeSeriesStats(linkData.id, 7);
 
 		// Format into a clean dictionary
 		const countries = geoStatsRaw.countryStats.reduce(
@@ -281,6 +296,25 @@ export class LinkService {
 			{} as Record<string, number>,
 		);
 
+		// Pad TimeSeries for Recharts to ensure every day exists without blanks
+		const timeSeries = [];
+		for (let i = 6; i >= 0; i--) {
+			const d = new Date();
+			d.setHours(0, 0, 0, 0);
+			d.setDate(d.getDate() - i);
+			const dateStr = d.toISOString().split('T')[0];
+
+			const existing = timeSeriesRaw.find((t) => {
+				const td = new Date(t.date);
+				return td.toISOString().split('T')[0] === dateStr;
+			});
+
+			timeSeries.push({
+				date: dateStr,
+				count: existing ? Number(existing.count) : 0,
+			});
+		}
+
 		return {
 			originalUrl: linkData.originalUrl,
 			shortCode: linkData.shortCode,
@@ -290,6 +324,7 @@ export class LinkService {
 				countries,
 				cities,
 			},
+			timeSeries,
 		};
 	}
 

@@ -41,10 +41,14 @@ export class LinkController {
 		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
 	};
 
-	getStats = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
+	getStats = async (
+		request: FastifyRequest<{ Params: { code: string }; Body?: { password?: string } }>,
+		reply: FastifyReply,
+	) => {
 		const { code } = request.params;
+		const password = request.body?.password;
 
-		const stats = await this.linkService.getLinkStats(code);
+		const stats = await this.linkService.getLinkStats(code, password);
 		return reply.status(HTTP_STATUS.OK).send(stats);
 	};
 

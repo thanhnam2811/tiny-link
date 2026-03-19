@@ -1,4 +1,5 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+import { Type } from '@sinclair/typebox';
 import { PrismaClient } from '@prisma/client';
 import {
 	CreateLinkBodySchema,
@@ -106,17 +107,19 @@ export const linkRoutes = (
 		);
 
 		// Stats API Route
-		server.get(
+		server.post(
 			'/api/stats/:code',
 			{
 				schema: {
 					tags: ['Analytics'],
 					summary: 'Get Link Analytics',
 					description:
-						'Retrieves aggregated click analytics and geographic distribution for a specific link.',
+						'Retrieves aggregated click analytics and geographic distribution for a specific link. Requires password if the link is protected.',
 					params: RedirectParamsSchema,
+					body: Type.Optional(Type.Object({ password: Type.Optional(Type.String()) })),
 					response: {
 						[HTTP_STATUS.OK]: LinkStatsResponseSchema,
+						[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
 					},
 				},
 			},

@@ -62,6 +62,20 @@ export class LinkRepository {
 		return { countryStats, cityStats };
 	}
 
+	async getTimeSeriesStats(linkId: string, days: number = 7) {
+		const startDate = new Date();
+		startDate.setDate(startDate.getDate() - days);
+
+		return this.prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+			SELECT DATE_TRUNC('day', "clickedAt") as date, COUNT(*)::bigint as count
+			FROM "Click"
+			WHERE "linkId" = ${linkId}
+			  AND "clickedAt" >= ${startDate}
+			GROUP BY DATE_TRUNC('day', "clickedAt")
+			ORDER BY date ASC;
+		`;
+	}
+
 	async updateMetadata(
 		id: string,
 		metadata: { metaTitle: string | null; metaDescription: string | null; metaImage: string | null },

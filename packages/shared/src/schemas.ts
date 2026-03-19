@@ -163,6 +163,12 @@ export const LinkStatsResponseSchema = Type.Object(
 			countries: Type.Record(Type.String(), Type.Number()),
 			cities: Type.Record(Type.String(), Type.Number()),
 		}),
+		timeSeries: Type.Array(
+			Type.Object({
+				date: Type.String(),
+				count: Type.Number(),
+			}),
+		),
 	},
 	{
 		examples: [
@@ -175,6 +181,11 @@ export const LinkStatsResponseSchema = Type.Object(
 					countries: { VN: 30, US: 12 },
 					cities: { Hanoi: 20, 'Ho Chi Minh City': 10, 'New York': 12 },
 				},
+				timeSeries: [
+					{ date: '2026-03-13', count: 0 },
+					{ date: '2026-03-14', count: 12 },
+					{ date: '2026-03-15', count: 30 },
+				],
 			},
 		],
 	},
