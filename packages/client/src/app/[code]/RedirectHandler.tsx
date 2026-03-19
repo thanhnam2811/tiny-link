@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 type RedirectHandlerProps = {
 	code: string;
@@ -11,6 +12,7 @@ type RedirectHandlerProps = {
 export default function RedirectHandler({ code, isProtected }: RedirectHandlerProps) {
 	const [password, setPassword] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	// PUBLIC LINK LOGIC
 	useEffect(() => {
@@ -27,15 +29,15 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 
 					if (!response.ok) {
 						toast.error(data.message || 'Error redirecting to link');
-						setIsLoading(false);
+						setError(data.message || 'This link is no longer available or you are rate-limited.');
 						return;
 					}
 
 					// Safe Frontend-driven redirect. Backend Analytics has already completed.
 					window.location.href = data.originalUrl;
-				} catch (err: unknown) {
+				} catch {
 					toast.error('Network error during redirect');
-					setIsLoading(false);
+					setError('A network error occurred while resolving the link. Please try again.');
 				}
 			}, 800);
 
@@ -45,13 +47,44 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 
 	// PUBLIC RENDERING
 	if (!isProtected) {
+		if (error) {
+			return (
+				<div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+					<div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-6 mx-auto">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="w-8 h-8"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+							/>
+						</svg>
+					</div>
+					<h1 className="text-2xl font-bold mb-4">Redirect Failed</h1>
+					<p className="text-gray-500 mb-8 max-w-sm">{error}</p>
+					<Link
+						href="/"
+						className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-medium transition-colors"
+					>
+						Create New Link
+					</Link>
+				</div>
+			);
+		}
+
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
 				<h1 className="text-2xl font-bold mb-4">Securing your connection...</h1>
 				<p className="text-gray-500 mb-8 max-w-sm">
 					Please wait a moment while we prepare your destination link.
 				</p>
-				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
 			</div>
 		);
 	}
