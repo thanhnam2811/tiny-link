@@ -123,8 +123,8 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 
 	// PASSWORD RENDERING
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen p-4">
-			<div className="w-full max-w-md bg-white rounded-xl shadow-sm border p-8">
+		<div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-background">
+			<div className="w-full max-w-md bg-card text-card-foreground rounded-xl shadow-sm border p-8">
 				<div className="text-center mb-6">
 					<div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
 						<svg
@@ -143,7 +143,7 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 						</svg>
 					</div>
 					<h1 className="text-2xl font-bold">Protected Link</h1>
-					<p className="text-gray-500 mt-2 text-sm">
+					<p className="text-muted-foreground mt-2 text-sm">
 						This link is secured with a password. Please enter it below to proceed.
 					</p>
 				</div>
