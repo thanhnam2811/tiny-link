@@ -20,8 +20,9 @@ describe('GET /api/stats/:code Stats API', () => {
 
 	it('should return 404 for non-existent link', async () => {
 		const response = await app.inject({
-			method: 'GET',
+			method: 'POST',
 			url: '/api/stats/missing-code',
+			payload: {},
 		});
 
 		expect(response.statusCode).toBe(404);
@@ -55,8 +56,9 @@ describe('GET /api/stats/:code Stats API', () => {
 
 		// 3. Call Stats API
 		const response = await app.inject({
-			method: 'GET',
+			method: 'POST',
 			url: `/api/stats/${shortCode}`,
+			payload: {},
 		});
 
 		expect(response.statusCode).toBe(200);
