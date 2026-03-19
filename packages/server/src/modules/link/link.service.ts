@@ -5,6 +5,7 @@ import { Redis } from 'ioredis';
 import { AppError } from '../../shared/app-error';
 import * as argon2 from 'argon2';
 import { SYSTEM_CONFIG, HTTP_STATUS, ERROR_MESSAGES } from '@tiny-link/shared';
+import { scrapeUrlMetadata } from './metadata.scraper';
 
 // Sentinel values used to distinguish edge cases from "cache miss"
 // This protects against Cache Penetration attacks
@@ -50,6 +51,16 @@ export class LinkService {
 					expiresAt,
 					passwordHash,
 				);
+
+				// Fire-and-forget: Scrape OpenGraph metadata in background
+				scrapeUrlMetadata(originalUrl).then(async (metadata) => {
+					if (metadata.metaTitle || metadata.metaDescription || metadata.metaImage) {
+						await this.linkRepository.updateMetadata(link.id, metadata).catch((err) => {
+							console.error(`[Scraper] Failed to save DB metadata for ${link.id}:`, err);
+						});
+					}
+				});
+
 				return link;
 			} catch (error: unknown) {
 				// P2002 is Prisma's error code for "Unique constraint failed"
@@ -306,8 +317,9 @@ export class LinkService {
 		}
 
 		return {
-			title: `TinyLink Redirect`,
-			description: `Redirecting to ${link.originalUrl}`,
+			title: link.metaTitle || `TinyLink Redirect`,
+			description: link.metaDescription || `Redirecting to ${link.originalUrl}`,
+			image: link.metaImage || undefined,
 			originalUrl: link.originalUrl,
 		};
 	}

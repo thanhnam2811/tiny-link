@@ -61,4 +61,14 @@ export class LinkRepository {
 
 		return { countryStats, cityStats };
 	}
+
+	async updateMetadata(
+		id: string,
+		metadata: { metaTitle: string | null; metaDescription: string | null; metaImage: string | null },
+	): Promise<Link> {
+		return this.prisma.link.update({
+			where: { id },
+			data: metadata,
+		});
+	}
 }

@@ -17,11 +17,16 @@ model Link {
   redirectType Int       @default(302) // 301 or 302
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
-  maxClicks    Int?
-  passwordHash String?
-  isActive     Boolean   @default(true)
-  clicksCount  Int       @default(0)
-  clicks       Click[]
+  maxClicks       Int?
+  passwordHash    String?
+  isActive        Boolean   @default(true)
+  clicksCount     Int       @default(0)
+  
+  metaTitle       String?
+  metaDescription String?
+  metaImage       String?
+
+  clicks          Click[]
 
   @@index([shortCode]) // Optimize lookup
 }
