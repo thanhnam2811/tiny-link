@@ -8,7 +8,9 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyCors from '@fastify/cors';
+import fastifyJwt from '@fastify/jwt';
 import { linkRoutes } from './modules/link/link.routes';
+import { adminRoutes } from './modules/admin/admin.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION } from '@tiny-link/shared';
@@ -54,6 +56,11 @@ export const buildServer = async () => {
 	await server.register(fastifyRedis, {
 		url: process.env.REDIS_URL || 'redis://localhost:6379',
 		closeClient: true,
+	});
+
+	// Register JWT
+	await server.register(fastifyJwt, {
+		secret: process.env.JWT_SECRET || 'super-secret-key-for-admin-jwt',
 	});
 
 	// Register Rate Limit plugin (uses Redis store for distributed limiting)
@@ -107,6 +114,7 @@ export const buildServer = async () => {
 	});
 
 	server.register(linkRoutes(prisma, analyticsManager, server.redis));
+	server.register(adminRoutes);
 
 	return { server, analyticsManager, prisma };
 };

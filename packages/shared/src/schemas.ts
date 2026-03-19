@@ -153,6 +153,44 @@ export const TrackPublicResponseSchema = Type.Object(
 
 export type TrackPublicResponseType = Static<typeof TrackPublicResponseSchema>;
 
+export const AdminLoginBodySchema = Type.Object(
+	{
+		password: Type.String({
+			minLength: 1,
+			description: 'The admin password for authentication',
+			examples: ['admin123'],
+		}),
+	},
+	{
+		description: 'Payload for admin login',
+		examples: [
+			{
+				password: 'admin123',
+			},
+		],
+	},
+);
+
+export type AdminLoginBodyType = Static<typeof AdminLoginBodySchema>;
+
+export const AdminLoginResponseSchema = Type.Object(
+	{
+		token: Type.String({
+			description: 'JWT token for admin sessions',
+		}),
+	},
+	{
+		description: 'Response payload for successful admin login',
+		examples: [
+			{
+				token: 'eyJhb...',
+			},
+		],
+	},
+);
+
+export type AdminLoginResponseType = Static<typeof AdminLoginResponseSchema>;
+
 export const LinkStatsResponseSchema = Type.Object(
 	{
 		originalUrl: Type.String(),
