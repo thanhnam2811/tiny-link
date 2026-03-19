@@ -33,7 +33,7 @@ export function proxy(request: NextRequest) {
 }
 
 // See "Matching Paths" below to learn more
-export const config = {
+export const proxyConfig = {
 	matcher: [
 		/*
 		 * Match all request paths except for the ones starting with:
