@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { AdminLoginResponseType } from '@tiny-link/shared';
 
-export async function loginAction(prevState: any, formData: FormData) {
+export async function loginAction(prevState: { error?: string } | null, formData: FormData) {
 	const password = formData.get('password') as string;
 
 	if (!password) {

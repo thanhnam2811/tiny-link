@@ -50,7 +50,7 @@ export default function DashboardPage() {
 				<header className="mb-8">
 					<h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">System Overview</h1>
 					<p className="text-zinc-500 dark:text-zinc-400">
-						Welcome back, Admin. Here is what's happening with your links.
+						Welcome back, Admin. Here is what&apos;s happening with your links.
 					</p>
 				</header>
 
