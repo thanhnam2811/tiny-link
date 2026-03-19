@@ -83,6 +83,16 @@ export const LinkResponseSchema = Type.Object(
 
 export type LinkResponseType = Static<typeof LinkResponseSchema>;
 
+export const LinkPreviewResponseSchema = Type.Object({
+	title: Type.String(),
+	description: Type.String(),
+	image: Type.Optional(Type.String()),
+	originalUrl: Type.Optional(Type.String()),
+	isProtected: Type.Optional(Type.Boolean()),
+});
+
+export type LinkPreviewResponseType = Static<typeof LinkPreviewResponseSchema>;
+
 export const RedirectParamsSchema = Type.Object({
 	code: Type.String({
 		minLength: 3,
@@ -127,6 +137,21 @@ export const VerifyPasswordResponseSchema = Type.Object(
 );
 
 export type VerifyPasswordResponseType = Static<typeof VerifyPasswordResponseSchema>;
+
+export const TrackPublicResponseSchema = Type.Object(
+	{
+		originalUrl: Type.String(),
+	},
+	{
+		examples: [
+			{
+				originalUrl: 'https://github.com/fastify/fastify',
+			},
+		],
+	},
+);
+
+export type TrackPublicResponseType = Static<typeof TrackPublicResponseSchema>;
 
 export const LinkStatsResponseSchema = Type.Object(
 	{

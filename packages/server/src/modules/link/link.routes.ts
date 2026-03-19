@@ -9,6 +9,8 @@ import {
 	ValidationErrorResponseSchema,
 	VerifyPasswordBodySchema,
 	VerifyPasswordResponseSchema,
+	LinkPreviewResponseSchema,
+	TrackPublicResponseSchema,
 } from '@tiny-link/shared';
 import { LinkRepository } from './link.repository';
 import { LinkService } from './link.service';
@@ -55,19 +57,24 @@ export const linkRoutes = (
 			controller.createLink,
 		);
 
-		// Redirect Route: Root level
-		// Regex constraint ensures it only matches alphanumeric codes (no dots, preventing static file conflicts like .css)
-		server.get(
-			'/:code(^[a-zA-Z0-9-]+$)',
+		// Track Public Route: Headless JSON API
+		// Replaces legacy GET /:code. Enforces usage via Next.js Client
+		server.post(
+			'/api/links/:code/track',
 			{
 				schema: {
-					tags: ['Redirects'],
-					summary: 'Redirect to Original URL',
-					description: 'Redirects the user to the original URL and tracks the click anonymously.',
+					tags: ['Analytics'],
+					summary: 'Track Public Link Click',
+					description: 'Records analytics silently and returns the original URL for client-side redirection.',
 					params: RedirectParamsSchema,
+					response: {
+						[HTTP_STATUS.OK]: TrackPublicResponseSchema,
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+						[HTTP_STATUS.GONE]: ErrorResponseSchema,
+					},
 				},
 			},
-			controller.redirect,
+			controller.trackPublic,
 		);
 
 		// Verify Password Route (Strict Rate Limit: 5 per minute)
@@ -114,6 +121,26 @@ export const linkRoutes = (
 				},
 			},
 			controller.getStats,
+		);
+
+		// Preview API Route (For Bot & Next.js Metadata fetcher)
+		server.get(
+			'/api/links/:code/preview',
+			{
+				schema: {
+					tags: ['Links'],
+					summary: 'Get Link Preview Metadata',
+					description:
+						'Retrieves read-only metadata (originalUrl, title, description) for constructing OpenGraph tags without triggering analytics increments.',
+					params: RedirectParamsSchema,
+					response: {
+						[HTTP_STATUS.OK]: LinkPreviewResponseSchema,
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+						[HTTP_STATUS.GONE]: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.getPreview,
 		);
 	};
 };

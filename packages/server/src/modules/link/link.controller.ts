@@ -16,9 +16,10 @@ export class LinkController {
 			password,
 		);
 
-		const host = request.headers.host || 'localhost:3000';
-		const protocol = request.protocol || 'http';
-		const shortUrl = `${protocol}://${host}/${link.shortCode}`;
+		// Use CLIENT_URL (falling back to localhost:3000) for security anti-bypass.
+		// We no longer trust request.headers.host to ensure the Next.js Frontend mask is strictly enforced.
+		const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+		const shortUrl = `${clientUrl}/${link.shortCode}`;
 
 		return reply.status(HTTP_STATUS.CREATED).send({
 			id: link.id,
@@ -31,13 +32,13 @@ export class LinkController {
 		});
 	};
 
-	redirect = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
+	trackPublic = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
 		const { code } = request.params;
 		const ip = request.ip;
 		const userAgent = request.headers['user-agent'];
 
 		const originalUrl = await this.linkService.getOriginalUrlAndTrack(code, ip, userAgent);
-		return reply.redirect(originalUrl);
+		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
 	};
 
 	getStats = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
@@ -47,6 +48,13 @@ export class LinkController {
 		return reply.status(HTTP_STATUS.OK).send(stats);
 	};
 
+	getPreview = async (request: FastifyRequest<{ Params: { code: string } }>, reply: FastifyReply) => {
+		const { code } = request.params;
+
+		const preview = await this.linkService.getPreview(code);
+		return reply.status(HTTP_STATUS.OK).send(preview);
+	};
+
 	verifyPassword = async (
 		request: FastifyRequest<{ Params: { code: string }; Body: { password?: string } }>,
 		reply: FastifyReply,
@@ -54,11 +62,16 @@ export class LinkController {
 		const { code } = request.params;
 		const { password } = request.body;
 
+		// We need to capture the IP and UserAgent from the verify API so that Next.js client-side verification
+		// clicks are properly accredited to the user's browser, not just lost.
+		const ip = request.ip;
+		const userAgent = request.headers['user-agent'];
+
 		if (!password) {
 			return reply.status(HTTP_STATUS.BAD_REQUEST).send({ message: 'Password is required' });
 		}
 
-		const originalUrl = await this.linkService.verifyPassword(code, password);
+		const originalUrl = await this.linkService.verifyPassword(code, password, ip, userAgent);
 		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
 	};
 }

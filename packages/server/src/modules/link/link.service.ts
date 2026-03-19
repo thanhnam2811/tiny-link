@@ -282,7 +282,37 @@ export class LinkService {
 		};
 	}
 
-	async verifyPassword(code: string, password: string): Promise<string> {
+	async getPreview(code: string) {
+		const link = await this.linkRepository.findByShortCode(code);
+
+		if (!link || !link.isActive) {
+			throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found');
+		}
+
+		if (link.expiresAt && link.expiresAt < new Date()) {
+			throw new AppError(HTTP_STATUS.GONE, ERROR_MESSAGES.LINK_GONE, 'Link has expired');
+		}
+
+		if (link.maxClicks && link.clicksCount >= link.maxClicks) {
+			throw new AppError(HTTP_STATUS.GONE, ERROR_MESSAGES.LINK_GONE, 'Link max clicks reached');
+		}
+
+		if (link.passwordHash) {
+			return {
+				title: 'Secured Link - TinyLink',
+				description: 'This link is protected by a password.',
+				isProtected: true,
+			};
+		}
+
+		return {
+			title: `TinyLink Redirect`,
+			description: `Redirecting to ${link.originalUrl}`,
+			originalUrl: link.originalUrl,
+		};
+	}
+
+	async verifyPassword(code: string, password: string, ipAddress?: string, userAgent?: string): Promise<string> {
 		const link = await this.linkRepository.findByShortCode(code);
 		if (!link || !link.isActive) {
 			throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.LINK_NOT_FOUND, 'Link not found');
@@ -304,7 +334,7 @@ export class LinkService {
 		// To track it elegantly bypassing the 401 check, we trigger a direct AnalyticsManager push
 		// Because the caching layer threw AppError(401), we can't easily recurse getOriginalUrlAndTrack
 		// unless we pass a bypass flag. Direct hit is simpler here:
-		this.analyticsManager.push({ linkId: link.id });
+		this.analyticsManager.push({ linkId: link.id, ipAddress, userAgent });
 
 		// We still need to manually bump Redis HINCRBY tracking since we bypassed it by not calling getOriginalUrlAndTrack!
 		const cacheKey = `link:${code}`;

@@ -70,12 +70,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 	const urlValue = watch('url');
 
 	useEffect(() => {
-		try {
-			const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-			setHost(new URL(apiUrl).host);
-		} catch {
-			setHost(window.location.host);
-		}
+		setHost(window.location.host);
 	}, []);
 
 	const onSubmit = async (values: FormValues) => {
@@ -90,7 +85,10 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 		try {
 			const response = await api.links.create(payload);
 			toast.success('Link Shortened successfully!');
-			onSuccess(response.shortUrl);
+
+			// Construct the short link using the frontend's origin instead of the backend API's origin
+			const clientShortUrl = `${window.location.protocol}//${window.location.host}/${response.shortCode}`;
+			onSuccess(clientShortUrl);
 		} catch (err) {
 			if (err instanceof ApiError) {
 				if (err.code === ERROR_MESSAGES.RATE_LIMIT_EXCEEDED) {
@@ -228,7 +226,8 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														}}
 														variant="ghost"
 														size="icon-xs"
-														className="h-7 w-7 rounded-sm hover:bg-muted"
+														className="h-full w-10 md:h-7 md:w-7 md:my-auto rounded-sm hover:bg-muted"
+														aria-label="Decrease max clicks limit"
 													>
 														<Minus className="h-3 w-3" />
 													</InputGroupButton>
@@ -240,7 +239,8 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														}}
 														variant="ghost"
 														size="icon-xs"
-														className="h-7 w-7 rounded-sm hover:bg-muted ml-0.5"
+														className="h-full w-10 md:h-7 md:w-7 md:my-auto rounded-sm hover:bg-muted ml-0.5"
+														aria-label="Increase max clicks limit"
 													>
 														<Plus className="h-3 w-3" />
 													</InputGroupButton>
@@ -276,6 +276,8 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														onClick={() => setShowPassword((p) => !p)}
 														variant="ghost"
 														size="icon-sm"
+														className="h-full px-3"
+														aria-label={showPassword ? 'Hide password' : 'Show password'}
 													>
 														{showPassword ? <EyeOff /> : <Eye />}
 													</InputGroupButton>
@@ -308,6 +310,12 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														onClick={() => setShowPasswordConfirm((p) => !p)}
 														variant="ghost"
 														size="icon-sm"
+														className="h-full px-3"
+														aria-label={
+															showPasswordConfirm
+																? 'Hide confirm password'
+																: 'Show confirm password'
+														}
 													>
 														{showPasswordConfirm ? <EyeOff /> : <Eye />}
 													</InputGroupButton>
