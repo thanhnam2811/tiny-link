@@ -83,9 +83,9 @@ _Goal: Intelligently route traffic between static metadata for bots and an inter
 
 _Goal: Build a dedicated dashboard for system administration and detailed analytics._
 
-- [ ] **Project Setup**: Initialize an `admin` package (NextJS or static React) inside the monorepo workspace.
-- [ ] **Authentication**: Implement secure admin login (JWT/Session).
-- [ ] **Dashboard Overview**:
+- [x] **Project Setup**: Initialize an `admin` package (NextJS or static React) inside the monorepo workspace.
+- [/] **Authentication**: Implement secure admin login (JWT/Session).
+- [/] **Dashboard Overview**:
     - [ ] Total links created, total clicks across the system.
     - [ ] System health metrics (if available).
 - [ ] **Link Management**:
