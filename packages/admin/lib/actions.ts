@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { AdminLoginResponseType } from '@tiny-link/shared';
 
 export async function loginAction(prevState: { error?: string } | null, formData: FormData) {
@@ -56,4 +57,54 @@ export async function logoutAction() {
 		httpOnly: true,
 	});
 	redirect('/login');
+}
+
+export async function toggleLinkStatusAction(id: string, currentStatus: boolean) {
+	const cookieStore = await cookies();
+	const token = cookieStore.get('admin_token')?.value;
+
+	if (!token) return { error: 'Unauthorized' };
+
+	try {
+		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+		const response = await fetch(`${apiUrl}/admin/links/${id}/status`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({ isActive: !currentStatus }),
+		});
+
+		if (!response.ok) return { error: 'Failed to update status' };
+
+		revalidatePath('/links');
+		return { success: true };
+	} catch (err) {
+		return { error: 'Something went wrong.' };
+	}
+}
+
+export async function deleteLinkAction(id: string) {
+	const cookieStore = await cookies();
+	const token = cookieStore.get('admin_token')?.value;
+
+	if (!token) return { error: 'Unauthorized' };
+
+	try {
+		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+		const response = await fetch(`${apiUrl}/admin/links/${id}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!response.ok) return { error: 'Failed to delete link' };
+
+		revalidatePath('/links');
+		return { success: true };
+	} catch (err) {
+		return { error: 'Something went wrong.' };
+	}
 }

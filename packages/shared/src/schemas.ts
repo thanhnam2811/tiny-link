@@ -280,3 +280,45 @@ export const AdminStatsResponseSchema = Type.Object(
 );
 
 export type AdminStatsResponseType = Static<typeof AdminStatsResponseSchema>;
+
+// Link Management Schemas
+export const AdminGetLinksQuerySchema = Type.Object({
+	page: Type.Optional(Type.Number({ minimum: 1, default: 1 })),
+	limit: Type.Optional(Type.Number({ minimum: 1, maximum: 100, default: 10 })),
+	search: Type.Optional(Type.String()),
+	sortBy: Type.Optional(Type.Union([Type.Literal('createdAt'), Type.Literal('clicksCount')])),
+	sortOrder: Type.Optional(Type.Union([Type.Literal('asc'), Type.Literal('desc')])),
+});
+export type AdminGetLinksQueryType = Static<typeof AdminGetLinksQuerySchema>;
+
+export const AdminGetLinksResponseSchema = Type.Object({
+	links: Type.Array(
+		Type.Object({
+			id: Type.String(),
+			originalUrl: Type.String(),
+			shortCode: Type.String(),
+			createdAt: Type.String({ format: 'date-time' }),
+			clicksCount: Type.Number(),
+			isActive: Type.Boolean(),
+		}),
+	),
+	totalCount: Type.Number(),
+	totalPages: Type.Number(),
+	currentPage: Type.Number(),
+});
+export type AdminGetLinksResponseType = Static<typeof AdminGetLinksResponseSchema>;
+
+export const AdminUpdateLinkStatusBodySchema = Type.Object({
+	isActive: Type.Boolean(),
+});
+export type AdminUpdateLinkStatusBodyType = Static<typeof AdminUpdateLinkStatusBodySchema>;
+
+export const AdminLinkIdParamsSchema = Type.Object({
+	id: Type.String(),
+});
+export type AdminLinkIdParamsType = Static<typeof AdminLinkIdParamsSchema>;
+
+export const AdminSuccessResponseSchema = Type.Object({
+	success: Type.Boolean(),
+});
+export type AdminSuccessResponseType = Static<typeof AdminSuccessResponseSchema>;
