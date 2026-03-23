@@ -1,8 +1,41 @@
 import { logoutAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { LogOut, LayoutDashboard, Link as LinkIcon, BarChart3, Settings } from 'lucide-react';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+	const cookieStore = await cookies();
+	const token = cookieStore.get('admin_token')?.value;
+
+	if (!token) {
+		redirect('/login');
+	}
+
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+	let stats = { totalLinks: 0, totalClicks: 0 };
+
+	try {
+		const res = await fetch(`${apiUrl}/admin/stats`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+			cache: 'no-store',
+		});
+
+		if (res.status === 401) {
+			redirect('/login');
+		}
+
+		if (res.ok) {
+			stats = await res.json();
+		}
+	} catch (error) {
+		console.error('Failed to fetch stats:', error);
+	}
+
+	const avgClicks = stats.totalLinks > 0 ? (stats.totalClicks / stats.totalLinks).toFixed(1) : '0';
+
 	return (
 		<div className="flex min-h-screen bg-zinc-50 dark:bg-black font-sans">
 			{/* Sidebar (Draft) */}
@@ -55,31 +88,30 @@ export default function DashboardPage() {
 				</header>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-					{/* Placeholder Stats */}
 					{[
 						{
 							label: 'Total Links',
-							value: '1,234',
+							value: stats.totalLinks.toLocaleString(),
 							icon: LinkIcon,
 							color: 'text-blue-600',
-							trend: '+12%',
+							trend: 'Live',
 							positive: true,
 						},
 						{
 							label: 'Total Clicks',
-							value: '45,678',
+							value: stats.totalClicks.toLocaleString(),
 							icon: BarChart3,
 							color: 'text-emerald-600',
-							trend: '+5.4%',
+							trend: 'Live',
 							positive: true,
 						},
 						{
 							label: 'Avg. Clicks/Link',
-							value: '37',
+							value: avgClicks,
 							icon: LayoutDashboard,
 							color: 'text-orange-600',
-							trend: '-2.1%',
-							positive: false,
+							trend: 'Live',
+							positive: true,
 						},
 					].map((stat, i) => (
 						<div

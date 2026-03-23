@@ -262,3 +262,21 @@ export const ValidationErrorResponseSchema = Type.Object({
 		}),
 	),
 });
+
+export const AdminStatsResponseSchema = Type.Object(
+	{
+		totalLinks: Type.Number(),
+		totalClicks: Type.Number(),
+	},
+	{
+		description: 'System wide statistics for the admin dashboard',
+		examples: [
+			{
+				totalLinks: 1234,
+				totalClicks: 45678,
+			},
+		],
+	},
+);
+
+export type AdminStatsResponseType = Static<typeof AdminStatsResponseSchema>;

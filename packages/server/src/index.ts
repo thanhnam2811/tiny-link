@@ -114,7 +114,7 @@ export const buildServer = async () => {
 	});
 
 	server.register(linkRoutes(prisma, analyticsManager, server.redis));
-	server.register(adminRoutes);
+	server.register(adminRoutes(prisma));
 
 	return { server, analyticsManager, prisma };
 };
