@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminGetLinksResponseType } from '@tiny-link/shared';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -13,6 +13,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import {
 	Dialog,
@@ -53,15 +54,20 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 	const [searchQuery, setSearchQuery] = useState(searchParams.search);
 	const [deleteDialogId, setDeleteDialogId] = useState<string | null>(null);
 
-	const handleSearch = (e: React.FormEvent) => {
-		e.preventDefault();
-		const params = new URLSearchParams();
-		if (searchQuery) params.set('search', searchQuery);
-		params.set('page', '1');
-		startTransition(() => {
-			router.push(`${pathname}?${params.toString()}`);
-		});
-	};
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			if (searchQuery !== searchParams.search) {
+				const params = new URLSearchParams();
+				if (searchQuery) params.set('search', searchQuery);
+				params.set('page', '1');
+				startTransition(() => {
+					router.push(`${pathname}?${params.toString()}`);
+				});
+			}
+		}, 300);
+
+		return () => clearTimeout(handler);
+	}, [searchQuery, pathname, router, searchParams.search]);
 
 	const handlePageChange = (newPage: number) => {
 		const params = new URLSearchParams();
@@ -90,7 +96,7 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 		<div className="space-y-4">
 			{/* Toolbar */}
 			<div className="flex items-center justify-between bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-				<form onSubmit={handleSearch} className="relative w-full max-w-sm">
+				<div className="relative w-full max-w-sm">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
 					<Input
 						value={searchQuery}
@@ -98,7 +104,7 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 						placeholder="Search by code or URL..."
 						className="pl-9 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-zinc-500"
 					/>
-				</form>
+				</div>
 				<div className="flex items-center gap-2">
 					<Button
 						variant="outline"
@@ -112,23 +118,27 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 			</div>
 
 			{/* Table */}
-			<div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-				<div className="overflow-x-auto">
+			<div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col">
+				<div className="overflow-x-auto min-h-[580px] flex-1">
 					<Table>
 						<TableHeader className="bg-zinc-50/50 dark:bg-zinc-950/50">
 							<TableRow className="border-zinc-200 dark:border-zinc-800">
-								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">
+								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100 w-[120px]">
 									Short Code
 								</TableHead>
 								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">
 									Original URL
 								</TableHead>
-								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Clicks</TableHead>
-								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">
+								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100 w-[100px]">
+									Clicks
+								</TableHead>
+								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100 w-[120px]">
 									Created At
 								</TableHead>
-								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Status</TableHead>
-								<TableHead className="text-right font-semibold text-zinc-900 dark:text-zinc-100">
+								<TableHead className="font-semibold text-zinc-900 dark:text-zinc-100 w-[120px]">
+									Status
+								</TableHead>
+								<TableHead className="text-right font-semibold text-zinc-900 dark:text-zinc-100 w-[80px]">
 									Actions
 								</TableHead>
 							</TableRow>
@@ -156,7 +166,7 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 											{link.clicksCount.toLocaleString()}
 										</TableCell>
 										<TableCell className="text-zinc-500">
-											{new Date(link.createdAt).toLocaleDateString()}
+											{new Date(link.createdAt).toLocaleDateString('en-GB')}
 										</TableCell>
 										<TableCell>
 											<span
@@ -179,45 +189,49 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 													align="end"
 													className="w-[160px] border-zinc-200 dark:border-zinc-800"
 												>
-													<DropdownMenuLabel>Actions</DropdownMenuLabel>
-													<DropdownMenuItem
-														onClick={() =>
-															navigator.clipboard.writeText(
-																`http://localhost:3000/${link.shortCode}`,
-															)
-														}
-														className="cursor-pointer"
-													>
-														<Copy className="mr-2 h-4 w-4" />
-														Copy Link
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															window.open(
-																`http://localhost:3000/${link.shortCode}`,
-																'_blank',
-															)
-														}
-														className="cursor-pointer"
-													>
-														<ExternalLink className="mr-2 h-4 w-4" />
-														Visit Link
-													</DropdownMenuItem>
+													<DropdownMenuGroup>
+														<DropdownMenuLabel>Actions</DropdownMenuLabel>
+														<DropdownMenuItem
+															onClick={() =>
+																navigator.clipboard.writeText(
+																	`http://localhost:3000/${link.shortCode}`,
+																)
+															}
+															className="cursor-pointer"
+														>
+															<Copy className="mr-2 h-4 w-4" />
+															Copy Link
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() =>
+																window.open(
+																	`http://localhost:3000/${link.shortCode}`,
+																	'_blank',
+																)
+															}
+															className="cursor-pointer"
+														>
+															<ExternalLink className="mr-2 h-4 w-4" />
+															Visit Link
+														</DropdownMenuItem>
+													</DropdownMenuGroup>
 													<DropdownMenuSeparator className="bg-zinc-200 dark:bg-zinc-800" />
-													<DropdownMenuItem
-														onClick={() => handleToggleStatus(link.id, link.isActive)}
-														className="cursor-pointer"
-													>
-														<ShieldAlert className="mr-2 h-4 w-4" />
-														{link.isActive ? 'Disable Link' : 'Enable Link'}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() => setDeleteDialogId(link.id)}
-														className="text-red-600 dark:text-red-400 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950/30 dark:focus:text-red-400 cursor-pointer"
-													>
-														<Trash2 className="mr-2 h-4 w-4" />
-														Delete
-													</DropdownMenuItem>
+													<DropdownMenuGroup>
+														<DropdownMenuItem
+															onClick={() => handleToggleStatus(link.id, link.isActive)}
+															className="cursor-pointer"
+														>
+															<ShieldAlert className="mr-2 h-4 w-4" />
+															{link.isActive ? 'Disable Link' : 'Enable Link'}
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => setDeleteDialogId(link.id)}
+															className="text-red-600 dark:text-red-400 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950/30 dark:focus:text-red-400 cursor-pointer"
+														>
+															<Trash2 className="mr-2 h-4 w-4" />
+															Delete
+														</DropdownMenuItem>
+													</DropdownMenuGroup>
 												</DropdownMenuContent>
 											</DropdownMenu>
 										</TableCell>

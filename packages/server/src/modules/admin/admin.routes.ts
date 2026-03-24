@@ -16,6 +16,10 @@ import {
 	AdminLinkIdParamsType,
 	AdminSuccessResponseSchema,
 	AdminSuccessResponseType,
+	AdminAnalyticsQuerySchema,
+	AdminAnalyticsQueryType,
+	AdminAnalyticsResponseSchema,
+	AdminAnalyticsResponseType,
 } from '@tiny-link/shared';
 
 export const adminRoutes =
@@ -204,6 +208,127 @@ export const adminRoutes =
 					} catch (error) {
 						return reply.code(404).send({ error: 'Not Found', message: 'Link not found' } as any);
 					}
+				},
+			);
+
+			protectedServer.get<{
+				Querystring: AdminAnalyticsQueryType;
+				Reply: AdminAnalyticsResponseType;
+			}>(
+				'/api/admin/analytics',
+				{
+					schema: {
+						querystring: AdminAnalyticsQuerySchema,
+						response: {
+							200: AdminAnalyticsResponseSchema,
+						},
+						tags: ['Admin'],
+						description: 'Get detailed system analytics (timeline, OS, browser, country)',
+						security: [{ bearerAuth: [] }],
+					},
+				},
+				async (request) => {
+					const { range = '7d' } = request.query;
+
+					// 1. Determine Date Range
+					const now = new Date();
+					let startDate = new Date();
+					if (range === '7d') startDate.setDate(now.getDate() - 7);
+					else if (range === '30d') startDate.setDate(now.getDate() - 30);
+					else startDate = new Date(0); // All time
+
+					startDate.setHours(0, 0, 0, 0);
+
+					// 2. Query Timeline using $queryRaw for performance (PostgreSQL DATE_TRUNC)
+					const timelineRaw = await prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+						SELECT DATE_TRUNC('day', "clickedAt") as date, COUNT(*) as count 
+						FROM "Click" 
+						WHERE "clickedAt" >= ${startDate}
+						GROUP BY DATE_TRUNC('day', "clickedAt") 
+						ORDER BY date ASC
+					`;
+
+					// 3. Zero-padding Timeline
+					const timelineMap = new Map<string, number>();
+					timelineRaw.forEach((row) => {
+						timelineMap.set(row.date.toISOString().split('T')[0], Number(row.count));
+					});
+
+					const timeline: { date: string; clicks: number }[] = [];
+					if (range !== 'all') {
+						const days = range === '7d' ? 7 : 30;
+						for (let i = 0; i <= days; i++) {
+							const d = new Date(startDate);
+							d.setDate(d.getDate() + i);
+							if (d > now) break;
+							const dateStr = d.toISOString().split('T')[0];
+							timeline.push({ date: dateStr, clicks: timelineMap.get(dateStr) || 0 });
+						}
+					} else {
+						if (timelineRaw.length > 0) {
+							const firstDate = timelineRaw[0].date;
+							const diffTime = Math.abs(now.getTime() - firstDate.getTime());
+							const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+							for (let i = 0; i <= diffDays; i++) {
+								const d = new Date(firstDate);
+								d.setDate(d.getDate() + i);
+								if (d > now) break;
+								const dateStr = d.toISOString().split('T')[0];
+								timeline.push({ date: dateStr, clicks: timelineMap.get(dateStr) || 0 });
+							}
+						}
+					}
+
+					// 4. Query Grouped Data
+					const countryGroups = await prisma.click.groupBy({
+						by: ['country'],
+						where: { clickedAt: { gte: startDate } },
+						_count: { id: true },
+						orderBy: { _count: { id: 'desc' } },
+						take: 10,
+					});
+
+					const countryData = countryGroups.map((g) => ({
+						name: g.country || 'Unknown',
+						count: g._count.id,
+					}));
+
+					const uaGroups = await prisma.click.groupBy({
+						by: ['userAgent'],
+						where: { clickedAt: { gte: startDate } },
+						_count: { id: true },
+					});
+
+					const osCount = new Map<string, number>();
+					const browserCount = new Map<string, number>();
+
+					const { UAParser } = await import('ua-parser-js');
+
+					uaGroups.forEach((g) => {
+						const parser = new UAParser(g.userAgent || '');
+						const osName = parser.getOS().name || 'Unknown';
+						const browserName = parser.getBrowser().name || 'Unknown';
+
+						osCount.set(osName, (osCount.get(osName) || 0) + g._count.id);
+						browserCount.set(browserName, (browserCount.get(browserName) || 0) + g._count.id);
+					});
+
+					const osData = Array.from(osCount.entries())
+						.map(([name, count]) => ({ name, count }))
+						.sort((a, b) => b.count - a.count)
+						.slice(0, 10);
+
+					const browserData = Array.from(browserCount.entries())
+						.map(([name, count]) => ({ name, count }))
+						.sort((a, b) => b.count - a.count)
+						.slice(0, 10);
+
+					return {
+						timeline,
+						os: osData,
+						browser: browserData,
+						country: countryData,
+					};
 				},
 			);
 		});

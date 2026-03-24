@@ -322,3 +322,37 @@ export const AdminSuccessResponseSchema = Type.Object({
 	success: Type.Boolean(),
 });
 export type AdminSuccessResponseType = Static<typeof AdminSuccessResponseSchema>;
+
+// Detailed Analytics Schemas
+export const AdminAnalyticsQuerySchema = Type.Object({
+	range: Type.Optional(Type.Union([Type.Literal('7d'), Type.Literal('30d'), Type.Literal('all')], { default: '7d' })),
+});
+export type AdminAnalyticsQueryType = Static<typeof AdminAnalyticsQuerySchema>;
+
+export const AdminAnalyticsResponseSchema = Type.Object({
+	timeline: Type.Array(
+		Type.Object({
+			date: Type.String(),
+			clicks: Type.Number(),
+		}),
+	),
+	os: Type.Array(
+		Type.Object({
+			name: Type.String(),
+			count: Type.Number(),
+		}),
+	),
+	browser: Type.Array(
+		Type.Object({
+			name: Type.String(),
+			count: Type.Number(),
+		}),
+	),
+	country: Type.Array(
+		Type.Object({
+			name: Type.String(),
+			count: Type.Number(),
+		}),
+	),
+});
+export type AdminAnalyticsResponseType = Static<typeof AdminAnalyticsResponseSchema>;

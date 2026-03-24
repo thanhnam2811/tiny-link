@@ -5,9 +5,9 @@ import Link from 'next/link';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="flex min-h-screen bg-zinc-50 dark:bg-black font-sans">
+		<div className="flex h-screen bg-zinc-50 dark:bg-black font-sans overflow-hidden">
 			{/* Sidebar */}
-			<aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 hidden md:flex flex-col bg-white dark:bg-black">
+			<aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 hidden md:flex flex-col bg-white dark:bg-black shrink-0">
 				<div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
 					<h2 className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-zinc-50">
 						<LinkIcon className="w-5 h-5" />
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 			</aside>
 
 			{/* Main Content */}
-			<main className="flex-1 p-0 md:p-8">
+			<main className="flex-1 h-full overflow-y-auto p-0 md:p-8">
 				<div className="p-4 md:p-0">{children}</div>
 			</main>
 		</div>
