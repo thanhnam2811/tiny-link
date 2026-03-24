@@ -91,7 +91,34 @@ _Goal: Build a dedicated dashboard for system administration and detailed analyt
 - [x] **Link Management**:
     - [x] Table view of all links with search, sort, and pagination.
     - [x] Ability to disable/delete malicious or reported links.
-- [ ] **Detailed Analytics**:
-    - [ ] Visual charts for click trends over time (using Chart.js or Recharts).
-    - [ ] Geographic distribution of clicks (re-using Geo-Analytics data from Phase 4).
-    - [ ] Operating system & browser statistics.
+- [x] **Detailed Analytics**:
+    - [x] Visual charts for click trends over time (using Chart.js or Recharts).
+    - [x] Geographic distribution of clicks (re-using Geo-Analytics data from Phase 4).
+    - [x] Operating system & browser statistics.
+
+---
+
+### 🟢 Phase 9: Private Accounts & User Dashboard
+
+_Goal: Allow regular users to log in easily and manage their own shortened links (SaaS evolution)._
+
+- [ ] **Database & Authentication (OAuth First)**:
+    - [ ] Setup `Auth.js` (NextAuth) or `Lucia Auth` for standard OAuth providers (Google/GitHub).
+    - [ ] Create `User` and `Session` models. Add `userId` relation to `Link` model.
+- [ ] **Feature: Claim Guest Links (UX Premium)**:
+    - [ ] Read old Session/IP upon successful registration to automatically assign anonymous links to the new user account.
+- [ ] **User Dashboard (Frontend `client` package)**:
+    - [ ] Social Login screen.
+    - [ ] Private dashboard to view personal link history and analytics.
+    - [ ] UI tools to create, edit metadata, and delete personal links.
+
+### 🟣 Phase 10: Applied AI Integration (The Smart System)
+
+_Goal: Learn practical, cost-effective AI deployment (OpenAI/Gemini) inside a modern backend architecture._
+
+- [ ] **AI-Assisted User Experience (Event-Driven Architecture)**:
+    - [ ] **Smart Short Codes (Streaming UI)**: AI streams memorable short code suggestions in real-time.
+    - [ ] **Auto-Generated Meta Tags (Background Job)**: Return the short link to the user instantly (50ms). A background worker handles the slow AI scraping process and updates the OpenGraph tags asynchronously.
+- [ ] **AI for System Security & Admin Insights**:
+    - [ ] **Malicious Content Detection (Funnel Model)**: Optimize LLM API costs. Tier 1: Check domains against a free Blacklist/Regex. Tier 2: Only send structurally suspicious Links to AI for final scoring and auto-Trap.
+    - [ ] **Traffic Anomaly Insights**: Admin dashboard displays conversational AI summaries highlighting click surges.
