@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
 import {
 	AdminLoginBodySchema,
 	AdminLoginResponseSchema,

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
 import geoip from 'geoip-lite';
 
 export interface ClickEvent {

@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { SessionProvider } from 'next-auth/react';
 
 const inter = Inter({
 	variable: '--font-inter',
@@ -29,9 +30,11 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${inter.className} ${interTight.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
-					<ThemeToggle />
-					<Toaster position="top-center" />
+					<SessionProvider>
+						{children}
+						<ThemeToggle />
+						<Toaster position="top-center" />
+					</SessionProvider>
 				</ThemeProvider>
 			</body>
 		</html>

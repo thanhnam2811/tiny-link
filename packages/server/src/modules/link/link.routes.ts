@@ -1,6 +1,6 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { Type } from '@sinclair/typebox';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
 import {
 	CreateLinkBodySchema,
 	LinkResponseSchema,

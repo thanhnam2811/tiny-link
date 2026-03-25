@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import path from 'path';
 import fastifyStatic from '@fastify/static';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, prisma } from '@tiny-link/db';
 import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
@@ -16,7 +16,6 @@ import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION } from '@tiny-link/shared';
 
 export const buildServer = async () => {
-	const prisma = new PrismaClient();
 	const analyticsManager = new AnalyticsManager(prisma);
 
 	const server = fastify({

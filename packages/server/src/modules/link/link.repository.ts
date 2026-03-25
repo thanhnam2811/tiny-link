@@ -1,4 +1,4 @@
-import { PrismaClient, Link } from '@prisma/client';
+import { PrismaClient, Link } from '@tiny-link/db';
 
 export class LinkRepository {
 	constructor(private readonly prisma: PrismaClient) {}
