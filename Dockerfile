@@ -28,6 +28,7 @@ ENV NODE_ENV=production
 ENV PORT=3001
 
 COPY --from=build /prod/server /prod/server
+COPY --from=build /app/packages/db/prisma ./prisma
 
 COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh

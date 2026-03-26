@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 
-./node_modules/.bin/prisma migrate deploy --schema=prisma/schema.prisma
+npx prisma migrate deploy --schema=./prisma/schema.prisma
 
 exec node dist/index.js
