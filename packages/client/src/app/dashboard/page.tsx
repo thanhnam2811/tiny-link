@@ -13,6 +13,7 @@ interface DashboardLink {
 	id: string;
 	shortCode: string;
 	originalUrl: string;
+	shortUrl: string;
 	clicksCount: number;
 	createdAt: string;
 	isActive: boolean;

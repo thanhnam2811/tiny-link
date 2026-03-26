@@ -33,6 +33,8 @@ export class LinkController {
 			maxClicks: link.maxClicks ?? undefined,
 			expiresAt: link.expiresAt?.toISOString() ?? undefined,
 			userId: link.userId ?? undefined,
+			clicksCount: 0,
+			isActive: true,
 		});
 	};
 

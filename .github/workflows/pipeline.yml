@@ -65,7 +65,7 @@ jobs:
               env:
                   DATABASE_URL: postgresql://admin:password@127.0.0.1:5432/tinylink
                   REDIS_URL: redis://127.0.0.1:6379
-              run: pnpm --filter @tiny-link/server exec prisma db push
+              run: pnpm --filter @tiny-link/db exec prisma db push
 
             - name: Lint
               run: pnpm lint

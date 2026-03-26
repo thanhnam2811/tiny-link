@@ -70,6 +70,8 @@ export const LinkResponseSchema = Type.Object(
 		maxClicks: Type.Optional(Type.Number()),
 		expiresAt: Type.Optional(Type.String({ format: 'date-time' })),
 		userId: Type.Optional(Type.String()),
+		clicksCount: Type.Number(),
+		isActive: Type.Boolean(),
 	},
 	{
 		examples: [

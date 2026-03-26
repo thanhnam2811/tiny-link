@@ -14,3 +14,4 @@ coverage/
 .npm
 *.log
 tsconfig.tsbuildinfo
+packages/db/generated/
