@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
 import { AnalyticsManager } from '../../src/modules/analytics/analytics_manager';
 
 describe('POST /api/links/:code/track API', () => {

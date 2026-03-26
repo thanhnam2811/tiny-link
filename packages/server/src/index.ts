@@ -13,7 +13,7 @@ import { linkRoutes } from './modules/link/link.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
-import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION } from '@tiny-link/shared';
+import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION, INTERNAL_AUTH } from '@tiny-link/shared';
 
 export const buildServer = async () => {
 	const analyticsManager = new AnalyticsManager(prisma);
@@ -163,6 +163,10 @@ const start = async () => {
 };
 
 // Only start the server if not in a test environment
+if (process.env.NODE_ENV === ENV_NAMES.TEST) {
+	process.env.INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || INTERNAL_AUTH.TEST_KEY;
+}
+
 if (process.env.NODE_ENV !== ENV_NAMES.TEST) {
 	start();
 }

@@ -1,12 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { LinkService } from './link.service';
-import { HTTP_STATUS, CreateLinkBodyType } from '@tiny-link/shared';
+import { HTTP_STATUS, CreateLinkBodyType, INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
 
 export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
 
-	createLink = async (request: FastifyRequest<{ Body: CreateLinkBodyType }>, reply: FastifyReply) => {
-		const { originalUrl, customCode, maxClicks, expiresAt, password } = request.body;
+	createLink = async (request: any, reply: FastifyReply) => {
+		const { originalUrl, customCode, maxClicks, expiresAt, password, userId, guestId } =
+			request.body as CreateLinkBodyType;
 
 		const link = await this.linkService.createShortLink(
 			originalUrl,
@@ -14,6 +15,8 @@ export class LinkController {
 			maxClicks,
 			expiresAt ? new Date(expiresAt) : undefined,
 			password,
+			userId,
+			guestId,
 		);
 
 		// Use CLIENT_URL (falling back to localhost:3000) for security anti-bypass.
@@ -29,6 +32,7 @@ export class LinkController {
 			createdAt: link.createdAt.toISOString(),
 			maxClicks: link.maxClicks ?? undefined,
 			expiresAt: link.expiresAt?.toISOString() ?? undefined,
+			userId: link.userId ?? undefined,
 		});
 	};
 
@@ -77,5 +81,72 @@ export class LinkController {
 
 		const originalUrl = await this.linkService.verifyPassword(code, password, ip, userAgent);
 		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
+	};
+
+	claimLinks = async (request: any, reply: FastifyReply) => {
+		const { guestId } = request.body as { guestId: string };
+		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
+
+		if (!userId) {
+			return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
+				statusCode: HTTP_STATUS.UNAUTHORIZED,
+				error: 'Unauthorized',
+				code: ERROR_MESSAGES.UNAUTHORIZED,
+				message: 'User ID missing in header',
+			});
+		}
+
+		const count = await this.linkService.claimLinks(guestId, userId);
+		return reply.status(HTTP_STATUS.OK).send({ success: true, claimedCount: count });
+	};
+
+	getUserLinks = async (request: any, reply: FastifyReply) => {
+		const { page, limit, search } = request.query as { page?: number; limit?: number; search?: string };
+		// In a real M2M setup, userId would be extracted from a trusted header or the body
+		// For simplicity, we assume the BFF sends the header 'x-user-id'
+		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
+
+		if (!userId) {
+			return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
+				statusCode: HTTP_STATUS.UNAUTHORIZED,
+				error: 'Unauthorized',
+				code: ERROR_MESSAGES.UNAUTHORIZED,
+				message: 'User ID missing in header',
+			});
+		}
+
+		const data = await this.linkService.getUserLinks(
+			userId,
+			request.query.page,
+			request.query.limit,
+			request.query.search,
+		);
+		return reply.status(HTTP_STATUS.OK).send(data);
+	};
+
+	deleteLink = async (request: any, reply: FastifyReply) => {
+		const { id } = request.params as { id: string };
+		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
+
+		if (!userId) {
+			return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
+				statusCode: HTTP_STATUS.UNAUTHORIZED,
+				error: 'Unauthorized',
+				code: ERROR_MESSAGES.UNAUTHORIZED,
+				message: 'User ID missing in header',
+			});
+		}
+
+		const success = await this.linkService.deleteLink(id, userId);
+		if (!success) {
+			return reply.status(HTTP_STATUS.NOT_FOUND).send({
+				statusCode: HTTP_STATUS.NOT_FOUND,
+				error: 'Not Found',
+				code: ERROR_MESSAGES.LINK_NOT_FOUND,
+				message: 'Link not found or unauthorized',
+			});
+		}
+
+		return reply.status(HTTP_STATUS.OK).send({ success: true });
 	};
 }

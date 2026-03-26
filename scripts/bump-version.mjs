@@ -17,7 +17,8 @@ if (!newVersion) {
 const packages = [
 	'packages/client/package.json',
 	'packages/server/package.json',
-	'packages/shared/package.json'
+	'packages/shared/package.json',
+	'packages/db/package.json'
 ];
 
 const rootDir = path.join(__dirname, '..');

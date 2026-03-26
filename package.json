@@ -1,7 +1,7 @@
 {
 	"name": "tiny-link",
 	"private": true,
-	"version": "1.4.2",
+	"version": "1.5.0",
 	"packageManager": "pnpm@10.32.1",
 	"type": "module",
 	"workspaces": [
@@ -35,6 +35,7 @@
 		"@commitlint/config-conventional": "^20.4.3",
 		"@eslint/js": "^9.21.0",
 		"@types/node": "^25.4.0",
+		"cross-env": "^10.1.0",
 		"eslint": "^9.21.0",
 		"globals": "^17.4.0",
 		"husky": "^9.1.7",

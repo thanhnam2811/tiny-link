@@ -6,5 +6,8 @@ export default defineConfig({
 		environment: 'node',
 		setupFiles: ['./test/setup.ts'],
 		fileParallelism: false,
+		env: {
+			INTERNAL_API_KEY: 'test-internal-key',
+		},
 	},
 });

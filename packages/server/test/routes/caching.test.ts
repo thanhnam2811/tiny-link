@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
+import { HTTP_STATUS, INTERNAL_AUTH } from '@tiny-link/shared';
 import type { Redis } from 'ioredis';
 
 describe('Rate Limiting & Caching', () => {
@@ -32,6 +33,7 @@ describe('Rate Limiting & Caching', () => {
 				app.inject({
 					method: 'POST',
 					url: '/api/links',
+					headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_AUTH.TEST_KEY },
 					payload: { originalUrl: 'https://example.com' },
 				}),
 			);

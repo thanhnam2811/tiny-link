@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
 
 describe('GET /api/stats/:code Stats API', () => {
 	let app: FastifyInstance;
@@ -29,7 +29,7 @@ describe('GET /api/stats/:code Stats API', () => {
 	});
 
 	it('should return correct click stats with direct DB seeding', async () => {
-		const shortCode = 'stats-test-code';
+		const shortCode = `stats-${Math.random().toString(36).substring(7)}`;
 
 		// 1. Create Link
 		const link = await prisma.link.create({

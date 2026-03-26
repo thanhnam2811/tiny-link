@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
+import { HTTP_STATUS, INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
+
+const INTERNAL_KEY = INTERNAL_AUTH.TEST_KEY;
 
 describe('POST /api/links', () => {
 	let app: FastifyInstance;
@@ -22,6 +25,7 @@ describe('POST /api/links', () => {
 		const response = await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
 				originalUrl: 'https://github.com/fastify',
 			},
@@ -32,7 +36,7 @@ describe('POST /api/links', () => {
 		const body = response.json();
 
 		expect(body.originalUrl).toBe('https://github.com/fastify');
-		expect(body.shortCode.length).toBe(7);
+		expect(body.shortCode.length).toBe(6);
 		expect(body.shortUrl).toContain(body.shortCode);
 		expect(body.id).toBeTypeOf('string');
 
@@ -48,6 +52,7 @@ describe('POST /api/links', () => {
 		const response = await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
 				originalUrl: 'not-a-url',
 			},
@@ -62,6 +67,7 @@ describe('POST /api/links', () => {
 		const response = await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
 				originalUrl: 'https://example.com/event',
 				customCode,
@@ -81,6 +87,7 @@ describe('POST /api/links', () => {
 		await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
 				originalUrl: 'https://example.com/one',
 				customCode,
@@ -92,6 +99,7 @@ describe('POST /api/links', () => {
 		const response2 = await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
 				originalUrl: 'https://example.com/two',
 				customCode,
@@ -101,6 +109,6 @@ describe('POST /api/links', () => {
 
 		expect(response2.statusCode).toBe(409);
 		expect(response2.json().message).toContain('already in use');
-		expect(response2.json().code).toBe('LINK_CODE_CONFLICT');
+		expect(response2.json().code).toBe(ERROR_MESSAGES.LINK_CODE_CONFLICT);
 	});
 });

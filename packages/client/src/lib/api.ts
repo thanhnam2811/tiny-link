@@ -52,7 +52,7 @@ export const api = {
 		 * Create a new short link
 		 */
 		create: (payload: CreateLinkBodyType) =>
-			fetcher<LinkResponseType>('/links', {
+			fetcher<LinkResponseType>('/proxy/links', {
 				method: 'POST',
 				body: JSON.stringify(payload),
 			}),
@@ -62,6 +62,39 @@ export const api = {
 		getStats: (code: string) =>
 			fetcher<unknown>(`/stats/${code}`, {
 				method: 'GET',
+			}),
+		/**
+		 * Claim guest links (called automatically on login)
+		 */
+		claim: (guestId: string) =>
+			fetcher<{ success: boolean; claimedCount: number }>('/proxy/links/claim', {
+				method: 'POST',
+				body: JSON.stringify({ guestId }),
+			}),
+		/**
+		 * Get links for the authenticated user
+		 */
+		getUserLinks: (page: number = 1, limit: number = 10, search?: string) => {
+			const query = new URLSearchParams({
+				page: page.toString(),
+				limit: limit.toString(),
+				...(search && { search }),
+			});
+			return fetcher<{
+				links: LinkResponseType[];
+				totalCount: number;
+				totalPages: number;
+				currentPage: number;
+			}>(`/proxy/links/user?${query.toString()}`, {
+				method: 'GET',
+			});
+		},
+		/**
+		 * Delete (Soft Delete) a link
+		 */
+		delete: (id: string) =>
+			fetcher<{ success: boolean }>(`/proxy/links/${id}`, {
+				method: 'DELETE',
 			}),
 	},
 };

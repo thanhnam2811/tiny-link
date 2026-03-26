@@ -21,6 +21,9 @@ export const metadata: Metadata = {
 	description: 'A lightning-fast, highly trackable URL shortener built for power users.',
 };
 
+import { Header } from '@/components/Header';
+import { ClaimLinksEffect } from '@/components/ClaimLinksEffect';
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -31,6 +34,8 @@ export default function RootLayout({
 			<body className={`${inter.className} ${interTight.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<SessionProvider>
+						<Header />
+						<ClaimLinksEffect />
 						{children}
 						<ThemeToggle />
 						<Toaster position="top-center" />

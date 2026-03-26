@@ -1,14 +1,14 @@
 {
 	"name": "@tiny-link/db",
-	"version": "1.4.2",
+	"version": "1.5.0",
 	"private": true,
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"generate": "prisma generate",
-		"db:push": "dotenv -e ../../.env -- prisma db push",
-		"db:studio": "dotenv -e ../../.env -- prisma studio",
+		"db:push": "prisma db push",
+		"db:studio": "prisma studio",
 		"lint": "eslint ."
 	},
 	"dependencies": {

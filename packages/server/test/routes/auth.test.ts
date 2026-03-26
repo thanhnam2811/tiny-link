@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@tiny-link/db';
+import { HTTP_STATUS, INTERNAL_AUTH } from '@tiny-link/shared';
+
+const INTERNAL_KEY = INTERNAL_AUTH.TEST_KEY;
 
 describe('Password Protected Links API', () => {
 	let app: FastifyInstance;
@@ -11,7 +14,6 @@ describe('Password Protected Links API', () => {
 		const { server } = await buildServer();
 		app = server;
 		await app.ready();
-		await app.redis.flushall();
 	});
 
 	afterAll(async () => {
@@ -23,20 +25,21 @@ describe('Password Protected Links API', () => {
 		const response = await app.inject({
 			method: 'POST',
 			url: '/api/links',
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
 			payload: {
-				originalUrl: 'https://secret.dev',
+				originalUrl: 'https://google.com',
 				password: 'my-super-secret-password',
 			},
-			remoteAddress: '127.0.0.2',
+			remoteAddress: '127.0.0.1',
 		});
 
 		expect(response.statusCode).toBe(201);
 		const body = response.json();
-		expect(body.shortCode).toBeDefined();
+		expect(body.shortCode).toBeTypeOf('string');
 
-		// Verify DB state
-		const dbLink = await prisma.link.findUnique({ where: { id: body.id } });
-		expect(dbLink?.passwordHash).toBeDefined();
+		// Verify in DB
+		const dbLink = await prisma.link.findUnique({ where: { shortCode: body.shortCode } });
+		expect(dbLink?.passwordHash).not.toBeNull();
 	});
 
 	it('should block direct redirection of a protected link with 401', async () => {
@@ -44,12 +47,13 @@ describe('Password Protected Links API', () => {
 		const createRes = await app.inject({
 			method: 'POST',
 			url: '/api/links',
-			payload: { originalUrl: 'https://secret2.dev', password: 'test' },
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
+			payload: { originalUrl: 'https://google.com', password: 'test' },
 			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
 
-		// 2. Attempt redirect
+		// 2. Try to track (which would usually redirect)
 		const response = await app.inject({
 			method: 'POST',
 			url: `/api/links/${shortCode}/track`,
@@ -65,7 +69,8 @@ describe('Password Protected Links API', () => {
 		const createRes = await app.inject({
 			method: 'POST',
 			url: '/api/links',
-			payload: { originalUrl: 'https://verify-me.dev', password: 'correct-horse-battery-staple' },
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
+			payload: { originalUrl: 'https://google.com', password: 'correct-horse-battery-staple' },
 			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
@@ -86,7 +91,7 @@ describe('Password Protected Links API', () => {
 		});
 
 		expect(correctRes.statusCode).toBe(200);
-		expect(correctRes.json().originalUrl).toBe('https://verify-me.dev');
+		expect(correctRes.json().originalUrl).toBe('https://google.com');
 	});
 
 	it('should enforce strict rate limit on the verify endpoint', async () => {
@@ -94,29 +99,24 @@ describe('Password Protected Links API', () => {
 		const createRes = await app.inject({
 			method: 'POST',
 			url: '/api/links',
-			payload: { originalUrl: 'https://brute.dev', password: 'brute' },
+			headers: { [INTERNAL_AUTH.HEADER]: INTERNAL_KEY },
+			payload: { originalUrl: 'https://google.com', password: 'brute' },
 			remoteAddress: '127.0.0.2',
 		});
 		const { shortCode } = createRes.json();
 
-		// 2. Fire 5 requests (Limit is 5 per min)
-		for (let i = 0; i < 5; i++) {
-			await app.inject({
+		// 2. Brute force (limit is 5 per minute)
+		const attempts = Array.from({ length: 6 }, () =>
+			app.inject({
 				method: 'POST',
 				url: `/api/links/${shortCode}/verify`,
 				payload: { password: 'wrong' },
-				remoteAddress: '10.0.0.99', // mock specific IP
-			});
-		}
+				remoteAddress: '127.0.0.9', // Use same IP
+			}),
+		);
 
-		// 3. The 6th request should hit 429 Too Many Requests
-		const rateLimitedRes = await app.inject({
-			method: 'POST',
-			url: `/api/links/${shortCode}/verify`,
-			payload: { password: 'wrong' },
-			remoteAddress: '10.0.0.99',
-		});
-
-		expect(rateLimitedRes.statusCode).toBe(429);
+		const responses = await Promise.all(attempts);
+		const statusCodes = responses.map((r) => r.statusCode);
+		expect(statusCodes).toContain(429);
 	});
 });

@@ -8,6 +8,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { api, ApiError } from '@/lib/api';
 import { CreateLinkBodyType, ERROR_MESSAGES } from '@tiny-link/shared';
+import { getOrCreateGuestId } from '@/lib/guest-id';
 import { format } from 'date-fns';
 import { CalendarIcon, Eye, EyeOff, LinkIcon, Minus, Plus, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -81,6 +82,9 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 		if (values.password) payload.password = values.password.trim();
 		if (values.maxClicks && typeof values.maxClicks === 'number') payload.maxClicks = values.maxClicks;
 		if (values.expiresAt) payload.expiresAt = values.expiresAt.toISOString();
+
+		// Always provide a guestId for anonymous tracking
+		payload.guestId = getOrCreateGuestId();
 
 		try {
 			const response = await api.links.create(payload);

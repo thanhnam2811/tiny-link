@@ -39,6 +39,8 @@ export const CreateLinkBodySchema = Type.Object(
 				examples: ['my-super-secret-password'],
 			}),
 		),
+		userId: Type.Optional(Type.String({ description: 'The ID of the user who owns this link' })),
+		guestId: Type.Optional(Type.String({ description: 'The anonymous tracking ID for guest links' })),
 	},
 	{
 		description: 'Payload for creating a new short link',
@@ -67,6 +69,7 @@ export const LinkResponseSchema = Type.Object(
 		createdAt: Type.String({ format: 'date-time' }),
 		maxClicks: Type.Optional(Type.Number()),
 		expiresAt: Type.Optional(Type.String({ format: 'date-time' })),
+		userId: Type.Optional(Type.String()),
 	},
 	{
 		examples: [
@@ -356,3 +359,9 @@ export const AdminAnalyticsResponseSchema = Type.Object({
 	),
 });
 export type AdminAnalyticsResponseType = Static<typeof AdminAnalyticsResponseSchema>;
+
+// Auth & Claiming Schemas
+export const ClaimLinksBodySchema = Type.Object({
+	guestId: Type.String({ description: 'The guest ID to claim links from' }),
+});
+export type ClaimLinksBodyType = Static<typeof ClaimLinksBodySchema>;

@@ -1,6 +1,6 @@
 {
 	"name": "@tiny-link/server",
-	"version": "1.4.2",
+	"version": "1.5.0",
 	"main": "dist/index.js",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
@@ -9,7 +9,7 @@
 		"start": "node dist/index.js",
 		"db:push": "pnpm --filter @tiny-link/db db:push",
 		"db:studio": "pnpm --filter @tiny-link/db db:studio",
-		"pretest": "pnpm --filter @tiny-link/db db:push --accept-data-loss",
+		"pretest": "dotenv -e .env.test -- pnpm --filter @tiny-link/db exec prisma db push --accept-data-loss",
 		"test": "dotenv -e .env.test -- vitest run",
 		"test:watch": "dotenv -e .env.test -- vitest"
 	},

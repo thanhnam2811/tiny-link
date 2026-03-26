@@ -29,6 +29,8 @@ export class LinkService {
 		maxClicks?: number,
 		expiresAt?: Date,
 		password?: string,
+		userId?: string,
+		guestId?: string,
 	) {
 		let shortCode = customCode;
 		const maxRetries = SYSTEM_CONFIG.SHORT_LINK_MAX_RETRIES;
@@ -50,16 +52,21 @@ export class LinkService {
 					maxClicks,
 					expiresAt,
 					passwordHash,
+					userId,
+					guestId,
 				);
 
 				// Fire-and-forget: Scrape OpenGraph metadata in background
-				scrapeUrlMetadata(originalUrl).then(async (metadata) => {
-					if (metadata.metaTitle || metadata.metaDescription || metadata.metaImage) {
-						await this.linkRepository.updateMetadata(link.id, metadata).catch((err) => {
-							console.error(`[Scraper] Failed to save DB metadata for ${link.id}:`, err);
-						});
-					}
-				});
+				// Skip in test mode to avoid race conditions with cleanup
+				if (process.env.NODE_ENV !== 'test') {
+					scrapeUrlMetadata(originalUrl).then(async (metadata) => {
+						if (metadata.metaTitle || metadata.metaDescription || metadata.metaImage) {
+							await this.linkRepository.updateMetadata(link.id, metadata).catch((err) => {
+								console.error(`[Scraper] Failed to save DB metadata for ${link.id}:`, err);
+							});
+						}
+					});
+				}
 
 				return link;
 			} catch (error: unknown) {
@@ -411,5 +418,36 @@ export class LinkService {
 		}
 
 		return link.originalUrl;
+	}
+
+	async claimLinks(guestId: string, userId: string) {
+		return this.linkRepository.claimLinks(guestId, userId);
+	}
+
+	async getUserLinks(userId: string, page: number = 1, limit: number = 10, search?: string) {
+		const skip = (page - 1) * limit;
+		const [links, totalCount] = await Promise.all([
+			this.linkRepository.findByUserId(userId, skip, limit, search),
+			this.linkRepository.countByUserId(userId, search),
+		]);
+
+		return {
+			links,
+			totalCount,
+			totalPages: Math.ceil(totalCount / limit),
+			currentPage: page,
+		};
+	}
+
+	async deleteLink(id: string, userId: string): Promise<boolean> {
+		const success = await this.linkRepository.delete(id, userId);
+		if (success) {
+			// Invalidate cache if we find it
+			const link = await this.linkRepository.findById(id);
+			if (link) {
+				await this.redis.del(`link:${link.shortCode}`);
+			}
+		}
+		return success;
 	}
 }

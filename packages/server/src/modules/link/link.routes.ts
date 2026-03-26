@@ -19,6 +19,8 @@ import { LinkController } from './link.controller';
 import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
 import { SYSTEM_CONFIG, HTTP_STATUS } from '@tiny-link/shared';
+import { internalAuthMiddleware } from '../../shared/internal-auth.middleware';
+import { ClaimLinksBodySchema } from '@tiny-link/shared';
 
 // This is where we wire up our dependencies (IoC)
 export const linkRoutes = (
@@ -42,6 +44,7 @@ export const linkRoutes = (
 						timeWindow: SYSTEM_CONFIG.RATE_LIMIT_WINDOW,
 					},
 				},
+				preHandler: [internalAuthMiddleware],
 				schema: {
 					tags: ['Links'],
 					summary: 'Create a Short Link',
@@ -126,24 +129,82 @@ export const linkRoutes = (
 			controller.getStats,
 		);
 
-		// Preview API Route (For Bot & Next.js Metadata fetcher)
-		server.get(
-			'/api/links/:code/preview',
+		// Claim Guest Links
+		server.post(
+			'/api/links/claim',
 			{
+				preHandler: [internalAuthMiddleware],
 				schema: {
 					tags: ['Links'],
-					summary: 'Get Link Preview Metadata',
-					description:
-						'Retrieves read-only metadata (originalUrl, title, description) for constructing OpenGraph tags without triggering analytics increments.',
-					params: RedirectParamsSchema,
+					summary: 'Claim Guest Links',
+					description: 'Assigns all orphan links with a specific guestId to a registered userId.',
+					body: ClaimLinksBodySchema,
 					response: {
-						[HTTP_STATUS.OK]: LinkPreviewResponseSchema,
-						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
-						[HTTP_STATUS.GONE]: ErrorResponseSchema,
+						[HTTP_STATUS.OK]: Type.Object({ success: Type.Boolean(), claimedCount: Type.Number() }),
+						[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
 					},
 				},
 			},
-			controller.getPreview,
+			controller.claimLinks,
+		);
+
+		// Get User Links (Dashboard)
+		server.get(
+			'/api/links/user',
+			{
+				preHandler: [internalAuthMiddleware],
+				schema: {
+					tags: ['Links'],
+					summary: 'Get Authenticated User Links',
+					description: 'Retrieves a paginated list of links owned by the authenticated user.',
+					querystring: Type.Object({
+						page: Type.Optional(Type.Number({ minimum: 1, default: 1 })),
+						limit: Type.Optional(Type.Number({ minimum: 1, maximum: 100, default: 10 })),
+						search: Type.Optional(Type.String()),
+					}),
+					response: {
+						[HTTP_STATUS.OK]: Type.Object({
+							links: Type.Array(
+								Type.Object({
+									id: Type.String(),
+									originalUrl: Type.String(),
+									shortCode: Type.String(),
+									createdAt: Type.String({ format: 'date-time' }),
+									clicksCount: Type.Number(),
+									isActive: Type.Boolean(),
+								}),
+							),
+							totalCount: Type.Number(),
+							totalPages: Type.Number(),
+							currentPage: Type.Number(),
+						}),
+						[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.getUserLinks,
+		);
+
+		server.delete(
+			'/links/:id',
+			{
+				preHandler: [internalAuthMiddleware],
+				schema: {
+					tags: ['Links'],
+					summary: 'Delete a link (Soft Delete)',
+					params: Type.Object({
+						id: Type.String({ format: 'uuid' }),
+					}),
+					response: {
+						[HTTP_STATUS.OK]: Type.Object({
+							success: Type.Boolean(),
+						}),
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+						[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.deleteLink,
 		);
 	};
 };
