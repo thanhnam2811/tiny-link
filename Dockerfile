@@ -23,7 +23,8 @@ RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
 FROM base AS runner
 
 # Install prisma globally to ensure CLI availability for migrations
-RUN npm install -g prisma
+# Pin to v6 to match project dependencies and avoid Prisma 7 breaking changes
+RUN npm install -g prisma@6.4.1
 
 WORKDIR /prod/server
 

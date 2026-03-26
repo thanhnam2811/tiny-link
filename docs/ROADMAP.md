@@ -102,23 +102,43 @@ _Goal: Build a dedicated dashboard for system administration and detailed analyt
 
 _Goal: Allow regular users to log in easily and manage their own shortened links (SaaS evolution)._
 
-- [ ] **Database & Authentication (OAuth First)**:
-    - [ ] Setup `Auth.js` (NextAuth) or `Lucia Auth` for standard OAuth providers (Google/GitHub).
-    - [ ] Create `User` and `Session` models. Add `userId` relation to `Link` model.
-- [ ] **Feature: Claim Guest Links (UX Premium)**:
-    - [ ] Read old Session/IP upon successful registration to automatically assign anonymous links to the new user account.
-- [ ] **User Dashboard (Frontend `client` package)**:
-    - [ ] Social Login screen.
-    - [ ] Private dashboard to view personal link history and analytics.
-    - [ ] UI tools to create, edit metadata, and delete personal links.
+- [x] **Database & Authentication (OAuth First)**:
+    - [x] Setup `Auth.js` (NextAuth) with Google/GitHub providers.
+    - [x] Create `User`/`Session` models and link-user relations.
+- [x] **Feature: Claim Guest Links (UX Premium)**:
+    - [x] Implement server-side and client-side auto-claiming of orphan links upon login.
+- [x] **User Dashboard (Frontend `client` package)**:
+    - [x] Private dashboard with CRUD operations (List, Search, Delete).
+    - [x] Secure BFF Proxy for session-aware link management.
 
-### 🟣 Phase 10: Applied AI Integration (The Smart System)
+### ✨ Phase 10: UI/UX Premium (The Last Mile)
+
+_Goal: Elevate the platform to a world-class standard with professional aesthetics and seamless interactions._
+
+- [ ] **Visual Identity & Design System**:
+    - [ ] Implement **HSL-based dynamic color palettes** (Dark/Light/System) using Tailwind CSS v4 logic.
+    - [ ] Integrate **Glassmorphism & Neumorphism** effects for cards, modals, and navigation.
+    - [ ] Setup modern typography (Inter/Outfit pairing) with fluid scaling.
+- [ ] **Enhanced Interactions**:
+    - [ ] **Framer Motion**: Add entrance animations, hover transforms, and layout transitions.
+    - [ ] **Micro-animations**: Add "Confetti" on success, magnetic buttons, and slick copy-to-clipboard feedback.
+    - [ ] **Smooth Scrolling**: Integrate Lenis for a premium feel.
+- [ ] **Resilience & Fallbacks (The "No Broken Flows" Rule)**:
+    - [ ] **Custom 404 (Not Found)**: A creative, animated page for non-existent or expired links.
+    - [ ] **Custom Error boundaries**: Implement `error.tsx` for graceful failure with auto-retry options.
+    - [ ] **Skeleton Loading**: Custom SVG skeletons for `loading.tsx` in Dashboard and Analytics.
+- [ ] **Page-Specific Polish**:
+    - [ ] **Landing Page**: Animated hero gradient, bento-grid feature section, and interactive link previewer.
+    - [ ] **Dashboard**: Modern sidebar, bulk selection UI, and empty-state illustrations.
+    - [ ] **Analytics**: High-fidelity **Recharts** integration with area gradients and interactive tooltips.
+
+### 🟣 Phase 11: Applied AI Integration (The Smart System)
 
 _Goal: Learn practical, cost-effective AI deployment (OpenAI/Gemini) inside a modern backend architecture._
 
-- [ ] **AI-Assisted User Experience (Event-Driven Architecture)**:
-    - [ ] **Smart Short Codes (Streaming UI)**: AI streams memorable short code suggestions in real-time.
-    - [ ] **Auto-Generated Meta Tags (Background Job)**: Return the short link to the user instantly (50ms). A background worker handles the slow AI scraping process and updates the OpenGraph tags asynchronously.
-- [ ] **AI for System Security & Admin Insights**:
-    - [ ] **Malicious Content Detection (Funnel Model)**: Optimize LLM API costs. Tier 1: Check domains against a free Blacklist/Regex. Tier 2: Only send structurally suspicious Links to AI for final scoring and auto-Trap.
-    - [ ] **Traffic Anomaly Insights**: Admin dashboard displays conversational AI summaries highlighting click surges.
+- [ ] **AI-Assisted User Experience**:
+    - [ ] **Smart Short Codes**: AI-powered streaming suggestions.
+    - [ ] **Auto-Generated Meta Tags**: Background workers updating OG tags via LLM analysis.
+- [ ] **AI for System Security & Insights**:
+    - [ ] **Malicious Content Detection**: Multi-tier cost-optimized LLM scoring.
+    - [ ] **Traffic Anomaly Insights**: Conversational summaries of click surges in Admin UI.
