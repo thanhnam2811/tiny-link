@@ -34,12 +34,12 @@ ENV PORT=3001
 COPY --from=build /prod/server /prod/server
 COPY --from=build /app/packages/db/prisma ./prisma
 
-COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs
 USER nodeuser
 
 EXPOSE 3001
 
-CMD ["./entrypoint.sh"]
+CMD ["/entrypoint.sh"]
