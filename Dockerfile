@@ -22,6 +22,9 @@ RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
 
 FROM base AS runner
 
+# Install prisma globally to ensure CLI availability for migrations
+RUN npm install -g prisma
+
 WORKDIR /prod/server
 
 ENV NODE_ENV=production
