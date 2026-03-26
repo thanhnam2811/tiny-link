@@ -1,6 +1,6 @@
 {
 	"name": "@tiny-link/server",
-	"version": "1.5.4",
+	"version": "1.5.6",
 	"main": "dist/index.js",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",

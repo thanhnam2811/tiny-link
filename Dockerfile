@@ -14,12 +14,11 @@ COPY . .
 # Use BuildKit cache mount for pnpm store to speed up rebuilds.
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
+RUN pnpm --filter @tiny-link/db exec prisma generate
 RUN pnpm --filter @tiny-link/server... build
 
 # Create a deployable, symlink-safe production tree for only the server package.
 RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
-WORKDIR /prod/server
-RUN pnpm exec prisma generate --schema=node_modules/@tiny-link/db/prisma/schema.prisma
 
 FROM base AS runner
 
