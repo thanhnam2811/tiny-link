@@ -21,6 +21,7 @@ describe('RedirectHandler', () => {
 	});
 
 	afterAll(() => {
+		// @ts-expect-error - necessary for location mock casting
 		window.location = originalLocation;
 	});
 

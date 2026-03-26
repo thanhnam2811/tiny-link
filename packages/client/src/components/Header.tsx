@@ -20,19 +20,19 @@ export function Header() {
 	const isLoading = status === 'loading';
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/60 backdrop-blur-md">
+		<header className="sticky top-0 z-50 w-full glass border-x-0 border-t-0 border-b shadow-sm">
 			<div className="container mx-auto flex h-16 items-center justify-between px-4">
 				<div className="flex items-center gap-6">
 					<Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-						<LinkIcon className="h-6 w-6 text-blue-500" />
-						<span className="text-xl font-bold tracking-tight text-white">TinyLink</span>
+						<LinkIcon className="h-6 w-6 text-primary" />
+						<span className="text-xl font-heading font-bold tracking-tight">TinyLink</span>
 					</Link>
 
 					{session && (
 						<nav className="hidden md:flex items-center gap-4">
 							<Link
 								href="/dashboard"
-								className="text-sm font-medium text-white/60 hover:text-white transition-colors"
+								className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
 							>
 								Dashboard
 							</Link>
@@ -50,7 +50,7 @@ export function Header() {
 							<DropdownMenuTrigger className="relative h-10 w-10 rounded-full p-0 cursor-pointer overflow-hidden border border-white/10 outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
 								<Avatar className="h-10 w-10">
 									<AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-									<AvatarFallback className="bg-blue-600 text-white">
+									<AvatarFallback className="bg-primary text-primary-foreground font-heading">
 										{session.user?.name?.charAt(0) || <User className="h-5 w-5" />}
 									</AvatarFallback>
 								</Avatar>
@@ -59,12 +59,14 @@ export function Header() {
 								className="w-56 border-white/10 bg-background/95 backdrop-blur-xl"
 								align="end"
 							>
-								<DropdownMenuLabel className="font-normal">
+								<DropdownMenuLabel className="font-normal font-sans">
 									<div className="flex flex-col space-y-1">
-										<p className="text-sm font-medium leading-none text-white">
+										<p className="text-sm font-heading font-bold leading-none text-foreground">
 											{session.user?.name}
 										</p>
-										<p className="text-xs leading-none text-white/60">{session.user?.email}</p>
+										<p className="text-xs leading-none text-muted-foreground">
+											{session.user?.email}
+										</p>
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator className="bg-white/10" />
@@ -76,7 +78,7 @@ export function Header() {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator className="bg-white/10" />
 								<DropdownMenuItem
-									className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-400"
+									className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
 									onClick={() => signOut({ callbackUrl: '/' })}
 								>
 									<LogOut className="h-4 w-4 mr-2" />
@@ -86,7 +88,7 @@ export function Header() {
 						</DropdownMenu>
 					) : (
 						<Link href="/login">
-							<Button className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-6 rounded-lg shadow-md transition-all">
+							<Button className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-6 rounded-lg shadow-md transition-all">
 								Sign In
 							</Button>
 						</Link>

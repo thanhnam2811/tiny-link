@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Inter_Tight } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -11,8 +11,8 @@ const inter = Inter({
 	subsets: ['latin'],
 });
 
-const interTight = Inter_Tight({
-	variable: '--font-inter-tight',
+const outfit = Outfit({
+	variable: '--font-outfit',
 	subsets: ['latin'],
 });
 
@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${inter.className} ${interTight.variable} antialiased`}>
+			<body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<SessionProvider>
 						<Header />

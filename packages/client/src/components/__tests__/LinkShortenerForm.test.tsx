@@ -49,6 +49,8 @@ describe('LinkShortenerForm', () => {
 			shortUrl: 'http://localhost:3000/my-link',
 			originalUrl: 'https://example.com',
 			createdAt: new Date().toISOString(),
+			clicksCount: 0,
+			isActive: true,
 		});
 
 		render(<LinkShortenerForm disabled={false} onSuccess={mockOnSuccess} />);

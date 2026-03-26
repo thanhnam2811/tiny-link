@@ -63,11 +63,11 @@ export default function DashboardPage() {
 		<div className="container mx-auto py-8 px-4 max-w-6xl">
 			<div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
 				<div>
-					<h1 className="text-4xl font-bold text-white mb-2 drop-shadow-sm">My Dashboard</h1>
-					<p className="text-white/60">Manage and track your shortened links</p>
+					<h1 className="text-4xl font-heading font-black text-foreground mb-2">My Dashboard</h1>
+					<p className="text-muted-foreground font-medium">Manage and track your shortened links</p>
 				</div>
 				<Link href="/">
-					<Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 h-12 px-6 rounded-xl shadow-lg hover:-translate-y-0.5 transition-all">
+					<Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-12 px-6 rounded-xl shadow-lg hover:-translate-y-0.5 transition-all">
 						<Plus className="h-5 w-5" />
 						Create New Link
 					</Button>
@@ -75,11 +75,11 @@ export default function DashboardPage() {
 			</div>
 
 			<div className="mb-6 relative">
-				<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+				<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
 				<input
 					type="text"
 					placeholder="Search links..."
-					className="w-full h-12 pl-10 pr-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+					className="w-full h-12 pl-10 pr-4 rounded-xl border border-border bg-muted/20 backdrop-blur-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-sans"
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 				/>
@@ -94,13 +94,13 @@ export default function DashboardPage() {
 					links.map((link) => (
 						<Card
 							key={link.id}
-							className="border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group overflow-hidden"
+							className="border border-border/40 bg-card/40 backdrop-blur-sm hover:bg-card/60 transition-all duration-300 group overflow-hidden shadow-sm"
 						>
 							<CardContent className="p-0 flex flex-col md:flex-row items-center">
 								<div className="p-6 flex-1 min-w-0">
 									<div className="flex items-center gap-2 mb-2">
-										<LinkIcon className="h-4 w-4 text-blue-400 shrink-0" />
-										<h3 className="font-bold text-white text-lg truncate hover:text-blue-400 transition-colors">
+										<LinkIcon className="h-4 w-4 text-primary shrink-0" />
+										<h3 className="font-heading font-bold text-foreground text-lg truncate hover:text-primary transition-colors">
 											<a
 												href={`${window.location.origin}/${link.shortCode}`}
 												target="_blank"
@@ -110,30 +110,29 @@ export default function DashboardPage() {
 											</a>
 										</h3>
 									</div>
-									<p className="text-white/40 text-sm truncate mb-4">{link.originalUrl}</p>
-									<div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
+									<div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground font-sans">
 										<span className="flex items-center gap-1">
 											<BarChart2 className="h-3 w-3" />
 											{link.clicksCount} clicks
 										</span>
 										<span>Created {format(new Date(link.createdAt), 'MMM d, yyyy')}</span>
 										{link.isActive ? (
-											<span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/20">
+											<span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/10">
 												Active
 											</span>
 										) : (
-											<span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/20">
+											<span className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/10">
 												Inactive
 											</span>
 										)}
 									</div>
 								</div>
-								<div className="flex items-center gap-2 p-6 bg-black/20 border-t md:border-t-0 md:border-l border-white/5 w-full md:w-auto justify-center">
+								<div className="flex items-center gap-2 p-6 bg-muted/30 border-t md:border-t-0 md:border-l border-border/30 w-full md:w-auto justify-center">
 									<Link href={`/${link.shortCode}/stats`}>
 										<Button
 											size="icon"
 											variant="ghost"
-											className="hover:bg-white/10 hover:text-white"
+											className="hover:bg-primary/10 hover:text-primary"
 											title="View Statistics"
 										>
 											<BarChart2 className="h-5 w-5" />

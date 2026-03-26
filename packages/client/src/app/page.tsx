@@ -70,13 +70,13 @@ export default function Home() {
 	return (
 		<main className="flex min-h-screen flex-col items-center p-6 sm:p-24 relative overflow-hidden bg-background">
 			<div className="z-10 w-full max-w-2xl flex flex-col items-center gap-6 text-center mt-12 mb-10">
-				<div className="inline-flex items-center rounded-full border border-border/50 bg-muted/20 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-foreground/80 tracking-wide">
-					<span className="flex h-1.5 w-1.5 rounded-full bg-blue-500 mr-2"></span>
-					TinyLink
+				<div className="inline-flex items-center rounded-full glass px-4 py-1.5 text-xs font-semibold tracking-wide shadow-sm">
+					<span className="flex h-2 w-2 rounded-full bg-primary animate-pulse mr-2"></span>
+					<span className="text-foreground/80">TinyLink v1.5.4 Stable</span>
 				</div>
-				<h1 className="text-5xl sm:text-[4rem] font-[800] leading-[1.1] tracking-tight text-foreground font-[family-name:var(--font-inter-tight)]">
+				<h1 className="text-5xl sm:text-[4rem] font-heading font-black leading-[1.05] tracking-tight text-foreground">
 					Shorten your links. <br className="hidden sm:block" />
-					<span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent font-extrabold pb-1">
+					<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent pb-1">
 						Track everything.
 					</span>
 				</h1>
@@ -86,8 +86,8 @@ export default function Home() {
 				</p>
 			</div>
 
-			<Card className="w-full max-w-2xl border-border bg-card shadow-sm rounded-2xl overflow-hidden relative">
-				<CardContent className="p-6 sm:p-8">
+			<Card className="w-full max-w-2xl border border-border/40 bg-card/50 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden relative">
+				<CardContent className="p-6 sm:p-10">
 					{!shortUrl && (
 						<ServerLoadingOverlay status={serverStatus} onRetry={() => setServerStatus('warming')} />
 					)}

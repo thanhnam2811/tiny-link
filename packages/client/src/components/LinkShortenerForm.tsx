@@ -120,16 +120,18 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 				control={control}
 				render={({ field, fieldState }) => (
 					<Field className="w-full text-left" data-invalid={fieldState.invalid}>
-						<FieldLabel className="text-sm font-semibold ml-1 mb-1">Shorten a long link</FieldLabel>
+						<FieldLabel className="text-sm font-heading font-semibold ml-1 mb-1">
+							Shorten a long link
+						</FieldLabel>
 						<div className="relative flex flex-col sm:flex-row gap-3">
-							<InputGroup className="h-14 w-full bg-background group-data-[invalid=true]:ring-destructive group-focus-within/field:ring-1 focus-within:ring-blue-500 transition-all border-border rounded-xl shadow-sm">
+							<InputGroup className="h-14 w-full bg-background/50 backdrop-blur-sm group-data-[invalid=true]:ring-destructive group-focus-within/field:ring-1 focus-within:ring-primary transition-all border-border rounded-xl shadow-sm">
 								<InputGroupAddon className="pl-3 text-muted-foreground">
 									<LinkIcon className="h-5 w-5" />
 								</InputGroupAddon>
 								<InputGroupInput
 									{...field}
 									placeholder="Paste long URL..."
-									className="text-base placeholder:text-muted-foreground/60 border-0 focus-visible:ring-0 px-2"
+									className="text-base font-sans placeholder:text-muted-foreground/60 border-0 focus-visible:ring-0 px-2"
 									autoComplete="nope"
 									autoFocus
 									disabled={loading}
@@ -143,9 +145,9 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 							</InputGroup>
 							<Button
 								type="submit"
-								className={`h-14 w-full sm:w-auto px-7 font-semibold text-base transition-all rounded-xl z-10 ${
+								className={`h-14 w-full sm:w-auto px-7 font-heading font-bold text-base transition-all rounded-xl z-10 ${
 									!loading && urlValue
-										? 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white hover:-translate-y-0.5'
+										? 'bg-primary hover:bg-primary/90 text-primary-foreground hover:-translate-y-0.5'
 										: 'bg-muted text-muted-foreground cursor-not-allowed opacity-60'
 								}`}
 								disabled={loading || !urlValue}
@@ -161,10 +163,10 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 			<div className="border border-border/40 rounded-xl bg-transparent overflow-hidden">
 				<Accordion className="w-full">
 					<AccordionItem value="advanced" className="border-b-0">
-						<AccordionTrigger className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:no-underline hover:bg-muted/10 transition-colors">
+						<AccordionTrigger className="px-3 py-3 text-sm font-heading font-semibold text-muted-foreground hover:text-foreground hover:no-underline hover:bg-muted/10 transition-colors">
 							<div className="flex items-center justify-between w-full">
 								<span className="flex items-center gap-2">Advanced Options</span>
-								<span className="text-[11px] font-semibold px-2 py-0.5 bg-muted text-muted-foreground rounded-md mr-2 uppercase tracking-wider">
+								<span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md mr-2 uppercase tracking-widest">
 									Optional
 								</span>
 							</div>
@@ -177,7 +179,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									control={control}
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
 												Custom Alias
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
@@ -203,7 +205,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									control={control}
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
 												Max Clicks Limit
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm pr-1">
@@ -263,7 +265,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									control={control}
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
 												Password Protection
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
@@ -297,7 +299,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									control={control}
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
 												Confirm Password
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
@@ -341,7 +343,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 											className="flex flex-col items-start gap-2"
 											data-invalid={fieldState.invalid}
 										>
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-full rounded-none border-0 bg-transparent p-0 flex">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80 w-full rounded-none border-0 bg-transparent p-0 flex">
 												Expiration Date
 											</FieldLabel>
 											<Popover>
@@ -412,7 +414,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									name="expiresAt"
 									render={({ field }) => (
 										<Field className="flex flex-col items-start gap-2">
-											<FieldLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-full rounded-none border-0 bg-transparent p-0 flex">
+											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80 w-full rounded-none border-0 bg-transparent p-0 flex">
 												Expiration Time
 											</FieldLabel>
 											<InputGroup

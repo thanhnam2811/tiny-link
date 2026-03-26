@@ -38,12 +38,10 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 		<div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-300 relative">
 			<div className="flex flex-col items-start gap-5 w-full">
 				<div className="flex items-center gap-2 mb-1">
-					<span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+					<span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
 						<Check className="w-4 h-4 stroke-[3]" />
 					</span>
-					<h2 className="text-lg font-bold text-foreground font-[family-name:var(--font-inter-tight)]">
-						Link Shortened
-					</h2>
+					<h2 className="text-xl font-heading font-bold text-foreground">Link Shortened Successfully</h2>
 				</div>
 
 				<div className="w-full flex flex-col sm:flex-row items-center justify-between p-5 rounded-xl bg-background border border-border gap-6 shadow-sm ring-1 ring-border/50">
@@ -52,7 +50,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 							href={shortUrl}
 							target="_blank"
 							rel="noreferrer"
-							className="relative z-10 text-xl sm:text-[22px] font-semibold text-foreground hover:text-blue-600 transition-colors truncate block font-sans"
+							className="relative z-10 text-xl sm:text-[22px] font-heading font-bold text-foreground hover:text-primary transition-colors truncate block"
 						>
 							{shortUrl.replace(/^https?:\/\//, '')}
 						</a>
@@ -69,10 +67,10 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 						<Button
 							size="default"
 							onClick={handleCopy}
-							className={`shrink-0 h-10 px-4 w-full sm:w-auto font-medium rounded-md transition-all gap-2 shadow-sm ${
+							className={`shrink-0 h-10 px-6 w-full sm:w-auto font-heading font-bold rounded-xl transition-all gap-2 shadow-sm ${
 								isCopied
-									? 'bg-[#22C55E] hover:bg-[#16A34A] text-white'
-									: 'bg-white hover:bg-gray-50 text-foreground border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800'
+									? 'bg-green-600 hover:bg-green-700 text-white'
+									: 'bg-primary hover:bg-primary/90 text-primary-foreground'
 							}`}
 						>
 							{isCopied ? (
