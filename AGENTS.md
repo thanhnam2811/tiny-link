@@ -1,10 +1,19 @@
-# AI Agent Operating Protocol (v1.0)
+# AI Agent Operating Protocol (v1.1)
 
 ## 1. Strategy: Plan-First, Code-Later
 
 - **Mandatory Planning:** Never initiate code changes without a predefined implementation plan. The Agent must outline the steps and wait for acknowledgment before modifying files.
-- **Re-planning on Failure:** If a bug or logical inconsistency occurs, stop immediately. Do not attempt "trial and error" patches. Re-evaluate the original plan, perform a **Re-plan**, and then proceed with the fix.
-- **Traceability:** Every major architectural change must correspond to a specific step in the confirmed plan.
+- **Branching Strategy:**
+    - `feature/xyz` or `fix/abc`: Dedicated branches for work.
+    - `develop`: Integration branch. **STAGING/PREVIEW** environment target.
+    - `main`: Production branch. **PRODUCTION** environment target.
+- **Git Workflow:**
+    1. Branch from `develop` for features/fixes.
+    2. Pull Request to `develop` once work is complete.
+    3. Verify code in the **Preview** environment (auto-deployed from `develop`).
+    4. Pull Request `develop` to `main` once Preview is confirmed stable.
+- **Rule of No-Main-Push:** **NEVER** commit or push directly to `develop` or `main`. All changes MUST go through a PR.
+- **Stable Main:** The `main` branch is the "Source of Truth" and must always reflect the current production state.
 
 ## 2. Resource Management & Sub-Agent Strategy
 

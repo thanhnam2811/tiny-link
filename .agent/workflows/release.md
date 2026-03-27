@@ -1,62 +1,65 @@
----
-description: Release Workflow Process
----
+# Release Workflow (2-Branch Model)
 
-# Release Workflow
+This workflow ensures that code is fully verified in the **Staging/Preview** environment before being promoted to **Production**.
 
-This workflow executes a safe monorepo version bump and creates a Git Tag. The final GitHub release **MUST** adhere to the Title and Content structure defined in `docs/RELEASE_TEMPLATE.md`.
+## 1. Feature Development & Integration
 
-## 1. Automated Testing (Mandatory Gate)
+- All features and fixes start on a dedicated branch (e.g., `feature/xyz`).
+- Once complete, create a Pull Request to the `develop` branch.
+- Merge the PR into `develop`.
 
-Ensure that all monorepo test suites pass fully before executing a release bypass. If tests fail, abort the workflow immediately.
+## 2. Staging Verification (Mandatory Gate)
+
+- Merging to `develop` automatically triggers a deployment to the **Staging/Preview** environment via GitHub Actions (`deploy_preview`).
+- **Wait** for the deployment to finish and verify the changes on the Staging URL.
+- Test critical paths: Login, Linking, Analytics, etc.
+
+## 3. Promotion to Production (Release)
+
+Once Staging is verified as stable:
+
+### A. Merge Develop to Main
+
+Create a Pull Request from `develop` to `main` and merge it. This ensures `main` always matches the verified `develop` state.
+
+### B. Automated Testing
+
+Run the test suite one last time locally to ensure workspace integrity.
 
 ```bash
 pnpm test
 ```
 
-## 2. Bump Workspace Packages Silently
+### C. Version Bump & Tagging
 
-Set the new version explicitly for all sub-packages without triggering NPM's workspace locking errors.
-
-```bash
-node scripts/bump-version.mjs 1.4.0 # UPDATE THIS TO TARGET VERSION
-```
-
-## 2. Stage Changes
+Execute the version bump script and create a Git Tag. This triggers the `deploy_production` job in GitHub Actions.
 
 ```bash
+# 1. Bump workspace packages
+node scripts/bump-version.mjs <version>
+
+# 2. Stage changes
 git add .
-```
 
-## 3. Bump Root & Tag
-
-Bump the external root to auto-generate the single Git Commit and Git Tag.
-
-```bash
+# 3. Bump root version & create tag
 npm version <patch|minor|major> --force -m "chore(release): v%s"
+
+# 4. Push to main with tags
+git push origin main --follow-tags
 ```
 
-## 4. Push to Trigger CI/CD
+## 4. Auto-Draft GitHub Release
 
-```bash
-git push --follow-tags
-```
-
-## 5. Auto-Draft GitHub Release
-
-Use the GitHub CLI (`gh`) to automatically create a drafted release including the markdown template contents so the user only has to review and publish it on GitHub.
-
-First, write the structured release notes to a temporary file (e.g., `/tmp/release_notes.md`), then execute the `gh release create` command.
+Use the GitHub CLI (`gh`) to create a drafted release for final review.
 
 ```bash
 gh release create <tag> --draft --title "<tag>" --notes-file /tmp/release_notes.md
 ```
 
-Note: Make sure the generated `release_notes.md` strictly adheres to the `docs/RELEASE_TEMPLATE.md` structure:
+Follow the structure in `docs/RELEASE_TEMPLATE.md` for the release notes.
 
 - `### 🚀 What's New`
 - `### ✨ Features`
-- `### 🐛 Bug Fixes & Edge Cases Squashed`
-- `### 🛠 Refactoring & Chores`
-- `### 🧪 Validation & Stability Highlights`
-- `---` followed by `**Full Changelog**: https://github.com/thanhnam2811/tiny-link/commits/vX.X.X`
+- `### 🐛 Bug Fixes`
+- `---`
+- `**Full Changelog**: https://github.com/thanhnam2811/tiny-link/commits/vX.X.X`
