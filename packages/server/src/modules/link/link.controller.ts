@@ -103,7 +103,7 @@ export class LinkController {
 	};
 
 	getUserLinks = async (request: FastifyRequest, reply: FastifyReply) => {
-		const { page, limit, search } = request.query as { page?: number; limit?: number; search?: string };
+		const query = request.query as { page?: number; limit?: number; search?: string };
 		// In a real M2M setup, userId would be extracted from a trusted header or the body
 		// For simplicity, we assume the BFF sends the header 'x-user-id'
 		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
@@ -117,12 +117,7 @@ export class LinkController {
 			});
 		}
 
-		const data = await this.linkService.getUserLinks(
-			userId,
-			request.query.page,
-			request.query.limit,
-			request.query.search,
-		);
+		const data = await this.linkService.getUserLinks(userId, query.page, query.limit, query.search);
 		return reply.status(HTTP_STATUS.OK).send(data);
 	};
 

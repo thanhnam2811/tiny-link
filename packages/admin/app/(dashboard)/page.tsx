@@ -1,4 +1,4 @@
-import { LayoutDashboard, Link as LinkIcon, BarChart3, Calendar } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, BarChart3 } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';

@@ -255,6 +255,8 @@ export const ErrorResponseSchema = Type.Object(
 	},
 );
 
+export type ErrorResponseType = Static<typeof ErrorResponseSchema>;
+
 export const ValidationErrorResponseSchema = Type.Object({
 	statusCode: Type.Number(),
 	error: Type.String(),

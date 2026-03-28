@@ -4,7 +4,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 import fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { PrismaClient, prisma } from '@tiny-link/db';
+import { prisma } from '@tiny-link/db';
 import fastifyRedis from '@fastify/redis';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';

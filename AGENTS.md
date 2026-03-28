@@ -9,9 +9,10 @@
     - `main`: Production branch. **PRODUCTION** environment target.
 - **Git Workflow**:
     1. Branch from `develop` for features/fixes.
-    2. Pull Request to `develop` once work is complete.
-    3. Verify code in the **Preview** environment (auto-deployed from `develop`).
-    4. Pull Request `develop` to `main` once Preview is confirmed stable.
+    2. Perform full validation by running `pnpm lint`, `pnpm build` and `pnpm test` locally.
+    3. Pull Request to `develop` once work is complete and all checks pass.
+    4. Verify code in the **Preview** environment (auto-deployed from `develop`).
+    5. Pull Request `develop` to `main` once Preview is confirmed stable.
 - **Rule of No-Main-Push**: **NEVER** commit or push directly to `develop` or `main`. All changes MUST go through a PR.
 - **Stable Main**: The `main` branch is the "Source of Truth" and must always reflect the current production state.
 

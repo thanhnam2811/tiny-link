@@ -1,4 +1,3 @@
-import { FastifyInstance } from 'fastify';
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { PrismaClient, Link } from '@tiny-link/db';
 import {
@@ -21,6 +20,8 @@ import {
 	AdminAnalyticsQueryType,
 	AdminAnalyticsResponseSchema,
 	AdminAnalyticsResponseType,
+	ErrorResponseSchema,
+	ErrorResponseType,
 } from '@tiny-link/shared';
 
 export const adminRoutes =
@@ -151,7 +152,7 @@ export const adminRoutes =
 			protectedServer.patch<{
 				Params: AdminLinkIdParamsType;
 				Body: AdminUpdateLinkStatusBodyType;
-				Reply: AdminSuccessResponseType;
+				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
 				'/api/admin/links/:id/status',
 				{
@@ -160,6 +161,7 @@ export const adminRoutes =
 						body: AdminUpdateLinkStatusBodySchema,
 						response: {
 							200: AdminSuccessResponseSchema,
+							404: ErrorResponseSchema,
 						},
 						tags: ['Admin'],
 						description: 'Update the active status of a link',
@@ -176,15 +178,20 @@ export const adminRoutes =
 							data: { isActive },
 						});
 						return { success: true };
-					} catch (error) {
-						return reply.code(404).send({ error: 'Not Found', message: 'Link not found' } as any);
+					} catch {
+						return reply.code(404).send({
+							statusCode: 404,
+							error: 'Not Found',
+							code: 'LINK_NOT_FOUND',
+							message: 'Link not found',
+						});
 					}
 				},
 			);
 
 			protectedServer.delete<{
 				Params: AdminLinkIdParamsType;
-				Reply: AdminSuccessResponseType;
+				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
 				'/api/admin/links/:id',
 				{
@@ -192,6 +199,7 @@ export const adminRoutes =
 						params: AdminLinkIdParamsSchema,
 						response: {
 							200: AdminSuccessResponseSchema,
+							404: ErrorResponseSchema,
 						},
 						tags: ['Admin'],
 						description: 'Delete a link permanently',
@@ -206,8 +214,13 @@ export const adminRoutes =
 							where: { id },
 						});
 						return { success: true };
-					} catch (error) {
-						return reply.code(404).send({ error: 'Not Found', message: 'Link not found' } as any);
+					} catch {
+						return reply.code(404).send({
+							statusCode: 404,
+							error: 'Not Found',
+							code: 'LINK_NOT_FOUND',
+							message: 'Link not found',
+						});
 					}
 				},
 			);
