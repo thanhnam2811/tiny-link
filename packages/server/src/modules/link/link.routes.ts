@@ -36,7 +36,7 @@ export const linkRoutes = (
 		// API Route: Create Short Link
 		// Stricter rate limit: 10 link creations per minute per IP
 		server.post(
-			'/api/links',
+			'/links',
 			{
 				config: {
 					rateLimit: {
@@ -64,7 +64,7 @@ export const linkRoutes = (
 		// Track Public Route: Headless JSON API
 		// Replaces legacy GET /:code. Enforces usage via Next.js Client
 		server.post(
-			'/api/links/:code/track',
+			'/links/:code/track',
 			{
 				schema: {
 					tags: ['Analytics'],
@@ -81,9 +81,27 @@ export const linkRoutes = (
 			controller.trackPublic,
 		);
 
+		// Link Preview Route
+		server.get(
+			'/links/:code/preview',
+			{
+				schema: {
+					tags: ['Links'],
+					summary: 'Get Link Preview',
+					description: 'Retrieves metadata (title, description, image) and protection status for a link.',
+					params: RedirectParamsSchema,
+					response: {
+						[HTTP_STATUS.OK]: LinkPreviewResponseSchema,
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.getPreview,
+		);
+
 		// Verify Password Route (Strict Rate Limit: 5 per minute)
 		server.post(
-			'/api/links/:code/verify',
+			'/links/:code/verify',
 			{
 				config: {
 					rateLimit: {
@@ -111,7 +129,7 @@ export const linkRoutes = (
 
 		// Stats API Route
 		server.post(
-			'/api/stats/:code',
+			'/stats/:code',
 			{
 				schema: {
 					tags: ['Analytics'],
@@ -131,7 +149,7 @@ export const linkRoutes = (
 
 		// Claim Guest Links
 		server.post(
-			'/api/links/claim',
+			'/links/claim',
 			{
 				preHandler: [internalAuthMiddleware],
 				schema: {
@@ -150,7 +168,7 @@ export const linkRoutes = (
 
 		// Get User Links (Dashboard)
 		server.get(
-			'/api/links/user',
+			'/links/user',
 			{
 				preHandler: [internalAuthMiddleware],
 				schema: {

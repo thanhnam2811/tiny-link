@@ -27,7 +27,7 @@ export const adminRoutes =
 	async (server: FastifyInstance) => {
 		// Public routes
 		server.post<{ Body: AdminLoginBodyType }>(
-			'/api/admin/login',
+			'/admin/login',
 			{
 				schema: {
 					body: AdminLoginBodySchema,
@@ -67,7 +67,7 @@ export const adminRoutes =
 			});
 
 			protectedServer.get<{ Reply: AdminStatsResponseType }>(
-				'/api/admin/stats',
+				'/admin/stats',
 				{
 					schema: {
 						response: {
@@ -96,7 +96,7 @@ export const adminRoutes =
 				Querystring: AdminGetLinksQueryType;
 				Reply: AdminGetLinksResponseType;
 			}>(
-				'/api/admin/links',
+				'/admin/links',
 				{
 					schema: {
 						querystring: AdminGetLinksQuerySchema,
@@ -152,7 +152,7 @@ export const adminRoutes =
 				Body: AdminUpdateLinkStatusBodyType;
 				Reply: AdminSuccessResponseType;
 			}>(
-				'/api/admin/links/:id/status',
+				'/admin/links/:id/status',
 				{
 					schema: {
 						params: AdminLinkIdParamsSchema,
@@ -185,7 +185,7 @@ export const adminRoutes =
 				Params: AdminLinkIdParamsType;
 				Reply: AdminSuccessResponseType;
 			}>(
-				'/api/admin/links/:id',
+				'/admin/links/:id',
 				{
 					schema: {
 						params: AdminLinkIdParamsSchema,
@@ -215,7 +215,7 @@ export const adminRoutes =
 				Querystring: AdminAnalyticsQueryType;
 				Reply: AdminAnalyticsResponseType;
 			}>(
-				'/api/admin/analytics',
+				'/admin/analytics',
 				{
 					schema: {
 						querystring: AdminAnalyticsQuerySchema,

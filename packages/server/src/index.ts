@@ -9,8 +9,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyCors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
-import { linkRoutes } from './modules/link/link.routes';
-import { adminRoutes } from './modules/admin/admin.routes';
+import { apiRoutes } from './modules/api.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION, INTERNAL_AUTH } from '@tiny-link/shared';
@@ -75,8 +74,7 @@ export const buildServer = async () => {
 		root: path.join(process.cwd(), 'public'),
 	});
 
-	// Health check – exempt from rate limit so Render LB never gets blocked
-	server.get('/healthz', { config: { rateLimit: { skip: () => true } } }, async () => ({ status: 'ok' }));
+	// REMOVED: Health check moved to apiRoutes under /api/healthz
 
 	// redirect root to client url
 	server.get('/', async (_request, reply) => {
@@ -112,8 +110,12 @@ export const buildServer = async () => {
 		},
 	});
 
-	server.register(linkRoutes(prisma, analyticsManager, server.redis));
-	server.register(adminRoutes(prisma));
+	await server.register(apiRoutes, {
+		prefix: '/api',
+		prisma,
+		analyticsManager,
+		redis: server.redis,
+	});
 
 	return { server, analyticsManager, prisma };
 };
