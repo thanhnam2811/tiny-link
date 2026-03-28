@@ -14,6 +14,7 @@ import { apiRoutes } from './modules/api.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION, INTERNAL_AUTH } from '@tiny-link/shared';
+import { getEnv } from './shared/env';
 
 export const buildServer = async () => {
 	const analyticsManager = new AnalyticsManager(prisma);
@@ -34,15 +35,18 @@ export const buildServer = async () => {
 	// Register CORS (Allow Next.js client to call the API)
 	await server.register(fastifyCors, {
 		origin: (origin, cb) => {
-			// During testing, allow all origins
 			if (process.env.NODE_ENV === ENV_NAMES.TEST) {
 				cb(null, true);
 				return;
 			}
-			const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-			// Allow if no origin (e.g. server-to-server), or if it matches client_url exactly,
-			// or if it matches a vercel preview URL pattern.
-			if (!origin || origin === clientUrl || /\.vercel\.app$/.test(origin)) {
+
+			const clientUrl = getEnv('CLIENT_URL', 'http://localhost:3000');
+
+			// Strict Vercel Domain Check (Placeholder for project safety)
+			const vercelProjectName = getEnv('VERCEL_PROJECT_NAME', 'tiny-link-client');
+			const vercelRegex = new RegExp(`^${vercelProjectName}.*\\.vercel\\.app$`);
+
+			if (!origin || origin === clientUrl || vercelRegex.test(origin)) {
 				cb(null, true);
 				return;
 			}
@@ -53,14 +57,18 @@ export const buildServer = async () => {
 
 	// Register Redis plugin
 	await server.register(fastifyRedis, {
-		url: process.env.REDIS_URL || 'redis://localhost:6379',
+		url: getEnv('REDIS_URL', 'redis://localhost:6379'),
 		closeClient: true,
 	});
 
 	// Register JWT
 	await server.register(fastifyJwt, {
-		secret: process.env.JWT_SECRET || 'super-secret-key-for-admin-jwt',
+		secret: getEnv('JWT_SECRET', 'super-secret-key-for-admin-jwt'),
 	});
+
+	// Decorate server with global dependencies (Dependency Injection)
+	server.decorate('prisma', prisma);
+	server.decorate('analyticsManager', analyticsManager);
 
 	// Register Rate Limit plugin (uses Redis store for distributed limiting)
 	await server.register(fastifyRateLimit, {
@@ -113,9 +121,6 @@ export const buildServer = async () => {
 
 	await server.register(apiRoutes, {
 		prefix: '/api',
-		prisma,
-		analyticsManager,
-		redis: server.redis,
 	});
 
 	return { server, analyticsManager, prisma };
