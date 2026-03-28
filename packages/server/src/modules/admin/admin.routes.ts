@@ -128,7 +128,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 						where,
 						skip,
 						take: limit,
-						orderBy: { [sortBy as any]: sortOrder as any },
+						orderBy: { [sortBy]: sortOrder } as Record<string, string>,
 					}),
 					prisma.link.count({ where }),
 				]);

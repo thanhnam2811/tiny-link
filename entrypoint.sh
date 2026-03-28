@@ -8,4 +8,4 @@ prisma generate --schema=./prisma/schema.prisma
 prisma migrate deploy --schema=./prisma/schema.prisma
 
 # Start the application
-exec node dist/index.js
+exec node dist/index.js

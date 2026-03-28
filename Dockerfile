@@ -15,6 +15,9 @@ COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 RUN pnpm --filter @tiny-link/db exec prisma generate
+# Build workspace dependencies in correct order before server
+RUN pnpm --filter @tiny-link/shared build
+RUN pnpm --filter @tiny-link/db build
 RUN pnpm --filter @tiny-link/server... build
 
 # Create a deployable, symlink-safe production tree for only the server package.
