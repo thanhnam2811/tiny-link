@@ -2,10 +2,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"outDir": "./dist",
-		"rootDir": "./src",
-		"paths": {
-			"@tiny-link/*": ["../../*"]
-		}
+		"rootDir": "./src"
 	},
 	"include": ["src/**/*"],
 	"references": [{ "path": "../shared" }, { "path": "../db" }]

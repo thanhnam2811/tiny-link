@@ -93,6 +93,7 @@ export const linkRoutes = (
 					response: {
 						[HTTP_STATUS.OK]: LinkPreviewResponseSchema,
 						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+						[HTTP_STATUS.GONE]: ErrorResponseSchema,
 					},
 				},
 			},

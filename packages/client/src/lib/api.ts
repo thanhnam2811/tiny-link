@@ -28,7 +28,7 @@ async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<
 		...options.headers,
 	};
 
-	const response = await fetch(url, { ...options, headers });
+	const response = await fetch(url, { ...options, headers, cache: 'no-store' });
 
 	let data: unknown;
 	try {

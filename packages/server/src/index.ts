@@ -1,6 +1,5 @@
+import 'dotenv/config';
 import path from 'path';
-import dotenv from 'dotenv';
-dotenv.config({ path: path.join(__dirname, '../.env') });
 import fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';

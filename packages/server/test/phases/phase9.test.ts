@@ -112,7 +112,7 @@ describe('Phase 9: Auth, Claiming & User Links', () => {
 		// Try to delete without correct userId (even with internal key)
 		const failRes = await app.inject({
 			method: 'DELETE',
-			url: `/links/${link.id}`,
+			url: `/api/links/${link.id}`,
 			headers: {
 				[INTERNAL_AUTH.HEADER]: INTERNAL_KEY,
 				[INTERNAL_AUTH.USER_ID_HEADER]: 'wrong-user',
@@ -123,7 +123,7 @@ describe('Phase 9: Auth, Claiming & User Links', () => {
 		// Correct delete
 		const successRes = await app.inject({
 			method: 'DELETE',
-			url: `/links/${link.id}`,
+			url: `/api/links/${link.id}`,
 			headers: {
 				[INTERNAL_AUTH.HEADER]: INTERNAL_KEY,
 				[INTERNAL_AUTH.USER_ID_HEADER]: userId,
