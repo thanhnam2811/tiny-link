@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
 import { PrismaClient } from '@tiny-link/db';
-import { HTTP_STATUS, INTERNAL_AUTH } from '@tiny-link/shared';
+import { INTERNAL_AUTH } from '@tiny-link/shared';
 
 const INTERNAL_KEY = INTERNAL_AUTH.TEST_KEY;
 

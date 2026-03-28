@@ -1,0 +1,56 @@
+{
+	"comments": [
+		{
+			"id": "IC_kwDORlA19M73JCdp",
+			"author": { "login": "vercel" },
+			"authorAssociation": "NONE",
+			"body": "[vc]: #yoHJfSttY6ZCqhBfBB6ZmP62Vhm6xZspaqgHMIkP9Jo=:eyJpc01vbm9yZXBvIjp0cnVlLCJ0eXBlIjoiZ2l0aHViIiwicHJvamVjdHMiOlt7Im5hbWUiOiJ0aW55LWxpbmstY2xpZW50IiwicHJvamVjdElkIjoicHJqXzRtb1B4Y1RXMm1JbWNiZmRzcEZLR3F3RGYyTTEiLCJpbnNwZWN0b3JVcmwiOiJodHRwczovL3ZlcmNlbC5jb20vdGhhbmhuYW0yODExL3RpbnktbGluay1jbGllbnQvOGJ0U0t3OTgxeGJzNDlrN2N4UXdnVFM5c2RBTCIsInByZXZpZXdVcmwiOiJ0aW55LWxpbmstY2xpZW50LWdpdC1mZWF0dXJlLWFwaS1zdGFuZGFyZGl6LTE4NzRhMS10aGFuaG5hbTI4MTEudmVyY2VsLmFwcCIsIm5leHRDb21taXRTdGF0dXMiOiJERVBMT1lFRCIsImxpdmVGZWVkYmFjayI6eyJyZXNvbHZlZCI6MCwidW5yZXNvbHZlZCI6MCwidG90YWwiOjAsImxpbmsiOiJ0aW55LWxpbmstY2xpZW50LWdpdC1mZWF0dXJlLWFwaS1zdGFuZGFyZGl6LTE4NzRhMS10aGFuaG5hbTI4MTEudmVyY2VsLmFwcCJ9LCJyb290RGlyZWN0b3J5IjoicGFja2FnZXMvY2xpZW50In1dfQ==\nThe latest updates on your projects. Learn more about [Vercel for GitHub](https://vercel.link/github-learn-more).\n\n| Project | Deployment | Actions | Updated (UTC) |\n| :--- | :----- | :------ | :------ |\n| [tiny-link-client](https://vercel.com/thanhnam2811/tiny-link-client) | ![Ready](https://vercel.com/static/status/ready.svg) [Ready](https://vercel.com/thanhnam2811/tiny-link-client/8btSKw981xbs49k7cxQwgTS9sdAL) | [Preview](https://tiny-link-client-git-feature-api-standardiz-1874a1-thanhnam2811.vercel.app), [Comment](https://vercel.live/open-feedback/tiny-link-client-git-feature-api-standardiz-1874a1-thanhnam2811.vercel.app?via=pr-comment-feedback-link) | Mar 28, 2026 2:07am |\n\n",
+			"createdAt": "2026-03-28T01:49:38Z",
+			"includesCreatedEdit": true,
+			"isMinimized": false,
+			"minimizedReason": "",
+			"reactionGroups": [],
+			"url": "https://github.com/thanhnam2811/tiny-link/pull/4#issuecomment-4146341737",
+			"viewerDidAuthor": false
+		},
+		{
+			"id": "IC_kwDORlA19M73JCeI",
+			"author": { "login": "cr-gpt" },
+			"authorAssociation": "NONE",
+			"body": "Seems you are using me but didn't get OPENAI_API_KEY seted in Variables/Secrets for this repo. you could follow [readme](https://github.com/anc95/ChatGPT-CodeReview) for more information",
+			"createdAt": "2026-03-28T01:49:40Z",
+			"includesCreatedEdit": false,
+			"isMinimized": false,
+			"minimizedReason": "",
+			"reactionGroups": [],
+			"url": "https://github.com/thanhnam2811/tiny-link/pull/4#issuecomment-4146341768",
+			"viewerDidAuthor": false
+		},
+		{
+			"id": "IC_kwDORlA19M73JKjA",
+			"author": { "login": "cr-gpt" },
+			"authorAssociation": "NONE",
+			"body": "Seems you are using me but didn't get OPENAI_API_KEY seted in Variables/Secrets for this repo. you could follow [readme](https://github.com/anc95/ChatGPT-CodeReview) for more information",
+			"createdAt": "2026-03-28T02:06:04Z",
+			"includesCreatedEdit": false,
+			"isMinimized": false,
+			"minimizedReason": "",
+			"reactionGroups": [],
+			"url": "https://github.com/thanhnam2811/tiny-link/pull/4#issuecomment-4146374848",
+			"viewerDidAuthor": false
+		}
+	],
+	"reviews": [
+		{
+			"id": "PRR_kwDORlA19M7v4RDa",
+			"author": { "login": "copilot-pull-request-reviewer" },
+			"authorAssociation": "NONE",
+			"body": "## Pull request overview\n\nThis PR aims to standardize the client↔server API flow (via the Next.js BFF proxy), improve environment loading/startup behavior, and add a dedicated client health check route.\n\n**Changes:**\n- Added/standardized API routes (e.g., link preview + consistent `/api/...` paths) and updated client calls to go through the `/api/proxy/...` BFF.\n- Updated server startup/env handling and TypeScript project configuration (including server→db project reference).\n- Added Prisma seeding support in `@tiny-link/db` and updated `.env.example` files and scripts.\n\n### Reviewed changes\n\nCopilot reviewed 21 out of 22 changed files in this pull request and generated 6 comments.\n\n<details>\n<summary>Show a summary per file</summary>\n\n| File | Description |\r\n| ---- | ----------- |\r\n| pnpm-lock.yaml | Locks new dev tooling deps (e.g., tsx/ts-node) needed by updated packages. |\r\n| packages/server/tsconfig.json | Adds TS path mapping + project reference to `../db`. |\r\n| packages/server/src/modules/link/link.service.ts | Adds explicit local interfaces for geo/time-series typing. |\r\n| packages/server/src/modules/link/link.routes.ts | Adds `GET /api/links/:code/preview` and standardizes delete route under `/api`. |\r\n| packages/server/src/modules/link/link.controller.ts | Replaces `any` with `FastifyRequest` for controller handlers. |\r\n| packages/server/src/modules/analytics/analytics_manager.ts | Types Prisma transaction client explicitly. |\r\n| packages/server/src/modules/admin/admin.routes.ts | Switches plugin typing to TypeBox provider and improves typing for mapped results. |\r\n| packages/server/src/index.ts | Adds dotenv loading in server entrypoint (intended to fix env loading). |\r\n| packages/server/package.json | Updates dev script to preload env when running `tsx watch`. |\r\n| packages/server/.env.example | Adds `INTERNAL_API_KEY` example entry. |\r\n| packages/db/prisma/seed.ts | Introduces a Prisma seed script scaffold. |\r\n| packages/db/package.json | Adds seed configuration and tooling (`tsx`, `ts-node`) for seeding. |\r\n| packages/db/.env.example | Adds DB env example for the db package. |\r\n| packages/client/src/lib/api.ts | Expands API client to use BFF proxy endpoints for stats/track/verify/preview. |\r\n| packages/client/src/app/stats/[code]/page.tsx | Uses shared API client for preview fetch instead of manual fetch. |\r\n| packages/client/src/app/stats/[code]/StatsDashboard.tsx | Switches stats fetching to shared API client + updated error handling. |\r\n| packages/client/src/app/healthz/route.ts | Adds a dedicated health check route for the client/BFF. |\r\n| packages/client/src/app/[code]/page.tsx | Uses shared API client for preview fetch in redirect flow. |\r\n| packages/client/src/app/[code]/RedirectHandler.tsx | Switches track/verify calls to shared API client. |\r\n| packages/client/.env.example | Updates example env values for client-side configuration. |\r\n| package.json | Adds docker convenience scripts. |\r\n| AGENTS.md | Documentation updates and adds a “no-any”/strictness section. |\n</details>\n\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **pnpm-lock.yaml**: Language not supported\n</details>\n\n<details>\n<summary>Comments suppressed due to low confidence (1)</summary>\n\n**packages/client/.env.example:19**\n* This example file contains concrete secret-looking values (`AUTH_SECRET`, `INTERNAL_API_KEY`) rather than placeholders. Even in `.env.example`, committing real secrets (or values that look usable) is risky because they often get copied into real deployments. Replace these with empty/obvious placeholder values and keep the instructions to generate real secrets locally.\n```\n# NextAuth (Auth.js) Configuration\n# Run 'npx auth secret' to generate a secure AUTH_SECRET\nAUTH_SECRET=df1f8ba1a3b2ce7fd3e01b4f188fd101865e8831c1493f8eb9685f759d6e72ae\nAUTH_URL=http://localhost:3000\n\n# OAuth Providers\nAUTH_GOOGLE_ID=\nAUTH_GOOGLE_SECRET=\nAUTH_GITHUB_ID=\nAUTH_GITHUB_SECRET=\n\n# Database (Prisma Adapter)\nDATABASE_URL=\"postgresql://user:password@host:port/dbname?schema=public&sslmode=require\"\n\n# Backend Integration\nNEXT_PUBLIC_API_URL=http://localhost:3000/api\nINTERNAL_API_URL=http://localhost:3001\nINTERNAL_API_KEY=secret\n\n```\n</details>\n\n\n\n---\n\n💡 <a href=\"/thanhnam2811/tiny-link/new/main?filename=.github/instructions/*.instructions.md\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Add Copilot custom instructions</a> for smarter, more guided reviews. <a href=\"https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Learn how to get started</a>.",
+			"submittedAt": "2026-03-28T01:55:29Z",
+			"includesCreatedEdit": false,
+			"reactionGroups": [],
+			"state": "COMMENTED",
+			"commit": { "oid": "6d9566fb33e7f7ee4f506082fa7eaf78ef6c7863" }
+		}
+	]
+}
