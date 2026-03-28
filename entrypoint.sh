@@ -1,13 +1,15 @@
 #!/bin/sh
 set -e
 
-# Extract DB connection info from DATABASE_URL if needed, but pg_isready 
-# can often take the full URL if passed correctly, or we use environment variables.
+# Cleanse the DATABASE_URL of query parameters for pg_isready compatibility
+# libpq-based tools like pg_isready do not support Prisma's ?schema=... parameter
+CLEAN_DATABASE_URL=$(echo "$DATABASE_URL" | sed 's/?.*//')
+
 echo "Waiting for database to be ready..."
 MAX_RETRIES=60
 COUNT=0
 
-until pg_isready -d "$DATABASE_URL" || [ $COUNT -eq $MAX_RETRIES ]; do
+until pg_isready -d "$CLEAN_DATABASE_URL" || [ $COUNT -eq $MAX_RETRIES ]; do
   echo "Database is unavailable - sleeping (attempt $((COUNT+1))/$MAX_RETRIES)"
   sleep 1
   COUNT=$((COUNT+1))
