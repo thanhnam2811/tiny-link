@@ -12,6 +12,17 @@ import { scrapeUrlMetadata } from './metadata.scraper';
 const NOT_FOUND_SENTINEL = '__NOT_FOUND__';
 const GONE_SENTINEL = '__GONE_SENTINEL__';
 
+interface GeoStatItem {
+	country?: string | null;
+	city?: string | null;
+	_count: { _all: number };
+}
+
+interface TimeSeriesItem {
+	date: Date;
+	count: bigint;
+}
+
 export class LinkService {
 	// Promise Coalescing (Singleflight): prevents Cache Stampede
 	// Maps a shortCode -> in-flight DB promise to deduplicate concurrent misses
@@ -288,7 +299,7 @@ export class LinkService {
 
 		// Format into a clean dictionary
 		const countries = geoStatsRaw.countryStats.reduce(
-			(acc, curr) => {
+			(acc: Record<string, number>, curr: GeoStatItem) => {
 				if (curr.country) acc[curr.country] = curr._count._all;
 				return acc;
 			},
@@ -296,7 +307,7 @@ export class LinkService {
 		);
 
 		const cities = geoStatsRaw.cityStats.reduce(
-			(acc, curr) => {
+			(acc: Record<string, number>, curr: GeoStatItem) => {
 				if (curr.city) acc[curr.city] = curr._count._all;
 				return acc;
 			},
@@ -311,7 +322,7 @@ export class LinkService {
 			d.setDate(d.getDate() - i);
 			const dateStr = d.toISOString().split('T')[0];
 
-			const existing = timeSeriesRaw.find((t) => {
+			const existing = timeSeriesRaw.find((t: TimeSeriesItem) => {
 				const td = new Date(t.date);
 				return td.toISOString().split('T')[0] === dateStr;
 			});

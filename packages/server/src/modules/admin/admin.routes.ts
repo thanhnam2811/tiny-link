@@ -1,5 +1,5 @@
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { PrismaClient } from '@tiny-link/db';
+import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+import { PrismaClient, Link } from '@tiny-link/db';
 import {
 	AdminLoginBodySchema,
 	AdminLoginResponseSchema,
@@ -20,11 +20,13 @@ import {
 	AdminAnalyticsQueryType,
 	AdminAnalyticsResponseSchema,
 	AdminAnalyticsResponseType,
+	ErrorResponseSchema,
+	ErrorResponseType,
 } from '@tiny-link/shared';
 
 export const adminRoutes =
-	(prisma: PrismaClient): FastifyPluginAsync =>
-	async (server: FastifyInstance) => {
+	(prisma: PrismaClient): FastifyPluginAsyncTypebox =>
+	async (server) => {
 		// Public routes
 		server.post<{ Body: AdminLoginBodyType }>(
 			'/admin/login',
@@ -132,7 +134,7 @@ export const adminRoutes =
 					]);
 
 					return {
-						links: links.map((link) => ({
+						links: links.map((link: Link) => ({
 							id: link.id,
 							originalUrl: link.originalUrl,
 							shortCode: link.shortCode,
@@ -150,7 +152,7 @@ export const adminRoutes =
 			protectedServer.patch<{
 				Params: AdminLinkIdParamsType;
 				Body: AdminUpdateLinkStatusBodyType;
-				Reply: AdminSuccessResponseType;
+				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
 				'/admin/links/:id/status',
 				{
@@ -159,6 +161,7 @@ export const adminRoutes =
 						body: AdminUpdateLinkStatusBodySchema,
 						response: {
 							200: AdminSuccessResponseSchema,
+							404: ErrorResponseSchema,
 						},
 						tags: ['Admin'],
 						description: 'Update the active status of a link',
@@ -175,15 +178,20 @@ export const adminRoutes =
 							data: { isActive },
 						});
 						return { success: true };
-					} catch (error) {
-						return reply.code(404).send({ error: 'Not Found', message: 'Link not found' } as any);
+					} catch {
+						return reply.code(404).send({
+							statusCode: 404,
+							error: 'Not Found',
+							code: 'LINK_NOT_FOUND',
+							message: 'Link not found',
+						});
 					}
 				},
 			);
 
 			protectedServer.delete<{
 				Params: AdminLinkIdParamsType;
-				Reply: AdminSuccessResponseType;
+				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
 				'/admin/links/:id',
 				{
@@ -191,6 +199,7 @@ export const adminRoutes =
 						params: AdminLinkIdParamsSchema,
 						response: {
 							200: AdminSuccessResponseSchema,
+							404: ErrorResponseSchema,
 						},
 						tags: ['Admin'],
 						description: 'Delete a link permanently',
@@ -205,8 +214,13 @@ export const adminRoutes =
 							where: { id },
 						});
 						return { success: true };
-					} catch (error) {
-						return reply.code(404).send({ error: 'Not Found', message: 'Link not found' } as any);
+					} catch {
+						return reply.code(404).send({
+							statusCode: 404,
+							error: 'Not Found',
+							code: 'LINK_NOT_FOUND',
+							message: 'Link not found',
+						});
 					}
 				},
 			);
@@ -250,7 +264,7 @@ export const adminRoutes =
 
 					// 3. Zero-padding Timeline
 					const timelineMap = new Map<string, number>();
-					timelineRaw.forEach((row) => {
+					timelineRaw.forEach((row: { date: Date; count: bigint }) => {
 						timelineMap.set(row.date.toISOString().split('T')[0], Number(row.count));
 					});
 
@@ -288,7 +302,7 @@ export const adminRoutes =
 						take: 10,
 					});
 
-					const countryData = countryGroups.map((g) => ({
+					const countryData = countryGroups.map((g: { country: string | null; _count: { id: number } }) => ({
 						name: g.country || 'Unknown',
 						count: g._count.id,
 					}));
@@ -304,7 +318,7 @@ export const adminRoutes =
 
 					const { UAParser } = await import('ua-parser-js');
 
-					uaGroups.forEach((g) => {
+					uaGroups.forEach((g: { userAgent: string | null; _count: { id: number } }) => {
 						const parser = new UAParser(g.userAgent || '');
 						const osName = parser.getOS().name || 'Unknown';
 						const browserName = parser.getBrowser().name || 'Unknown';

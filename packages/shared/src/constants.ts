@@ -1,5 +1,3 @@
-import { Type, Static } from '@sinclair/typebox';
-
 /**
  * Shared constants for HTTP Status Codes
  */

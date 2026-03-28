@@ -5,12 +5,10 @@ const INTERNAL_API_URL = process.env.INTERNAL_API_URL || 'http://localhost:3001'
 /**
  * Proper Health Check Route for the Client (BFF)
  * This prevents 'healthz' from being matched by the dynamic [code] route redirection logic.
- * Pre-refactor: HIT /healthz
- * Post-refactor: HIT /api/healthz (as standardized for the REST prefix)
  */
 export async function GET() {
 	try {
-		const response = await fetch(`${INTERNAL_API_URL}/api/healthz`, {
+		const response = await fetch(`${INTERNAL_API_URL}/healthz`, {
 			cache: 'no-store',
 		});
 

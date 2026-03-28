@@ -2,26 +2,23 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import RedirectHandler from './RedirectHandler';
+import { api } from '@/lib/api';
 
 type Props = {
 	params: Promise<{ code: string }>;
 };
 
-// Next.js deduplicates fetch inherently when used with the native `fetch` API.
+// Next.js handles deduplication of API calls effectively
 async function getLinkPreview(code: string) {
-	const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-	const response = await fetch(`${API_URL}/links/${code}/preview`, {
-		next: { revalidate: 60 }, // Cache the preview for 60 seconds
-	});
-
-	if (!response.ok) {
-		if (response.status === 404 || response.status === 410) {
+	try {
+		return await api.links.getPreview(code);
+	} catch (err: unknown) {
+		const error = err as { statusCode?: number };
+		if (error.statusCode === 404 || error.statusCode === 410) {
 			return null;
 		}
-		throw new Error('Failed to fetch link preview');
+		throw err;
 	}
-
-	return response.json();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
