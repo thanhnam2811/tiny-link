@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 
 type RedirectHandlerProps = {
 	code: string;
@@ -20,18 +21,7 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 			// Simulate a small loading state for "Premium" UX feel as requested
 			const timer = setTimeout(async () => {
 				try {
-					const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-					const response = await fetch(`${API_URL}/links/${code}/track`, {
-						method: 'POST',
-					});
-
-					const data = await response.json();
-
-					if (!response.ok) {
-						toast.error(data.message || 'Error redirecting to link');
-						setError(data.message || 'This link is no longer available or you are rate-limited.');
-						return;
-					}
+					const data = await api.links.track(code);
 
 					// Safe Frontend-driven redirect. Backend Analytics has already completed.
 					window.location.href = data.originalUrl;
@@ -99,18 +89,7 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 
 		setIsLoading(true);
 		try {
-			const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-			const response = await fetch(`${API_URL}/links/${code}/verify`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ password }),
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				throw new Error(data.message || 'Incorrect password');
-			}
+			const data = await api.links.verify(code, password);
 
 			toast.success('Password verified. Redirecting...');
 			// Safely redirect to original URL! The backend AnalyticsManager.push has already tracked this!

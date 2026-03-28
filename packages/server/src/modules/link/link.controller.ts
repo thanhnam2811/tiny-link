@@ -5,7 +5,7 @@ import { HTTP_STATUS, CreateLinkBodyType, INTERNAL_AUTH, ERROR_MESSAGES } from '
 export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
 
-	createLink = async (request: any, reply: FastifyReply) => {
+	createLink = async (request: FastifyRequest, reply: FastifyReply) => {
 		const { originalUrl, customCode, maxClicks, expiresAt, password, userId, guestId } =
 			request.body as CreateLinkBodyType;
 
@@ -85,7 +85,7 @@ export class LinkController {
 		return reply.status(HTTP_STATUS.OK).send({ originalUrl });
 	};
 
-	claimLinks = async (request: any, reply: FastifyReply) => {
+	claimLinks = async (request: FastifyRequest, reply: FastifyReply) => {
 		const { guestId } = request.body as { guestId: string };
 		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
 
@@ -102,7 +102,7 @@ export class LinkController {
 		return reply.status(HTTP_STATUS.OK).send({ success: true, claimedCount: count });
 	};
 
-	getUserLinks = async (request: any, reply: FastifyReply) => {
+	getUserLinks = async (request: FastifyRequest, reply: FastifyReply) => {
 		const { page, limit, search } = request.query as { page?: number; limit?: number; search?: string };
 		// In a real M2M setup, userId would be extracted from a trusted header or the body
 		// For simplicity, we assume the BFF sends the header 'x-user-id'
@@ -126,7 +126,7 @@ export class LinkController {
 		return reply.status(HTTP_STATUS.OK).send(data);
 	};
 
-	deleteLink = async (request: any, reply: FastifyReply) => {
+	deleteLink = async (request: FastifyRequest, reply: FastifyReply) => {
 		const { id } = request.params as { id: string };
 		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { api } from '@/lib/api';
 import { LinkStatsResponseType } from '@tiny-link/shared';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import {
@@ -30,30 +31,18 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 	const fetchStats = async (pw?: string) => {
 		setIsLoading(true);
 		try {
-			const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-			const response = await fetch(`${API_URL}/stats/${code}`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ password: pw }),
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				if (response.status === 401) {
-					setIsLocked(true);
-					toast.error(data.message || 'Incorrect password');
-				} else {
-					toast.error(data.message || 'Failed to load statistics');
-				}
-				setIsLoading(false);
-				return;
-			}
-
-			setStats(data);
+			const data = await api.links.getStats(code, pw);
+			setStats(data as LinkStatsResponseType);
 			setIsLocked(false);
-		} catch {
-			toast.error('Network error while fetching stats');
+		} catch (err: unknown) {
+			const error = err as { statusCode?: number; message?: string };
+			if (error.statusCode === 401) {
+				setIsLocked(true);
+				toast.error(error.message || 'Incorrect password');
+			} else {
+				toast.error(error.message || 'Failed to load statistics');
+				console.error('Stats fetch error:', err);
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -134,7 +123,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 
 	// Helper to format country array for Recharts
 	const countryData = Object.entries(stats.geo.countries)
-		.map(([name, clicks]) => ({ name, clicks }))
+		.map(([name, clicks]) => ({ name, clicks: clicks as number }))
 		.sort((a, b) => b.clicks - a.clicks)
 		.slice(0, 5);
 

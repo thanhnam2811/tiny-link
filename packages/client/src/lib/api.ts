@@ -1,4 +1,11 @@
-import { ERROR_MESSAGES, CreateLinkBodyType, LinkResponseType } from '@tiny-link/shared';
+import {
+	ERROR_MESSAGES,
+	CreateLinkBodyType,
+	LinkResponseType,
+	LinkPreviewResponseType,
+	VerifyPasswordResponseType,
+	TrackPublicResponseType,
+} from '@tiny-link/shared';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -59,8 +66,31 @@ export const api = {
 		/**
 		 * Get stats for a short link
 		 */
-		getStats: (code: string) =>
-			fetcher<unknown>(`/stats/${code}`, {
+		getStats: (code: string, password?: string) =>
+			fetcher<unknown>(`/proxy/stats/${code}`, {
+				method: 'POST',
+				body: JSON.stringify({ password }),
+			}),
+		/**
+		 * Track a public link click
+		 */
+		track: (code: string) =>
+			fetcher<TrackPublicResponseType>(`/proxy/links/${code}/track`, {
+				method: 'POST',
+			}),
+		/**
+		 * Verify password for a protected link
+		 */
+		verify: (code: string, password: string) =>
+			fetcher<VerifyPasswordResponseType>(`/proxy/links/${code}/verify`, {
+				method: 'POST',
+				body: JSON.stringify({ password }),
+			}),
+		/**
+		 * Get preview metadata for a link
+		 */
+		getPreview: (code: string) =>
+			fetcher<LinkPreviewResponseType>(`/proxy/links/${code}/preview`, {
 				method: 'GET',
 			}),
 		/**

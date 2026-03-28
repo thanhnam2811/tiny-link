@@ -81,6 +81,24 @@ export const linkRoutes = (
 			controller.trackPublic,
 		);
 
+		// Link Preview Route
+		server.get(
+			'/api/links/:code/preview',
+			{
+				schema: {
+					tags: ['Links'],
+					summary: 'Get Link Preview',
+					description: 'Retrieves metadata (title, description, image) and protection status for a link.',
+					params: RedirectParamsSchema,
+					response: {
+						[HTTP_STATUS.OK]: LinkPreviewResponseSchema,
+						[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
+					},
+				},
+			},
+			controller.getPreview,
+		);
+
 		// Verify Password Route (Strict Rate Limit: 5 per minute)
 		server.post(
 			'/api/links/:code/verify',
@@ -186,7 +204,7 @@ export const linkRoutes = (
 		);
 
 		server.delete(
-			'/links/:id',
+			'/api/links/:id',
 			{
 				preHandler: [internalAuthMiddleware],
 				schema: {

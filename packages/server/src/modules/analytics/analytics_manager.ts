@@ -1,4 +1,4 @@
-import { PrismaClient } from '@tiny-link/db';
+import { PrismaClient, Prisma } from '@tiny-link/db';
 import geoip from 'geoip-lite';
 
 export interface ClickEvent {
@@ -77,7 +77,7 @@ export class AnalyticsManager {
 			{} as Record<string, number>,
 		);
 
-		await this.prisma.$transaction(async (tx) => {
+		await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 			// 3. Batch Insert raw click data
 			await tx.click.createMany({
 				data: events.map((e) => {
