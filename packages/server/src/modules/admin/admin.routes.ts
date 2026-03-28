@@ -29,7 +29,7 @@ export const adminRoutes =
 	async (server) => {
 		// Public routes
 		server.post<{ Body: AdminLoginBodyType }>(
-			'/admin/login',
+			'/login',
 			{
 				schema: {
 					body: AdminLoginBodySchema,
@@ -69,7 +69,7 @@ export const adminRoutes =
 			});
 
 			protectedServer.get<{ Reply: AdminStatsResponseType }>(
-				'/admin/stats',
+				'/stats',
 				{
 					schema: {
 						response: {
@@ -98,7 +98,7 @@ export const adminRoutes =
 				Querystring: AdminGetLinksQueryType;
 				Reply: AdminGetLinksResponseType;
 			}>(
-				'/admin/links',
+				'/links',
 				{
 					schema: {
 						querystring: AdminGetLinksQuerySchema,
@@ -154,7 +154,7 @@ export const adminRoutes =
 				Body: AdminUpdateLinkStatusBodyType;
 				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
-				'/admin/links/:id/status',
+				'/links/:id/status',
 				{
 					schema: {
 						params: AdminLinkIdParamsSchema,
@@ -193,7 +193,7 @@ export const adminRoutes =
 				Params: AdminLinkIdParamsType;
 				Reply: AdminSuccessResponseType | ErrorResponseType;
 			}>(
-				'/admin/links/:id',
+				'/links/:id',
 				{
 					schema: {
 						params: AdminLinkIdParamsSchema,
@@ -229,7 +229,7 @@ export const adminRoutes =
 				Querystring: AdminAnalyticsQueryType;
 				Reply: AdminAnalyticsResponseType;
 			}>(
-				'/admin/analytics',
+				'/analytics',
 				{
 					schema: {
 						querystring: AdminAnalyticsQuerySchema,
