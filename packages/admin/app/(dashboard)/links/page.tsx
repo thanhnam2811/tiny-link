@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { LinksTable } from '@/components/links-table';
 import { AdminGetLinksResponseType } from '@tiny-link/shared';
+import { getEnv } from '@/lib/env';
 
 // Generate dynamic pages
 export const dynamic = 'force-dynamic';
@@ -28,7 +29,7 @@ export default async function LinksPage(props: {
 		redirect('/login');
 	}
 
-	const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+	const apiUrl = getEnv('INTERNAL_API_URL') + '/api';
 	let data: AdminGetLinksResponseType = {
 		links: [],
 		totalCount: 0,
