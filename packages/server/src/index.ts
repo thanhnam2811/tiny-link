@@ -14,7 +14,7 @@ import { apiRoutes } from './modules/api.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
 import { SYSTEM_CONFIG, ENV_NAMES, APP_VERSION, INTERNAL_AUTH } from '@tiny-link/shared';
-import { getEnv } from './shared/env';
+import { getEnv, isProduction } from './shared/env';
 
 export const buildServer = async () => {
 	const analyticsManager = new AnalyticsManager(prisma);
