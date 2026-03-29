@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@tiny-link/db';
+import { prisma } from '@tiny-link/db';
 import { INTERNAL_AUTH } from '@tiny-link/shared';
 import type { Redis } from 'ioredis';
 
 describe('Rate Limiting & Caching', () => {
 	let app: FastifyInstance;
 	let redis: Redis;
-	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
 		const { server } = await buildServer();
@@ -21,7 +20,6 @@ describe('Rate Limiting & Caching', () => {
 	afterAll(async () => {
 		await redis.flushdb(); // Clean Redis keys after tests
 		await app.close();
-		await prisma.$disconnect();
 	});
 
 	// ─── Rate Limiting Tests ──────────────────────────────────────────────────
