@@ -15,3 +15,6 @@ coverage
 test
 **/test
 *.log
+*.log
+# packages/db/generated-client (MUST NOT BE IGNORED for builder stage)
+# packages/db/src/generated-client (MUST NOT BE IGNORED for builder stage)

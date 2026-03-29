@@ -22,5 +22,5 @@ fi
 
 echo "Database is ready! Starting application..."
 
-# Start the application
-exec node dist/index.js
+# Start the application from the server package
+exec node packages/server/dist/index.js

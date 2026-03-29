@@ -1,10 +1,11 @@
 {
 	"name": "@tiny-link/server",
 	"version": "1.5.7",
+	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
 		"dev": "dotenv -e .env -- tsx watch src/index.ts",
-		"build": "tsc",
+		"build": "tsc -b",
 		"lint": "eslint .",
 		"start": "node dist/index.js",
 		"db:push": "pnpm --filter @tiny-link/db db:push",
@@ -23,6 +24,7 @@
 		"@fastify/swagger": "^9.7.0",
 		"@fastify/swagger-ui": "^5.2.5",
 		"@fastify/type-provider-typebox": "^6.1.0",
+		"@prisma/client": "7.6.0",
 		"@sinclair/typebox": "^0.34.48",
 		"@tiny-link/db": "workspace:*",
 		"@tiny-link/shared": "workspace:*",
@@ -43,5 +45,9 @@
 		"@types/ua-parser-js": "^0.7.39",
 		"dotenv-cli": "^11.0.0",
 		"vitest": "^4.1.0"
-	}
+	},
+	"files": [
+		"dist",
+		"public"
+	]
 }

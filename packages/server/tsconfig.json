@@ -1,9 +1,16 @@
 {
-	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"outDir": "./dist",
-		"rootDir": "./src"
+		"rootDir": "./src",
+		"baseUrl": ".",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true
 	},
-	"include": ["src/**/*"],
-	"references": [{ "path": "../shared" }, { "path": "../db" }]
+	"include": ["src/**/*"]
 }
