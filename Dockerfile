@@ -34,8 +34,6 @@ RUN pnpm --filter @tiny-link/db exec prisma generate
 # 2. Build local workspace dependencies in order
 RUN pnpm --filter @tiny-link/shared build
 RUN pnpm --filter @tiny-link/db build
-
-# 3. Build the main server application
 RUN pnpm --filter @tiny-link/server build
 
 # 4. Prune workspace for production

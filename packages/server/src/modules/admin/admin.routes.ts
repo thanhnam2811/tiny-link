@@ -41,7 +41,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 			},
 		},
 		async (request, reply) => {
-			const { password } = request.body;
+			const { password } = request.body as AdminLoginBodyType;
 			const adminPassword = getEnv('ADMIN_PASSWORD', 'admin123');
 
 			if (password !== adminPassword) {
@@ -111,7 +111,13 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				},
 			},
 			async (request) => {
-				const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = request.query;
+				const {
+					page = 1,
+					limit = 10,
+					search,
+					sortBy = 'createdAt',
+					sortOrder = 'desc',
+				} = request.query as AdminGetLinksQueryType;
 				const skip = (page - 1) * limit;
 
 				const where = search
@@ -169,8 +175,8 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				},
 			},
 			async (request, reply) => {
-				const { id } = request.params;
-				const { isActive } = request.body;
+				const { id } = request.params as AdminLinkIdParamsType;
+				const { isActive } = request.body as AdminUpdateLinkStatusBodyType;
 
 				try {
 					await prisma.link.update({
@@ -207,7 +213,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				},
 			},
 			async (request, reply) => {
-				const { id } = request.params;
+				const { id } = request.params as AdminLinkIdParamsType;
 
 				try {
 					await prisma.link.delete({
@@ -242,7 +248,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				},
 			},
 			async (request) => {
-				const { range = '7d' } = request.query;
+				const { range = '7d' } = request.query as AdminAnalyticsQueryType;
 
 				// 1. Determine Date Range
 				const now = new Date();
@@ -254,7 +260,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				startDate.setHours(0, 0, 0, 0);
 
 				// 2. Query Timeline using $queryRaw for performance
-				const timelineRaw = await prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+				const timelineRaw = await prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
 					SELECT DATE_TRUNC('day', "clickedAt") as date, COUNT(*) as count 
 					FROM "Click" 
 					WHERE "clickedAt" >= ${startDate}

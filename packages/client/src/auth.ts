@@ -6,8 +6,7 @@ import { prisma } from '@tiny-link/db';
 import { cookies } from 'next/headers';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-	// @ts-expect-error - PrismaAdapter requires an index signature which is lost in the monorepo re-export from @tiny-link/db
-	adapter: PrismaAdapter(prisma),
+	adapter: PrismaAdapter(prisma as unknown as Parameters<typeof PrismaAdapter>[0]),
 	secret: process.env.AUTH_SECRET,
 	providers: [
 		Google({
