@@ -6,7 +6,7 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"prebuild": "prisma generate",
-		"build": "tsc",
+		"build": "tsc && cp -r src/generated-client/ dist/generated-client/",
 		"generate": "prisma generate",
 		"db:push": "prisma db push",
 		"db:studio": "prisma studio",

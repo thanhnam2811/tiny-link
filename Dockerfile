@@ -17,9 +17,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # Generate Prisma client for all packages that need it
 RUN pnpm --filter @tiny-link/db exec prisma generate
 
-# Build workspace dependencies in correct order
-# Using root build script to ensure all project references are resolved
-RUN pnpm run build
+# Build workspace dependencies in correct order to resolve Type declarations
+# We build shared first, then db, then server to ensure all references exist.
+RUN pnpm --filter @tiny-link/shared build \
+    && pnpm --filter @tiny-link/db build \
+    && pnpm --filter @tiny-link/server build
 
 # Create a deployable, symlink-safe production tree for only the server package.
 RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
