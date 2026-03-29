@@ -1,9 +1,10 @@
 import { auth } from '@/auth';
 import { INTERNAL_AUTH } from '@tiny-link/shared';
 import { NextRequest, NextResponse } from 'next/server';
+import { getEnv } from '@/lib/env';
 
-const FASTIFY_URL = process.env.INTERNAL_API_URL || 'http://localhost:3001';
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+const FASTIFY_URL = getEnv('INTERNAL_API_URL');
+const INTERNAL_API_KEY = getEnv('INTERNAL_API_KEY');
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
 	const { path } = await params;
