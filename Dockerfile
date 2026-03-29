@@ -7,23 +7,30 @@ RUN corepack enable
 
 WORKDIR /app
 
-# 1. Copy everything for local resolution
-COPY . .
+# 1. Copy ONLY workspace configs and ALL package.json files first
+# This is the "Magic Step" for speed: it allows Docker to cache the install layer.
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY packages/admin/package.json ./packages/admin/
+COPY packages/client/package.json ./packages/client/
+COPY packages/db/package.json ./packages/db/
+COPY packages/server/package.json ./packages/server/
+COPY packages/shared/package.json ./packages/shared/
 
-# 2. Install dependencies (with full context to preserve workspace symlinks)
+# 2. Install dependencies (This layer is now cached unless libraries change)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# 3. Generate Prisma Client
+# 3. Copy the rest of the source code (Changes below this line will only rebuild from here downward)
+COPY . .
+
+# 4. Generate Prisma Client
 RUN ./node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
-# 4. Build dependencies first (creates actual dist and types)
-RUN pnpm --filter @tiny-link/shared build
-RUN pnpm --filter @tiny-link/db build
+# 5. Build only server and its dependencies (shared, db)
+RUN pnpm --filter @tiny-link/shared build && \
+    pnpm --filter @tiny-link/db build && \
+    pnpm --filter @tiny-link/server build
 
-# 5. Build server and dependencies
-RUN pnpm --filter @tiny-link/server build
-
-# 6. Deploy server to a standalone directory (flattens dependencies)
+# 6. Deploy server to a standalone directory
 RUN pnpm --filter @tiny-link/server deploy --prod /app/out
 
 # -----------------------------------------------------------------
@@ -40,7 +47,6 @@ RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs
 
 # Ensure environment variables are set for production
 ENV NODE_ENV=production
-ENV PORT=3001
 
 # Copy ONLY the standalone deployed application
 COPY --from=builder --chown=nodeuser:nodejs /app/out ./
@@ -51,16 +57,11 @@ RUN chmod +x /entrypoint.sh
 
 USER nodeuser
 
-# Healthcheck to verify service availability
+# Healthcheck to verify service availability using the dynamic PORT
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/healthz || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3001}/api/healthz || exit 1
 
 EXPOSE 3001
 
 # Start the application from the flattened structure
-ENTRYPOINT ["/entrypoint.sh"]
-
-EXPOSE 3001
-
-# Start using the workspace entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
