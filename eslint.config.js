@@ -14,6 +14,7 @@ export default tseslint.config(
 			'**/.next/**',
 			'eslint.config.js',
 			'**/public/**',
+			'**/generated-client/**',
 		],
 	},
 	{

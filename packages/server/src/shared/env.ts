@@ -1,4 +1,9 @@
-import { ENV_NAMES } from '@tiny-link/shared';
+import { ENV_NAMES, INTERNAL_AUTH } from '@tiny-link/shared';
+
+// Centralize environment checks for efficiency and consistency
+export const isProduction = process.env.NODE_ENV === ENV_NAMES.PRODUCTION;
+export const isTest = process.env.NODE_ENV === ENV_NAMES.TEST || !!process.env.VITEST;
+export const isDev = process.env.NODE_ENV === ENV_NAMES.DEVELOPMENT || !process.env.NODE_ENV;
 
 /**
  * Utility to get environment variables with strict validation for production.
@@ -6,7 +11,6 @@ import { ENV_NAMES } from '@tiny-link/shared';
  */
 export const getEnv = (key: string, fallback?: string): string => {
 	const value = process.env[key];
-	const isProduction = process.env.NODE_ENV === ENV_NAMES.PRODUCTION;
 
 	if (!value) {
 		if (isProduction) {
@@ -19,7 +23,14 @@ export const getEnv = (key: string, fallback?: string): string => {
 	}
 
 	// Check for dangerous default values in production
-	const dangerousDefaults = ['admin123', 'super-secret-key-for-admin-jwt', 'secret', 'test-internal-key'];
+	const dangerousDefaults = [
+		'admin123',
+		'super-secret-key-for-admin-jwt',
+		'secret',
+		'test-internal-key',
+		INTERNAL_AUTH.TEST_KEY, // Added for extra safety
+	];
+
 	if (isProduction && dangerousDefaults.includes(value)) {
 		console.warn(
 			`[CAUTION] Environment variable ${key} is using a well-known default value. This is highly discouraged in production!`,
