@@ -4,18 +4,19 @@ import GitHub from 'next-auth/providers/github';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@tiny-link/db';
 import { cookies } from 'next/headers';
+import { getEnv } from './lib/env';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	adapter: PrismaAdapter(prisma as unknown as Parameters<typeof PrismaAdapter>[0]),
-	secret: process.env.AUTH_SECRET,
+	secret: getEnv('AUTH_SECRET'),
 	providers: [
 		Google({
-			clientId: process.env.AUTH_GOOGLE_ID || 'dummy-id',
-			clientSecret: process.env.AUTH_GOOGLE_SECRET || 'dummy-secret',
+			clientId: getEnv('AUTH_GOOGLE_ID'),
+			clientSecret: getEnv('AUTH_GOOGLE_SECRET'),
 		}),
 		GitHub({
-			clientId: process.env.AUTH_GITHUB_ID || 'dummy-id',
-			clientSecret: process.env.AUTH_GITHUB_SECRET || 'dummy-secret',
+			clientId: getEnv('AUTH_GITHUB_ID'),
+			clientSecret: getEnv('AUTH_GITHUB_SECRET'),
 		}),
 	],
 	session: {
@@ -35,8 +36,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			const guestId = cookieStore.get('tiny_link_guest_id')?.value;
 
 			if (guestId && user.id) {
-				const internalUrl = process.env.INTERNAL_API_URL || 'http://localhost:3001';
-				const internalKey = process.env.INTERNAL_API_KEY;
+				const internalUrl = getEnv('INTERNAL_API_URL');
+				const internalKey = getEnv('INTERNAL_API_KEY');
 
 				try {
 					console.log(`[Auth Event] Triggering silent claim for guest ${guestId}`);

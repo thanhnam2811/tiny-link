@@ -7,8 +7,10 @@ import {
 	TrackPublicResponseType,
 } from '@tiny-link/shared';
 
+import { getEnv } from './env';
+
 const isServer = typeof window === 'undefined';
-const BASE_URL = isServer ? (process.env.INTERNAL_API_URL || 'http://localhost:3001') + '/api' : '/api/proxy';
+const BASE_URL = isServer ? getEnv('INTERNAL_API_URL') + '/api' : '/api/proxy';
 
 export class ApiError extends Error {
 	constructor(
