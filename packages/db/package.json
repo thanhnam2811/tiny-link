@@ -2,33 +2,32 @@
 	"name": "@tiny-link/db",
 	"version": "1.5.7",
 	"private": true,
+	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
 	"scripts": {
-		"prebuild": "prisma generate",
-		"build": "tsc && cp -r src/generated-client/ dist/generated-client/",
+		"build": "tsup src/index.ts --format esm --dts --clean",
 		"generate": "prisma generate",
 		"db:push": "prisma db push",
 		"db:studio": "prisma studio",
+		"db:migrate": "prisma migrate dev",
+		"db:deploy": "prisma migrate deploy",
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@prisma/client": "^6.4.1",
-		"prisma": "^6.4.1"
+		"@prisma/adapter-pg": "7.6.0",
+		"@prisma/client": "7.6.0",
+		"pg": "^8.13.3",
+		"prisma": "7.6.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20",
-		"dotenv-cli": "^11.0.0",
-		"eslint": "^9",
-		"ts-node": "^10.9.2",
-		"tsx": "^4.21.0",
-		"typescript": "^5"
-	},
-	"files": [
-		"dist",
-		"prisma"
-	],
-	"prisma": {
-		"seed": "tsx prisma/seed.ts"
+		"@types/pg": "^8.11.11"
 	}
 }

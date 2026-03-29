@@ -22,5 +22,5 @@ fi
 
 echo "Database is ready! Starting application..."
 
-# Start the application
+# Start the application (flattened by pnpm deploy)
 exec node dist/index.js

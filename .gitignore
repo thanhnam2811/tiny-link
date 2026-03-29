@@ -15,4 +15,4 @@ coverage/
 *.log
 tsconfig.tsbuildinfo
 packages/db/generated/
-packages/db/src/generated-client/
+packages/db/generated-client/

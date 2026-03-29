@@ -1,6 +1,11 @@
 {
 	"version": 1,
 	"skills": {
+		"docker-expert": {
+			"source": "sickn33/antigravity-awesome-skills",
+			"sourceType": "github",
+			"computedHash": "51defa57449d1e7a3e51ae6444c111c4424cd47ed1fb96a3eb1dba0c17971c0d"
+		},
 		"fastify-best-practices": {
 			"source": "mcollina/skills",
 			"sourceType": "github",
@@ -15,6 +20,11 @@
 			"source": "antfu/skills",
 			"sourceType": "github",
 			"computedHash": "318f9fca2441a3e06fedc336e195dd18be5dbe901064e4fa71b76b40b096ab3a"
+		},
+		"prisma-database-setup": {
+			"source": "prisma/skills",
+			"sourceType": "github",
+			"computedHash": "b05e88d284c4a754d3624697c2f749e21f7da3fc1f4319b6658df318e84b0dd9"
 		},
 		"shadcn": {
 			"source": "shadcn/ui",

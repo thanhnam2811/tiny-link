@@ -1,65 +1,66 @@
-FROM node:24-alpine AS base
+# Stage 1: Build the application (Unified Build Stage)
+FROM node:24-alpine AS builder
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-
 RUN corepack enable
-
-FROM base AS build
 
 WORKDIR /app
 
+# 1. Copy everything for local resolution
 COPY . .
 
-# Use BuildKit cache mount for pnpm store to speed up rebuilds.
+# 2. Install dependencies (with full context to preserve workspace symlinks)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# Generate Prisma client for all packages that need it
-RUN pnpm --filter @tiny-link/db exec prisma generate
+# 3. Generate Prisma Client
+RUN ./node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
-# Build workspace dependencies in correct order to resolve Type declarations
-# We build shared first, then db, then server to ensure all references exist.
-RUN pnpm --filter @tiny-link/shared build \
-    && pnpm --filter @tiny-link/db build \
-    && pnpm --filter @tiny-link/server build
+# 4. Build dependencies first (creates actual dist and types)
+RUN pnpm --filter @tiny-link/shared build
+RUN pnpm --filter @tiny-link/db build
 
-# Create a deployable, symlink-safe production tree for only the server package.
-RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
+# 5. Build server and dependencies
+RUN pnpm --filter @tiny-link/server build
 
-FROM base AS runner
+# 6. Deploy server to a standalone directory (flattens dependencies)
+RUN pnpm --filter @tiny-link/server deploy --prod /app/out
 
-WORKDIR /prod/server
+# -----------------------------------------------------------------
+# Stage 2: Production runner
+# -----------------------------------------------------------------
+FROM node:24-alpine AS runner
+WORKDIR /app
 
-# Install essentials for healthcheck and wait-for-db
-# postgresql-client provides pg_isready
+# Install runtime essentials
 RUN apk add --no-cache postgresql-client wget
 
-# Environment configuration
+# Create a non-root user for security
+RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs
+
+# Ensure environment variables are set for production
 ENV NODE_ENV=production
 ENV PORT=3001
-# Ensure Prisma looks for engines in a predictable location
-ENV PRISMA_SKIP_POSTINSTALL_GENERATE=1
 
-COPY --from=build /prod/server /prod/server
-COPY --from=build /app/packages/db/prisma ./prisma
+# Copy ONLY the standalone deployed application
+COPY --from=builder --chown=nodeuser:nodejs /app/out ./
 
-# Copy the generated Prisma client from the build stage. 
-# pnpm stores this in a specific .pnpm path due to strict symlinking.
-COPY --from=build /app/node_modules/.pnpm/@prisma+client@6.4.1*/node_modules/.prisma ./node_modules/.prisma
-
-COPY entrypoint.sh /entrypoint.sh
+# Copy the entrypoint script
+COPY --chown=nodeuser:nodejs entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Create non-root user and set ownership of the app directory
-RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs \
-    && chown -R nodeuser:nodejs /prod/server
 
 USER nodeuser
 
-# Healthcheck to let Docker Engine know if the container is healthy
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget -no-verbose --tries=1 --spider http://localhost:3001/api/healthz || exit 1
+# Healthcheck to verify service availability
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/healthz || exit 1
 
 EXPOSE 3001
 
-CMD ["/entrypoint.sh"]
+# Start the application from the flattened structure
+ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE 3001
+
+# Start using the workspace entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
