@@ -65,6 +65,7 @@ export const linkRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				summary: 'Track Public Link Click',
 				description: 'Records analytics silently and returns the original URL for client-side redirection.',
 				params: RedirectParamsSchema,
+				body: Type.Optional(Type.Any()),
 				response: {
 					[HTTP_STATUS.OK]: TrackPublicResponseSchema,
 					[HTTP_STATUS.NOT_FOUND]: ErrorResponseSchema,
