@@ -42,17 +42,12 @@ export const buildServer = async () => {
 
 			const clientUrl = getEnv('CLIENT_URL', 'http://localhost:3000');
 
-			// Allow localhost and 127.0.0.1 in development/test
-			const isLocal =
-				!isProduction &&
-				origin &&
-				(/^https?:\/\/localhost:\d+$/.test(origin) || /^https?:\/\/127\.0\.0\.1:\d+$/.test(origin));
-
 			// Strict Vercel Domain Check (Placeholder for project safety)
 			const vercelProjectName = getEnv('VERCEL_PROJECT_NAME', 'tiny-link-client');
 			const vercelRegex = new RegExp(`^${vercelProjectName}.*\\.vercel\\.app$`);
 
-			if (!origin || origin === clientUrl || isLocal || vercelRegex.test(origin)) {
+			// Allow all in development/test, or strict match in production
+			if (!isProduction || !origin || origin === clientUrl || vercelRegex.test(origin)) {
 				cb(null, true);
 				return;
 			}
