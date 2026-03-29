@@ -43,10 +43,15 @@ async function handleProxy(req: NextRequest, pathSegments: string[]) {
 	try {
 		const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
 
+		// If body is empty, remove content-type to avoid Fastify errors
+		if (body === '' || body === undefined) {
+			headers.delete('content-type');
+		}
+
 		const response = await fetch(url, {
 			method: req.method,
 			headers,
-			body,
+			body: body || undefined,
 			cache: 'no-store',
 		});
 
