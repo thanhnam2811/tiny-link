@@ -86,13 +86,7 @@ export function Header() {
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-					) : (
-						<Link href="/login">
-							<Button className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-6 rounded-lg shadow-md transition-all">
-								Sign In
-							</Button>
-						</Link>
-					)}
+					) : null}
 				</div>
 			</div>
 		</header>
