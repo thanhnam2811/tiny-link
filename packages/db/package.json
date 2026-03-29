@@ -6,7 +6,7 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"prebuild": "prisma generate",
-		"build": "tsc",
+		"build": "mkdir -p dist && cp -r generated-client dist/ && tsc",
 		"generate": "prisma generate",
 		"db:push": "prisma db push",
 		"db:studio": "prisma studio",

@@ -38,12 +38,12 @@ services:
             dockerfile: Dockerfile
         container_name: tiny-link-app
         ports:
-            - '3000:3000'
+            - '3001:3001'
         environment:
             DATABASE_URL: postgresql://admin:password@postgres:5432/tinylink
             REDIS_URL: redis://redis:6379
             NODE_ENV: production
-            PORT: 3000
+            PORT: 3001
         depends_on:
             postgres:
                 condition: service_healthy
@@ -51,11 +51,11 @@ services:
                 condition: service_healthy
         restart: unless-stopped
         healthcheck:
-            test: ['CMD-SHELL', 'wget -q -O - http://localhost:3000/ >/dev/null 2>&1 || exit 1']
+            test: ['CMD-SHELL', 'wget -q -O - http://localhost:3001/api/healthz || exit 1']
             interval: 10s
             timeout: 3s
-            retries: 10
-            start_period: 15s
+            retries: 5
+            start_period: 20s
 
 volumes:
     postgres_data:

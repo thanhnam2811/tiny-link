@@ -134,7 +134,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				]);
 
 				return {
-					links: links.map((link) => ({
+					links: links.map((link: any) => ({
 						id: link.id,
 						originalUrl: link.originalUrl,
 						shortCode: link.shortCode,
@@ -264,7 +264,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 
 				// 3. Zero-padding Timeline
 				const timelineMap = new Map<string, number>();
-				timelineRaw.forEach((row) => {
+				timelineRaw.forEach((row: { date: Date; count: bigint }) => {
 					timelineMap.set(row.date.toISOString().split('T')[0], Number(row.count));
 				});
 
@@ -302,7 +302,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					take: 10,
 				});
 
-				const countryData = countryGroups.map((g) => ({
+				const countryData = countryGroups.map((g: { country: string | null; _count: { id: number } }) => ({
 					name: g.country || 'Unknown',
 					count: g._count.id,
 				}));
@@ -318,7 +318,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 
 				const { UAParser } = await import('ua-parser-js');
 
-				uaGroups.forEach((g) => {
+				uaGroups.forEach((g: { userAgent: string | null; _count: { id: number } }) => {
 					const parser = new UAParser(g.userAgent || '');
 					const osName = parser.getOS().name || 'Unknown';
 					const browserName = parser.getBrowser().name || 'Unknown';
