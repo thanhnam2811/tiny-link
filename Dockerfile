@@ -47,7 +47,6 @@ RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs
 
 # Ensure environment variables are set for production
 ENV NODE_ENV=production
-ENV PORT=3001
 
 # Copy ONLY the standalone deployed application
 COPY --from=builder --chown=nodeuser:nodejs /app/out ./
@@ -58,16 +57,11 @@ RUN chmod +x /entrypoint.sh
 
 USER nodeuser
 
-# Healthcheck to verify service availability
+# Healthcheck to verify service availability using the dynamic PORT
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/healthz || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3001}/api/healthz || exit 1
 
 EXPOSE 3001
 
 # Start the application from the flattened structure
-ENTRYPOINT ["/entrypoint.sh"]
-
-EXPOSE 3001
-
-# Start using the workspace entrypoint
 ENTRYPOINT ["/entrypoint.sh"]

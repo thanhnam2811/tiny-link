@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { AdminLoginResponseType } from '@tiny-link/shared';
+import { getEnv } from './env';
 
 export async function loginAction(prevState: { error?: string } | null, formData: FormData) {
 	const password = formData.get('password') as string;
@@ -13,7 +14,7 @@ export async function loginAction(prevState: { error?: string } | null, formData
 	}
 
 	try {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+		const apiUrl = getEnv('INTERNAL_API_URL') + '/api';
 		const response = await fetch(`${apiUrl}/admin/login`, {
 			method: 'POST',
 			headers: {
@@ -66,7 +67,7 @@ export async function toggleLinkStatusAction(id: string, currentStatus: boolean)
 	if (!token) return { error: 'Unauthorized' };
 
 	try {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+		const apiUrl = getEnv('INTERNAL_API_URL') + '/api';
 		const response = await fetch(`${apiUrl}/admin/links/${id}/status`, {
 			method: 'PATCH',
 			headers: {
@@ -92,7 +93,7 @@ export async function deleteLinkAction(id: string) {
 	if (!token) return { error: 'Unauthorized' };
 
 	try {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+		const apiUrl = getEnv('INTERNAL_API_URL') + '/api';
 		const response = await fetch(`${apiUrl}/admin/links/${id}`, {
 			method: 'DELETE',
 			headers: {

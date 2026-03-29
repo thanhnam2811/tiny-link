@@ -84,16 +84,28 @@ export const buildServer = async () => {
 		root: path.join(process.cwd(), 'public'),
 	});
 
-	// Root Health Check (Standard for many PaaS/Load Balancers)
+	// Root Health Check
 	server.get('/healthz', async () => ({
 		status: 'ok',
+		environment: process.env.NODE_ENV,
+		version: APP_VERSION,
 		timestamp: new Date().toISOString(),
 	}));
 
+	// Add identification header to all responses
+	server.addHook('onSend', async (_request, reply) => {
+		reply.header('X-App-Environment', process.env.NODE_ENV || 'development');
+		reply.header('X-App-Version', APP_VERSION);
+	});
+
 	// redirect root to client url
 	server.get('/', async (_request, reply) => {
-		const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-		return reply.code(301).redirect(clientUrl);
+		const clientUrl = process.env.CLIENT_URL;
+		if (clientUrl) {
+			return reply.code(302).redirect(clientUrl);
+		}
+		// Fallback to a simple message instead of a hardcoded localhost
+		return { message: 'TinyLink API Server is running', version: APP_VERSION };
 	});
 
 	// Register Swagger Plugins

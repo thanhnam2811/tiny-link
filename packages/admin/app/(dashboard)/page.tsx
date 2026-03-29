@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AnalyticsCharts } from '@/components/analytics-charts';
 import { AdminAnalyticsResponseType } from '@tiny-link/shared';
+import { getEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ra
 		redirect('/login');
 	}
 
-	const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+	const apiUrl = getEnv('INTERNAL_API_URL') + '/api';
 	let stats = { totalLinks: 0, totalClicks: 0 };
 	let analyticsData: AdminAnalyticsResponseType = {
 		timeline: [],
