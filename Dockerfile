@@ -19,7 +19,7 @@ COPY packages/shared/package.json ./packages/shared/
 # 2. Install dependencies (This layer is now cached unless libraries change)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# 3. Copy the rest of the source code (Sửa code chỉ làm chạy lại từ đây trở xuống)
+# 3. Copy the rest of the source code (Changes below this line will only rebuild from here downward)
 COPY . .
 
 # 4. Generate Prisma Client
