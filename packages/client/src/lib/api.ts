@@ -7,7 +7,8 @@ import {
 	TrackPublicResponseType,
 } from '@tiny-link/shared';
 
-const BASE_URL = '/api';
+const isServer = typeof window === 'undefined';
+const BASE_URL = isServer ? (process.env.INTERNAL_API_URL || 'http://localhost:3001') + '/api' : '/api/proxy';
 
 export class ApiError extends Error {
 	constructor(
@@ -59,7 +60,7 @@ export const api = {
 		 * Create a new short link
 		 */
 		create: (payload: CreateLinkBodyType) =>
-			fetcher<LinkResponseType>('/proxy/links', {
+			fetcher<LinkResponseType>('/links', {
 				method: 'POST',
 				body: JSON.stringify(payload),
 			}),
@@ -67,7 +68,7 @@ export const api = {
 		 * Get stats for a short link
 		 */
 		getStats: (code: string, password?: string) =>
-			fetcher<unknown>(`/proxy/stats/${code}`, {
+			fetcher<unknown>(`/stats/${code}`, {
 				method: 'POST',
 				body: JSON.stringify({ password }),
 			}),
@@ -75,14 +76,14 @@ export const api = {
 		 * Track a public link click
 		 */
 		track: (code: string) =>
-			fetcher<TrackPublicResponseType>(`/proxy/links/${code}/track`, {
+			fetcher<TrackPublicResponseType>(`/links/${code}/track`, {
 				method: 'POST',
 			}),
 		/**
 		 * Verify password for a protected link
 		 */
 		verify: (code: string, password: string) =>
-			fetcher<VerifyPasswordResponseType>(`/proxy/links/${code}/verify`, {
+			fetcher<VerifyPasswordResponseType>(`/links/${code}/verify`, {
 				method: 'POST',
 				body: JSON.stringify({ password }),
 			}),
@@ -90,14 +91,14 @@ export const api = {
 		 * Get preview metadata for a link
 		 */
 		getPreview: (code: string) =>
-			fetcher<LinkPreviewResponseType>(`/proxy/links/${code}/preview`, {
+			fetcher<LinkPreviewResponseType>(`/links/${code}/preview`, {
 				method: 'GET',
 			}),
 		/**
 		 * Claim guest links (called automatically on login)
 		 */
 		claim: (guestId: string) =>
-			fetcher<{ success: boolean; claimedCount: number }>('/proxy/links/claim', {
+			fetcher<{ success: boolean; claimedCount: number }>('/links/claim', {
 				method: 'POST',
 				body: JSON.stringify({ guestId }),
 			}),
@@ -115,7 +116,7 @@ export const api = {
 				totalCount: number;
 				totalPages: number;
 				currentPage: number;
-			}>(`/proxy/links/user?${query.toString()}`, {
+			}>(`/links/user?${query.toString()}`, {
 				method: 'GET',
 			});
 		},
@@ -123,7 +124,7 @@ export const api = {
 		 * Delete (Soft Delete) a link
 		 */
 		delete: (id: string) =>
-			fetcher<{ success: boolean }>(`/proxy/links/${id}`, {
+			fetcher<{ success: boolean }>(`/links/${id}`, {
 				method: 'DELETE',
 			}),
 	},

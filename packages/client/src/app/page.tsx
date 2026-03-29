@@ -12,7 +12,7 @@ export default function Home() {
 
 	// Server Warmup Polling Logic
 	useEffect(() => {
-		const healthUrl = '/healthz';
+		const healthUrl = '/api/proxy/healthz';
 		let attempts = 0;
 		const maxAttempts = 30; // 30 attempts * 2s = 60s max
 		const abortController = new AbortController();
