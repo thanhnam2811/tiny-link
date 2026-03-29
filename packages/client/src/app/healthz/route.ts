@@ -8,7 +8,7 @@ const INTERNAL_API_URL = process.env.INTERNAL_API_URL || 'http://localhost:3001'
  */
 export async function GET() {
 	try {
-		const response = await fetch(`${INTERNAL_API_URL}/healthz`, {
+		const response = await fetch(`${INTERNAL_API_URL}/api/healthz`, {
 			cache: 'no-store',
 		});
 
