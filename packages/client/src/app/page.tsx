@@ -12,9 +12,7 @@ export default function Home() {
 
 	// Server Warmup Polling Logic
 	useEffect(() => {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
-		// If absolute URL, strip /api and add /healthz. If relative, just use /healthz
-		const healthUrl = apiUrl.startsWith('http') ? `${apiUrl.replace(/\/api\/?$/, '')}/healthz` : '/healthz';
+		const healthUrl = '/healthz';
 		let attempts = 0;
 		const maxAttempts = 30; // 30 attempts * 2s = 60s max
 		const abortController = new AbortController();
