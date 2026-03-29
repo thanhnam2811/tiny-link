@@ -31,7 +31,8 @@ RUN pnpm --filter @tiny-link/shared build && \
     pnpm --filter @tiny-link/server build
 
 # 6. Deploy server to a standalone directory
-RUN pnpm --filter @tiny-link/server deploy --prod /app/out
+RUN pnpm --filter @tiny-link/server deploy --prod /app/out && \
+    cp -r packages/db/prisma/migrations /app/out/prisma/migrations 2>/dev/null || true
 
 # -----------------------------------------------------------------
 # Stage 2: Production runner

@@ -29,5 +29,10 @@
 	},
 	"devDependencies": {
 		"@types/pg": "^8.11.11"
-	}
+	},
+	"files": [
+		"dist",
+		"prisma/migrations",
+		"prisma/schema.prisma"
+	]
 }
