@@ -18,11 +18,6 @@ export const prisma: PrismaClient =
 	globalForPrisma.prisma ||
 	new PrismaClient({
 		adapter,
-		datasources: {
-			db: {
-				url: connectionString,
-			},
-		},
 	});
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
