@@ -140,7 +140,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				]);
 
 				return {
-					links: links.map((link) => ({
+					links: links.map((link: any) => ({
 						id: link.id,
 						originalUrl: link.originalUrl,
 						shortCode: link.shortCode,
