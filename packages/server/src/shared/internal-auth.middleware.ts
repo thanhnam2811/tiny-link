@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { HTTP_STATUS, ERROR_MESSAGES, INTERNAL_AUTH } from '@tiny-link/shared';
+import { HTTP_STATUS, ERROR_MESSAGES, INTERNAL_AUTH, ENV_NAMES } from '@tiny-link/shared';
+import { getEnv } from './env';
 
 /**
  * Middleware to protect internal M2M (Machine-to-Machine) routes.
@@ -9,8 +10,8 @@ export const internalAuthMiddleware = async (request: FastifyRequest, reply: Fas
 	const authHeader = request.headers[INTERNAL_AUTH.HEADER];
 
 	// In test mode, we use a fixed key as a fallback if not provided in env
-	const isTest = !!process.env.VITEST || process.env.NODE_ENV === 'test' || process.env.NODE_ENV?.includes('test');
-	const expectedKey = process.env.INTERNAL_API_KEY || (isTest ? INTERNAL_AUTH.TEST_KEY : undefined);
+	const isTest = process.env.NODE_ENV === ENV_NAMES.TEST || !!process.env.VITEST;
+	const expectedKey = getEnv('INTERNAL_API_KEY', isTest ? INTERNAL_AUTH.TEST_KEY : undefined);
 
 	if (!expectedKey) {
 		request.log.error('INTERNAL_API_KEY is not set in environment variables');

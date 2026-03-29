@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
 import { PrismaClient } from '@tiny-link/db';
-import { HTTP_STATUS, INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
+import { INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
 
 const INTERNAL_KEY = INTERNAL_AUTH.TEST_KEY;
 
@@ -112,7 +112,7 @@ describe('Phase 9: Auth, Claiming & User Links', () => {
 		// Try to delete without correct userId (even with internal key)
 		const failRes = await app.inject({
 			method: 'DELETE',
-			url: `/links/${link.id}`,
+			url: `/api/links/${link.id}`,
 			headers: {
 				[INTERNAL_AUTH.HEADER]: INTERNAL_KEY,
 				[INTERNAL_AUTH.USER_ID_HEADER]: 'wrong-user',
@@ -123,7 +123,7 @@ describe('Phase 9: Auth, Claiming & User Links', () => {
 		// Correct delete
 		const successRes = await app.inject({
 			method: 'DELETE',
-			url: `/links/${link.id}`,
+			url: `/api/links/${link.id}`,
 			headers: {
 				[INTERNAL_AUTH.HEADER]: INTERNAL_KEY,
 				[INTERNAL_AUTH.USER_ID_HEADER]: userId,

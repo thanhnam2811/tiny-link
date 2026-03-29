@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import StatsDashboard from './StatsDashboard';
+import { api } from '@/lib/api';
 
 type Props = {
 	params: Promise<{ code: string }>;
@@ -8,19 +9,15 @@ type Props = {
 
 // Fetch preview strictly to detect if it's protected before rendering UI
 async function getLinkPreview(code: string) {
-	const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-	const response = await fetch(`${API_URL}/links/${code}/preview`, {
-		cache: 'no-store', // Always fetch fresh to know current protection status
-	});
-
-	if (!response.ok) {
-		if (response.status === 404 || response.status === 410) {
+	try {
+		return await api.links.getPreview(code);
+	} catch (err: unknown) {
+		const error = err as { statusCode?: number };
+		if (error.statusCode === 404 || error.statusCode === 410) {
 			return null;
 		}
-		throw new Error('Failed to fetch link preview');
+		throw err;
 	}
-
-	return response.json();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

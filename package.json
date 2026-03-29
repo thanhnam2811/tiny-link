@@ -13,6 +13,8 @@
 		"start": "pnpm --filter @tiny-link/server start",
 		"docker:up": "docker compose up -d postgres redis",
 		"docker:down": "docker compose down",
+		"docker:build": "docker compose build",
+		"docker:run": "docker compose run --rm",
 		"clean": "rimraf --glob \"packages/*/{dist,*.tsbuildinfo}\"",
 		"lint": "pnpm --recursive run lint",
 		"test": "pnpm --recursive run test",

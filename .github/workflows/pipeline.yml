@@ -130,10 +130,45 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
+    db_migrate:
+        name: Database Migration
+        runs-on: ubuntu-latest
+        needs: docker_build
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.32.1
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: 'pnpm'
+
+            - name: Install dependencies (Workspace Root)
+              run: pnpm install --frozen-lockfile
+
+            - name: Run Migrations (Staging)
+              if: github.ref == 'refs/heads/develop'
+              env:
+                  DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+              run: pnpm --filter @tiny-link/db exec prisma migrate deploy
+
+            - name: Run Migrations (Production)
+              if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+              env:
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+              run: pnpm --filter @tiny-link/db exec prisma migrate deploy
+
     deploy_preview:
         name: Deploy to Staging (Render)
         runs-on: ubuntu-latest
-        needs: docker_build
+        needs: db_migrate
         if: github.ref == 'refs/heads/develop'
         steps:
             - name: Trigger Render Staging Deploy Hook
@@ -145,7 +180,7 @@ jobs:
     deploy_production:
         name: Deploy to Production (Render)
         runs-on: ubuntu-latest
-        needs: docker_build
+        needs: db_migrate
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
         steps:
             - name: Trigger Render Production Deploy Hook

@@ -80,7 +80,7 @@ export async function toggleLinkStatusAction(id: string, currentStatus: boolean)
 
 		revalidatePath('/links');
 		return { success: true };
-	} catch (err) {
+	} catch {
 		return { error: 'Something went wrong.' };
 	}
 }
@@ -104,7 +104,7 @@ export async function deleteLinkAction(id: string) {
 
 		revalidatePath('/links');
 		return { success: true };
-	} catch (err) {
+	} catch {
 		return { error: 'Something went wrong.' };
 	}
 }
