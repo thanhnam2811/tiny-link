@@ -7,23 +7,30 @@ RUN corepack enable
 
 WORKDIR /app
 
-# 1. Copy everything for local resolution
-COPY . .
+# 1. Copy ONLY workspace configs and ALL package.json files first
+# This is the "Magic Step" for speed: it allows Docker to cache the install layer.
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY packages/admin/package.json ./packages/admin/
+COPY packages/client/package.json ./packages/client/
+COPY packages/db/package.json ./packages/db/
+COPY packages/server/package.json ./packages/server/
+COPY packages/shared/package.json ./packages/shared/
 
-# 2. Install dependencies (with full context to preserve workspace symlinks)
+# 2. Install dependencies (This layer is now cached unless libraries change)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# 3. Generate Prisma Client
+# 3. Copy the rest of the source code (Sửa code chỉ làm chạy lại từ đây trở xuống)
+COPY . .
+
+# 4. Generate Prisma Client
 RUN ./node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
-# 4. Build dependencies first (creates actual dist and types)
-RUN pnpm --filter @tiny-link/shared build
-RUN pnpm --filter @tiny-link/db build
+# 5. Build only server and its dependencies (shared, db)
+RUN pnpm --filter @tiny-link/shared build && \
+    pnpm --filter @tiny-link/db build && \
+    pnpm --filter @tiny-link/server build
 
-# 5. Build server and dependencies
-RUN pnpm --filter @tiny-link/server build
-
-# 6. Deploy server to a standalone directory (flattens dependencies)
+# 6. Deploy server to a standalone directory
 RUN pnpm --filter @tiny-link/server deploy --prod /app/out
 
 # -----------------------------------------------------------------
