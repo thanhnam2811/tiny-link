@@ -17,9 +17,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # Generate Prisma client for all packages that need it
 RUN pnpm --filter @tiny-link/db exec prisma generate
 
-# Build workspace dependencies in correct order
-# Using root build script to ensure all project references are resolved
-RUN pnpm run build
+# Build workspace dependencies in correct order to resolve Type declarations
+# We build shared first, then db, then server to ensure all references exist.
+RUN pnpm --filter @tiny-link/shared build \
+    && pnpm --filter @tiny-link/db build \
+    && pnpm --filter @tiny-link/server build
 
 # Create a deployable, symlink-safe production tree for only the server package.
 RUN pnpm deploy --filter @tiny-link/server --prod /prod/server
@@ -41,16 +43,13 @@ ENV PRISMA_SKIP_POSTINSTALL_GENERATE=1
 COPY --from=build /prod/server /prod/server
 COPY --from=build /app/packages/db/prisma ./prisma
 
-# Copy the generated Prisma client from the build stage. 
-# pnpm stores this in a specific .pnpm path due to strict symlinking.
-COPY --from=build /app/node_modules/.pnpm/@prisma+client@6.4.1*/node_modules/.prisma ./node_modules/.prisma
-
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create non-root user and set ownership of the app directory
+# Create non-root user and set ownership of the app directory.
+# We must ensure nodeuser has write access for runtime client generation.
 RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs \
-    && chown -R nodeuser:nodejs /prod/server
+    && chown -R nodeuser:nodejs /prod/server /entrypoint.sh
 
 USER nodeuser
 

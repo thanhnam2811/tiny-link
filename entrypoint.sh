@@ -22,5 +22,8 @@ fi
 
 echo "Database is ready! Starting application..."
 
+# Generate Prisma client at runtime to ensure compatibility with the container OS
+npx prisma generate
+
 # Start the application
 exec node dist/index.js

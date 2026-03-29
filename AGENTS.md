@@ -1,4 +1,4 @@
-# AI Agent Operating Protocol (v1.1)
+# AI Agent Operating Protocol (v1.2)
 
 ## 1. Strategy: Plan-First, Code-Later
 
@@ -35,6 +35,7 @@ A task is strictly considered **Done** only when:
 - **Test-Driven Validation**: Unit, integration, or functional tests have been executed and passed 100%.
 - **Log Verification**: Console logs and system logs have been inspected to confirm there are no hidden warnings or unintended side effects.
 - **Code Quality**: The code has been refactored for readability, following project standards (e.g., removing dead code or temporary comments).
+- **Zero `unknown` inputs**: All Request Params, Body, and Query objects must have explicit schemas or validated types (No `implicit any`).
 
 ## 5. Bug Resolution & Root Cause Analysis (RCA)
 
@@ -44,11 +45,22 @@ A task is strictly considered **Done** only when:
 
 ## 6. Security & Infrastructure Integrity
 
-- **Secret Safety**: Never hard-code API keys, credentials, or sensitive data. Always utilize environment variables (`.env`).
+- **Environment & Secret Hardening**:
+    - Never hard-code API keys, credentials, or sensitive data. Use `.env`.
+    - **Production Safety**: The `getEnv` utility must be used for all secrets. Fallbacks (`admin123`, `secret`, `TEST_KEY`) are **STRICTLY PROHIBITED** in Production.
+    - Missing production secrets must result in an immediate `CRITICAL` error during startup.
+- **Monorepo Build Integrity**:
+    - **Isolation**: Always use `--filter` when building or testing to ensure package isolation.
+    - **Build Order**: Dependencies (e.g., `@tiny-link/shared`, `@tiny-link/db`) must be built **BEFORE** the consumer package (e.g., `@tiny-link/server`).
 - **Dependency Mindfulness**: Before adding new packages, verify if existing libraries in the project can fulfill the requirement to avoid bloat.
-- **Documentation Sync**: Any change to business logic must be immediately reflected in the project's documentation (README or inline docs).
+- **Ops Guardrails**:
+    - All Dockerfiles MUST include a `HEALTHCHECK` (calling `/api/healthz` or equivalent).
+    - Database migrations MUST be separated from the primary application container lifecycle (e.g., CI/CD Job) to prevent race conditions during scale-out.
 
-## 7. Type Safety & Strictness
+## 7. Type Safety & Architectural Patterns
 
-- **Rule of No-Any**: **NEVER** use the `any` type. Use `unknown` if the type is truly unknown, or preferably, use generics, specific interfaces, or Prisma's generated types to ensure end-to-end type safety.
+- **Fastify Architectural Consistency**:
+    - Custom services MUST be registered via `server.decorate` with proper module augmentation in `fastify.d.ts`.
+    - Always point `tsconfig` paths to built `dist` folder to avoid `TS6305` errors.
+- **Rule of No-Any**: **NEVER** use the `any` type. Use `unknown` if the type is truly unknown, or preferably, use generics, specific interfaces, or Prisma's generated types.
 - **Strict Mode Compliance**: All code must pass `tsc` without warnings. Suppressing errors with `@ts-ignore` is only allowed as a last resort with a documented justification.

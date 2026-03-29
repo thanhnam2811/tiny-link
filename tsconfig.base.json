@@ -3,6 +3,11 @@
 		"target": "ES2022",
 		"module": "CommonJS",
 		"moduleResolution": "node",
+		"baseUrl": ".",
+		"paths": {
+			"@tiny-link/shared": ["packages/shared/dist/index.d.ts"],
+			"@tiny-link/db": ["packages/db/dist/index.d.ts"]
+		},
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
