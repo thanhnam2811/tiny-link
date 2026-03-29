@@ -12,8 +12,7 @@ export default function Home() {
 
 	// Server Warmup Polling Logic
 	useEffect(() => {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-		const healthUrl = `${apiUrl.replace(/\/api\/?$/, '')}/healthz`;
+		const healthUrl = '/healthz';
 		let attempts = 0;
 		const maxAttempts = 30; // 30 attempts * 2s = 60s max
 		const abortController = new AbortController();

@@ -83,7 +83,11 @@ export const buildServer = async () => {
 		root: path.join(process.cwd(), 'public'),
 	});
 
-	// REMOVED: Health check moved to apiRoutes under /api/healthz
+	// Root Health Check (Standard for many PaaS/Load Balancers)
+	server.get('/healthz', async () => ({
+		status: 'ok',
+		timestamp: new Date().toISOString(),
+	}));
 
 	// redirect root to client url
 	server.get('/', async (_request, reply) => {
