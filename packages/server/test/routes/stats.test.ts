@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@tiny-link/db';
+import { prisma } from '@tiny-link/db';
 
 describe('GET /api/stats/:code Stats API', () => {
 	let app: FastifyInstance;
-	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
 		const { server } = await buildServer();
@@ -15,7 +14,6 @@ describe('GET /api/stats/:code Stats API', () => {
 
 	afterAll(async () => {
 		await app.close();
-		await prisma.$disconnect();
 	});
 
 	it('should return 404 for non-existent link', async () => {

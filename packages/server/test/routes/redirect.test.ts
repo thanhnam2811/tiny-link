@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@tiny-link/db';
+import { prisma } from '@tiny-link/db';
 import { AnalyticsManager } from '../../src/modules/analytics/analytics_manager';
 
 describe('POST /api/links/:code/track API', () => {
 	let app: FastifyInstance;
-	const prisma = new PrismaClient();
 
 	let analyticsManager: AnalyticsManager;
 
@@ -20,7 +19,6 @@ describe('POST /api/links/:code/track API', () => {
 
 	afterAll(async () => {
 		await app.close();
-		await prisma.$disconnect();
 	});
 
 	it('should redirect to the original URL and track a click', async () => {

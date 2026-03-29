@@ -1,55 +1,49 @@
-# Stage 1: Base image with pnpm enabled
-FROM node:24-alpine AS base
+# Stage 1: Build the application (Unified Build Stage)
+FROM node:24-alpine AS builder
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-# Stage 2: Install dependencies (leveraging layer caching)
-FROM base AS deps
 WORKDIR /app
 
-# Copy configuration files first
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-
-# Copy package.json files of all workspace members to facilitate cached install
-COPY packages/db/package.json ./packages/db/
-COPY packages/server/package.json ./packages/server/
-COPY packages/shared/package.json ./packages/shared/
-
-# Use BuildKit cache for pnpm store.
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-
-# Stage 3: Build the application
-FROM base AS builder
-WORKDIR /app
-
-# Copy node_modules from deps stage and all source code
-COPY --from=deps /app/node_modules ./node_modules
+# 1. Copy everything for local resolution
 COPY . .
 
-# 1. Generate Prisma Client to the dedicated location
-RUN pnpm --filter @tiny-link/db exec prisma generate
+# 2. Install dependencies (with full context to preserve workspace symlinks)
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# 2. Build local workspace dependencies in order
+# 3. Generate Prisma Client
+RUN ./node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
+
+# 4. Build dependencies first (creates actual dist and types)
 RUN pnpm --filter @tiny-link/shared build
 RUN pnpm --filter @tiny-link/db build
+
+# 5. Build server (now it will find the dist/index.d.ts files correctly)
 RUN pnpm --filter @tiny-link/server build
 
-# 4. Prune workspace for production
-# This creates a standalone folder with only production dependencies and built code.
-RUN pnpm deploy --filter @tiny-link/server --prod /app/prod/server
+# 6. Prune dev dependencies for production
+RUN CI=true pnpm prune --prod --ignore-scripts
 
-# Stage 4: Production runner
-FROM base AS runner
-WORKDIR /app/prod/server
+# ---------------------------------------------------------------------------------
+# Stage 2: Production runner
+# ---------------------------------------------------------------------------------
+FROM node:24-alpine AS runner
+WORKDIR /app
 
-# Install runtime essentials (healthchecks & db-wait)
+# Install runtime essentials
 RUN apk add --no-cache postgresql-client wget
 
 # Ensure environment variables are set for production
 ENV NODE_ENV=production
 ENV PORT=3001
+
+# MANUAL ASSEMBLY: Copy all needed artifacts
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
 
 # Copy the entrypoint script and ensure it's executable
 COPY entrypoint.sh /entrypoint.sh
@@ -57,7 +51,7 @@ RUN chmod +x /entrypoint.sh
 
 # Create a non-root user for security
 RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs \
-    && chown -R nodeuser:nodejs /app/prod/server /entrypoint.sh
+    && chown -R nodeuser:nodejs /app /entrypoint.sh
 
 USER nodeuser
 
@@ -67,4 +61,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 3001
 
+# Start using the workspace entrypoint
 ENTRYPOINT ["/entrypoint.sh"]

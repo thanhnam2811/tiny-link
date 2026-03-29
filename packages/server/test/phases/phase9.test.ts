@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildServer } from '../../src/index';
-import { PrismaClient } from '@tiny-link/db';
+import { prisma } from '@tiny-link/db';
 import { INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
 
 const INTERNAL_KEY = INTERNAL_AUTH.TEST_KEY;
 
 describe('Phase 9: Auth, Claiming & User Links', () => {
 	let app: FastifyInstance;
-	const prisma = new PrismaClient();
 
 	beforeAll(async () => {
 		// Ensure environment is set BEFORE building server
@@ -26,7 +25,6 @@ describe('Phase 9: Auth, Claiming & User Links', () => {
 
 	afterAll(async () => {
 		await app.close();
-		await prisma.$disconnect();
 	});
 
 	afterEach(async () => {
