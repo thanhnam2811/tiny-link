@@ -3,7 +3,6 @@ import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { SessionProvider } from 'next-auth/react';
 
 const inter = Inter({
@@ -23,6 +22,7 @@ export const metadata: Metadata = {
 
 import { Header } from '@/components/Header';
 import { ClaimLinksEffect } from '@/components/ClaimLinksEffect';
+import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 
 export default function RootLayout({
 	children,
@@ -34,11 +34,12 @@ export default function RootLayout({
 			<body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<SessionProvider>
-						<Header />
-						<ClaimLinksEffect />
-						{children}
-						<ThemeToggle />
-						<Toaster position="top-center" />
+						<SmoothScrollProvider>
+							<Header />
+							<ClaimLinksEffect />
+							{children}
+							<Toaster position="top-center" />
+						</SmoothScrollProvider>
 					</SessionProvider>
 				</ThemeProvider>
 			</body>
