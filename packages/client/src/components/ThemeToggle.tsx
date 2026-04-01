@@ -16,7 +16,7 @@ export function ThemeToggle() {
 
 	if (!mounted) {
 		// Render an invisible placeholder with exact same dimensions
-		return <div className="fixed top-6 right-6 z-50 h-10 w-10 opacity-0" aria-hidden="true" />;
+		return <div className="h-10 w-10 opacity-0" aria-hidden="true" />;
 	}
 
 	const toggleTheme = () => {
@@ -30,7 +30,7 @@ export function ThemeToggle() {
 			variant="ghost"
 			size="icon"
 			onClick={toggleTheme}
-			className="fixed top-6 right-6 z-[100] h-10 w-10 rounded-full border border-border/50 bg-background/50 backdrop-blur-md shadow-sm transition-all duration-500 hover:scale-110 active:scale-95 text-muted-foreground hover:text-foreground hover:bg-muted/50 overflow-hidden"
+			className="h-10 w-10 rounded-full border border-border/50 bg-background/50 backdrop-blur-md shadow-sm transition-all duration-500 hover:scale-110 active:scale-95 text-muted-foreground hover:text-foreground hover:bg-muted/50 overflow-hidden cursor-pointer"
 			aria-label="Toggle theme"
 			title={`Current theme: ${theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light'}`}
 		>

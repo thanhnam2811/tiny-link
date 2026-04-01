@@ -130,7 +130,59 @@
 }
 
 @layer utilities {
+	/* Base glass — nav, headers */
 	.glass {
-		@apply bg-background/60 backdrop-blur-md border border-border/50 supports-[backdrop-filter]:bg-background/60;
+		@apply bg-background/70 backdrop-blur-md border border-border/50 supports-[backdrop-filter]:bg-background/70;
+	}
+
+	/* Glass card — content panels, forms */
+	.glass-card {
+		@apply bg-background/60 backdrop-blur-xl border border-border/40 shadow-xl supports-[backdrop-filter]:bg-background/50;
+	}
+
+	/* Glass modal — dialogs, popovers */
+	.glass-modal {
+		@apply bg-background/80 backdrop-blur-2xl border border-border/60 shadow-2xl supports-[backdrop-filter]:bg-background/75;
+	}
+
+	/* Glass subtle — list items, rows */
+	.glass-subtle {
+		@apply bg-background/40 backdrop-blur-sm border border-border/30 supports-[backdrop-filter]:bg-background/30;
+	}
+
+	/* Minimalist surface — flat, no blur */
+	.surface {
+		@apply bg-muted/40 border border-border/30;
+	}
+
+	/* Gradient mesh background */
+	.gradient-mesh {
+		background-image:
+			radial-gradient(ellipse 80% 50% at 20% -10%, hsl(var(--primary) / 0.15) 0%, transparent 60%),
+			radial-gradient(ellipse 60% 40% at 80% 110%, hsl(var(--primary) / 0.1) 0%, transparent 60%);
+	}
+
+	/* Gradient mesh — dark mode intensified */
+	.dark .gradient-mesh {
+		background-image:
+			radial-gradient(ellipse 80% 50% at 20% -10%, hsl(var(--primary) / 0.2) 0%, transparent 60%),
+			radial-gradient(ellipse 60% 40% at 80% 110%, hsl(var(--primary) / 0.15) 0%, transparent 60%);
+	}
+
+	/* Skeleton shimmer */
+	.skeleton {
+		@apply relative overflow-hidden bg-muted/60 rounded-xl;
+	}
+
+	.skeleton::after {
+		@apply absolute inset-0 -translate-x-full;
+		content: '';
+		background: linear-gradient(
+			90deg,
+			transparent,
+			hsl(var(--muted-foreground) / 0.08),
+			transparent
+		);
+		animation: shimmer 1.6s infinite;
 	}
 }

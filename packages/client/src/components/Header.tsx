@@ -1,92 +1,38 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LayoutDashboard, LogOut, Link as LinkIcon, User } from 'lucide-react';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link as LinkIcon } from 'lucide-react';
 
 export function Header() {
-	const { data: session, status } = useSession();
-	const isLoading = status === 'loading';
+	const [scrolled, setScrolled] = useState(false);
+
+	useEffect(() => {
+		const onScroll = () => setScrolled(window.scrollY > 12);
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	}, []);
 
 	return (
-		<header className="sticky top-0 z-50 w-full glass border-x-0 border-t-0 border-b shadow-sm">
+		<header
+			className={`sticky top-0 z-50 w-full border-x-0 border-t-0 border-b transition-all duration-300 ${
+				scrolled ? 'glass shadow-md py-0' : 'bg-transparent border-transparent py-0'
+			}`}
+		>
 			<div className="container mx-auto flex h-16 items-center justify-between px-4">
 				<div className="flex items-center gap-6">
-					<Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+					<Link
+						href="/"
+						className="flex items-center gap-2 transition-opacity hover:opacity-80 cursor-pointer"
+					>
 						<LinkIcon className="h-6 w-6 text-primary" />
 						<span className="text-xl font-heading font-bold tracking-tight">TinyLink</span>
 					</Link>
-
-					{session && (
-						<nav className="hidden md:flex items-center gap-4">
-							<Link
-								href="/dashboard"
-								className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-							>
-								Dashboard
-							</Link>
-						</nav>
-					)}
 				</div>
 
 				<div className="flex items-center gap-4">
 					<ThemeToggle />
-
-					{isLoading ? (
-						<div className="h-9 w-24 animate-pulse rounded-md bg-white/5" />
-					) : session ? (
-						<DropdownMenu>
-							<DropdownMenuTrigger className="relative h-10 w-10 rounded-full p-0 cursor-pointer overflow-hidden border border-white/10 outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
-								<Avatar className="h-10 w-10">
-									<AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-									<AvatarFallback className="bg-primary text-primary-foreground font-heading">
-										{session.user?.name?.charAt(0) || <User className="h-5 w-5" />}
-									</AvatarFallback>
-								</Avatar>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								className="w-56 border-white/10 bg-background/95 backdrop-blur-xl"
-								align="end"
-							>
-								<DropdownMenuLabel className="font-normal font-sans">
-									<div className="flex flex-col space-y-1">
-										<p className="text-sm font-heading font-bold leading-none text-foreground">
-											{session.user?.name}
-										</p>
-										<p className="text-xs leading-none text-muted-foreground">
-											{session.user?.email}
-										</p>
-									</div>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator className="bg-white/10" />
-								<DropdownMenuItem className="cursor-pointer focus:bg-white/5 focus:text-white">
-									<Link href="/dashboard" className="flex items-center gap-2 w-full">
-										<LayoutDashboard className="h-4 w-4" />
-										<span>Dashboard</span>
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator className="bg-white/10" />
-								<DropdownMenuItem
-									className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-									onClick={() => signOut({ callbackUrl: '/' })}
-								>
-									<LogOut className="h-4 w-4 mr-2" />
-									<span>Sign out</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					) : null}
 				</div>
 			</div>
 		</header>

@@ -1,4 +1,37 @@
-# Lessons Learned: Robust Prisma Monorepo Deployments (v2.0)
+# Lessons Learned
+
+---
+
+## Phase 10: Framer Motion + pnpm Peer Dependency Pitfalls
+
+### Root Causes
+
+1. **Duplicate component code**: Using the `edit` tool to replace only part of a file (e.g., just the imports) causes the old function body to be appended after the new content. Always verify file length after editing — if suspiciously long, check for duplicate `export default` / interface declarations.
+
+2. **`framer-motion` Variants type with custom function**: When using a `visible: (i: number) => (...)` factory in a `Variants` object, TypeScript rejects `ease: number[]`. Must cast cubic-bezier arrays explicitly: `ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]` or import and annotate with `Variants` type.
+
+3. **`pnpm add` hangs when peer dep mismatch exists**: `next-auth@5.0.0-beta.25` declares `peerDependencies: { next: "^14 || ^15" }` but project uses Next.js 16. Fix by adding to root `package.json`:
+
+    ```json
+    "pnpm": {
+      "peerDependencyRules": {
+        "allowedVersions": { "next-auth>next": "16" }
+      }
+    }
+    ```
+
+4. **Workspace packages must be built before client**: `@tiny-link/db` and `@tiny-link/shared` must be built (`tsup`) before running `next build` for `@tiny-link/client`, otherwise `Module not found: @tiny-link/db`.
+
+### Prevention Strategy
+
+- After every `edit` call on a large file, count lines or view the end to catch duplication early.
+- Always annotate Framer Motion variants with `import { type Variants }` from the start.
+- Add `pnpm.peerDependencyRules` proactively when upgrading Next.js beyond a library's declared peer range.
+- Build order: `shared` → `db` → `client`.
+
+---
+
+## Robust Prisma Monorepo Deployments (v2.0)
 
 ## The Root Cause (Brittle Monorepos)
 
