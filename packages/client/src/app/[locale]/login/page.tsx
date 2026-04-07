@@ -6,19 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Github, Mail } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 
 function LoginForm() {
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+	const t = useTranslations('Login');
 
 	return (
 		<main className="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center p-6 bg-background">
 			<div className="z-10 w-full max-w-md flex flex-col items-center gap-6 text-center mb-8">
-				<h1 className="text-4xl font-heading font-black tracking-tight text-foreground">Welcome back.</h1>
-				<p className="text-muted-foreground font-sans font-medium">
-					Sign in to your account to manage your links <br className="hidden sm:block" />
-					and view detailed analytics.
-				</p>
+				<h1 className="text-4xl font-heading font-black tracking-tight text-foreground">{t('title')}</h1>
+				<p className="text-muted-foreground font-sans font-medium whitespace-pre-line">{t('description')}</p>
 			</div>
 
 			<Card className="w-full max-w-md border border-border/40 bg-card/50 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden relative">
@@ -29,7 +28,7 @@ function LoginForm() {
 						onClick={() => signIn('google', { callbackUrl })}
 					>
 						<Mail className="h-5 w-5" />
-						Continue with Google
+						{t('continueGoogle')}
 					</Button>
 					<Button
 						variant="outline"
@@ -37,7 +36,7 @@ function LoginForm() {
 						onClick={() => signIn('github', { callbackUrl })}
 					>
 						<Github className="h-5 w-5" />
-						Continue with GitHub
+						{t('continueGitHub')}
 					</Button>
 
 					<div className="relative my-4">
@@ -45,14 +44,11 @@ function LoginForm() {
 							<span className="w-full border-t border-border/40" />
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
-							<span className="bg-background px-2 text-muted-foreground">Or</span>
+							<span className="bg-background px-2 text-muted-foreground">{t('or')}</span>
 						</div>
 					</div>
 
-					<p className="text-center text-sm text-muted-foreground">
-						By continuing, you agree to our Terms of Service <br />
-						and Privacy Policy.
-					</p>
+					<p className="text-center text-sm text-muted-foreground">{t('terms')}</p>
 				</CardContent>
 			</Card>
 		</main>

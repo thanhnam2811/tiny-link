@@ -11,40 +11,12 @@ import { CreateLinkBodyType, ERROR_MESSAGES } from '@tiny-link/shared';
 import { getOrCreateGuestId } from '@/lib/guest-id';
 import { format } from 'date-fns';
 import { CalendarIcon, Eye, EyeOff, LinkIcon, Minus, Plus, Clock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import * as z from 'zod';
-
-const formSchema = z
-	.object({
-		url: z.string().url({ message: 'Please enter a valid URL (e.g., https://example.com)' }),
-		customCode: z
-			.string()
-			.optional()
-			.refine((val) => !val || /^[a-zA-Z0-9-_]+$/.test(val), {
-				message: 'Custom alias can only contain letters, numbers, hyphens, and underscores',
-			}),
-		password: z.string().optional(),
-		passwordConfirm: z.string().optional(),
-		maxClicks: z.union([z.number().min(1, 'Must be at least 1'), z.literal('')]).optional(),
-		expiresAt: z.date().optional(),
-	})
-	.refine(
-		(data) => {
-			if (data.password && data.password !== data.passwordConfirm) {
-				return false;
-			}
-			return true;
-		},
-		{
-			message: 'Passwords do not match',
-			path: ['passwordConfirm'],
-		},
-	);
-
-type FormValues = z.infer<typeof formSchema>;
+import { useTranslations } from 'next-intl';
 
 interface LinkShortenerFormProps {
 	disabled: boolean;
@@ -52,10 +24,44 @@ interface LinkShortenerFormProps {
 }
 
 export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProps) {
+	const t = useTranslations('Form');
 	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 	const [host, setHost] = useState('');
+
+	const formSchema = useMemo(
+		() =>
+			z
+				.object({
+					url: z.string().url({ message: t('validation.invalidUrl') }),
+					customCode: z
+						.string()
+						.optional()
+						.refine((val) => !val || /^[a-zA-Z0-9-_]+$/.test(val), {
+							message: t('validation.invalidAlias'),
+						}),
+					password: z.string().optional(),
+					passwordConfirm: z.string().optional(),
+					maxClicks: z.union([z.number().min(1, t('validation.minClicks')), z.literal('')]).optional(),
+					expiresAt: z.date().optional(),
+				})
+				.refine(
+					(data) => {
+						if (data.password && data.password !== data.passwordConfirm) {
+							return false;
+						}
+						return true;
+					},
+					{
+						message: t('validation.passwordMismatch'),
+						path: ['passwordConfirm'],
+					},
+				),
+		[t],
+	);
+
+	type FormValues = z.infer<typeof formSchema>;
 
 	const { handleSubmit, control, watch } = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -87,23 +93,23 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 		payload.guestId = getOrCreateGuestId();
 
 		try {
-			const response = await api.links.create(payload);
-			toast.success('Link Shortened successfully!');
+			await api.links.create(payload);
+			toast.success(t('success'));
 
-			// Construct the short link using the frontend's origin instead of the backend API's origin
+			const response = await api.links.create(payload);
 			const clientShortUrl = `${window.location.protocol}//${window.location.host}/${response.shortCode}`;
 			onSuccess(clientShortUrl);
 		} catch (err) {
 			if (err instanceof ApiError) {
 				if (err.code === ERROR_MESSAGES.RATE_LIMIT_EXCEEDED) {
-					toast.error('Whoa there! You are creating links too fast.');
+					toast.error(t('errorRateLimit'));
 				} else if (err.code === ERROR_MESSAGES.LINK_CODE_CONFLICT) {
-					toast.error('Custom code already taken. Please pick a different one.');
+					toast.error(t('errorCodeConflict'));
 				} else {
-					toast.error(`Failed to create link: ${err.message}`);
+					toast.error(t('errorGeneric', { message: err.message }));
 				}
 			} else {
-				toast.error('Network error. Please try again.');
+				toast.error(t('errorNetwork'));
 			}
 		} finally {
 			setLoading(false);
@@ -120,9 +126,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 				control={control}
 				render={({ field, fieldState }) => (
 					<Field className="w-full text-left" data-invalid={fieldState.invalid}>
-						<FieldLabel className="text-sm font-heading font-semibold ml-1 mb-1">
-							Shorten a long link
-						</FieldLabel>
+						<FieldLabel className="text-sm font-heading font-semibold ml-1 mb-1">{t('label')}</FieldLabel>
 						<div className="relative flex flex-col sm:flex-row gap-3">
 							<InputGroup className="h-14 w-full bg-background/50 backdrop-blur-sm group-data-[invalid=true]:ring-destructive group-focus-within/field:ring-1 focus-within:ring-primary transition-all border-border rounded-xl shadow-sm">
 								<InputGroupAddon className="pl-3 text-muted-foreground">
@@ -130,7 +134,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 								</InputGroupAddon>
 								<InputGroupInput
 									{...field}
-									placeholder="Paste long URL..."
+									placeholder={t('placeholder')}
 									className="text-base font-sans placeholder:text-muted-foreground/60 border-0 focus-visible:ring-0 px-2"
 									autoComplete="nope"
 									autoFocus
@@ -152,7 +156,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 								}`}
 								disabled={loading || !urlValue}
 							>
-								{loading ? 'Shortening...' : 'Shorten'}
+								{loading ? t('shortening') : t('button')}
 							</Button>
 						</div>
 						{fieldState.invalid && <FieldError className="mt-1">{fieldState.error?.message}</FieldError>}
@@ -165,9 +169,9 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 					<AccordionItem value="advanced" className="border-b-0">
 						<AccordionTrigger className="px-3 py-3 text-sm font-heading font-semibold text-muted-foreground hover:text-foreground hover:no-underline hover:bg-muted/10 transition-colors">
 							<div className="flex items-center justify-between w-full">
-								<span className="flex items-center gap-2">Advanced Options</span>
+								<span className="flex items-center gap-2">{t('advanced')}</span>
 								<span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md mr-2 uppercase tracking-widest">
-									Optional
+									{t('optional')}
 								</span>
 							</div>
 						</AccordionTrigger>
@@ -180,7 +184,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
-												Custom Alias
+												{t('alias')}
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
 												<InputGroupAddon className="text-foreground/60 p-0 pl-3 border-r-0 mr-0 pr-0 bg-muted/50 rounded-l-md pr-2 border-r border-border h-full flex items-center">
@@ -188,7 +192,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 												</InputGroupAddon>
 												<InputGroupInput
 													{...field}
-													placeholder="custom-alias"
+													placeholder={t('aliasPlaceholder')}
 													className="text-sm border-0 focus-visible:ring-0 pl-0"
 													autoComplete="nope"
 													disabled={loading}
@@ -206,7 +210,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
-												Max Clicks Limit
+												{t('clicksLimit')}
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm pr-1">
 												<InputGroupInput
@@ -218,7 +222,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 													value={field.value ?? ''}
 													type="number"
 													min="1"
-													placeholder="e.g. 100"
+													placeholder={t('clicksPlaceholder')}
 													className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none pl-3"
 													aria-invalid={fieldState.invalid}
 													autoComplete="nope"
@@ -233,7 +237,6 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														variant="ghost"
 														size="icon-xs"
 														className="h-full w-10 md:h-7 md:w-7 md:my-auto rounded-sm hover:bg-muted"
-														aria-label="Decrease max clicks limit"
 													>
 														<Minus className="h-3 w-3" />
 													</InputGroupButton>
@@ -246,7 +249,6 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														variant="ghost"
 														size="icon-xs"
 														className="h-full w-10 md:h-7 md:w-7 md:my-auto rounded-sm hover:bg-muted ml-0.5"
-														aria-label="Increase max clicks limit"
 													>
 														<Plus className="h-3 w-3" />
 													</InputGroupButton>
@@ -266,13 +268,13 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
-												Password Protection
+												{t('password')}
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
 												<InputGroupInput
 													{...field}
 													type={showPassword ? 'text' : 'password'}
-													placeholder="Secure with password..."
+													placeholder={t('passwordPlaceholder')}
 													autoComplete="new-password"
 													aria-invalid={fieldState.invalid}
 												/>
@@ -283,7 +285,6 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														variant="ghost"
 														size="icon-sm"
 														className="h-full px-3"
-														aria-label={showPassword ? 'Hide password' : 'Show password'}
 													>
 														{showPassword ? <EyeOff /> : <Eye />}
 													</InputGroupButton>
@@ -300,13 +301,13 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									render={({ field, fieldState }) => (
 										<Field data-invalid={fieldState.invalid}>
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80">
-												Confirm Password
+												{t('confirmPassword')}
 											</FieldLabel>
 											<InputGroup className="h-11 bg-background/50 group-data-[invalid=true]:ring-destructive transition-all border-border shadow-sm">
 												<InputGroupInput
 													{...field}
 													type={showPasswordConfirm ? 'text' : 'password'}
-													placeholder="Confirm password..."
+													placeholder={t('confirmPlaceholder')}
 													autoComplete="new-password"
 													aria-invalid={fieldState.invalid}
 												/>
@@ -317,11 +318,6 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 														variant="ghost"
 														size="icon-sm"
 														className="h-full px-3"
-														aria-label={
-															showPasswordConfirm
-																? 'Hide confirm password'
-																: 'Show confirm password'
-														}
 													>
 														{showPasswordConfirm ? <EyeOff /> : <Eye />}
 													</InputGroupButton>
@@ -344,7 +340,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 											data-invalid={fieldState.invalid}
 										>
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80 w-full rounded-none border-0 bg-transparent p-0 flex">
-												Expiration Date
+												{t('expirationDate')}
 											</FieldLabel>
 											<Popover>
 												<PopoverTrigger
@@ -360,7 +356,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 													{field.value ? (
 														format(field.value, 'PPP')
 													) : (
-														<span>Pick a date</span>
+														<span>{t('pickDate')}</span>
 													)}
 												</PopoverTrigger>
 												<PopoverContent className="w-auto p-0 border-border" align="start">
@@ -397,7 +393,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 																className="h-8 px-3 text-xs w-full"
 																onClick={() => field.onChange(undefined)}
 															>
-																Clear Selection
+																{t('clearDate')}
 															</Button>
 														</div>
 													)}
@@ -415,7 +411,7 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 									render={({ field }) => (
 										<Field className="flex flex-col items-start gap-2">
 											<FieldLabel className="text-xs font-heading font-bold uppercase tracking-widest text-muted-foreground/80 w-full rounded-none border-0 bg-transparent p-0 flex">
-												Expiration Time
+												{t('expirationTime')}
 											</FieldLabel>
 											<InputGroup
 												className={`h-11 w-full bg-background/50 transition-all border-border shadow-sm ${!field.value ? 'opacity-50 pointer-events-none' : ''}`}

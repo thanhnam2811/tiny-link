@@ -1,56 +1,38 @@
-import { auth } from '@/auth';
-import { NextResponse } from 'next/server';
+import { auth } from './auth';
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
-// Regex for common bots, crawlers, and social media preview fetchers
-const BOT_REGEX =
-	/bot|crawler|spider|crawling|facebookexternalhit|slurp|WhatsApp|Viber|TelegramBot|Discordbot|Twitterbot|Applebot/i;
+const intlMiddleware = createMiddleware(routing);
 
-export default auth((req) => {
-	const { pathname } = req.nextUrl;
+// Next.js 16 expects an exported function named 'proxy' and a config named 'proxyConfig'
+export const proxy = auth((req) => {
 	const isAuth = !!req.auth;
+	const { pathname } = req.nextUrl;
 
-	// 1. Dashboard Protection (PRIORITY)
-	if (pathname.startsWith('/dashboard') && !isAuth) {
-		console.log(`[Middleware] Unauthorized access to ${pathname}, redirecting to /login`);
-		return NextResponse.redirect(new URL('/login', req.nextUrl));
+	// Check if we're on an auth page or dashboard, regardless of locale prefix
+	const isLogin = pathname.endsWith('/login');
+	const isDashboard = pathname.includes('/dashboard');
+
+	if (isLogin && isAuth) {
+		// Already logged in, redirect to localized dashboard
+		const locale = pathname.startsWith('/vi') ? 'vi' : 'en';
+		return Response.redirect(new URL(`/${locale}/dashboard`, req.url));
 	}
 
-	// 2. Bot Detection & Context Injection
-	const userAgent = req.headers.get('user-agent') || '';
-	const isBot = BOT_REGEX.test(userAgent);
-	const requestHeaders = new Headers(req.headers);
-	requestHeaders.set('x-is-bot', isBot ? 'true' : 'false');
-
-	const shortCode = pathname.replace(/^\//, '');
-	// Only inject short-code for non-internal routes
-	const isInternal =
-		pathname.startsWith('/api') ||
-		pathname.startsWith('/_next') ||
-		pathname.startsWith('/login') ||
-		pathname.startsWith('/dashboard') ||
-		pathname.startsWith('/stats');
-
-	if (shortCode && !isInternal) {
-		requestHeaders.set('x-short-code', shortCode);
+	if (isDashboard && !isAuth) {
+		// Not logged in, redirect to localized login
+		const locale = pathname.startsWith('/vi') ? 'vi' : 'en';
+		return Response.redirect(new URL(`/${locale}/login`, req.url));
 	}
 
-	return NextResponse.next({
-		request: {
-			headers: requestHeaders,
-		},
-	});
+	// Use next-intl to handle locale detection and routing
+	return intlMiddleware(req);
 });
 
-export const config = {
-	matcher: [
-		/*
-		 * Match all request paths except for the ones starting with:
-		 * - api (API routes)
-		 * - _next/static (static files)
-		 * - _next/image (image optimization files)
-		 * - _next/data (data fetching)
-		 * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-		 */
-		'/((?!api|_next/static|_next/image|_next/data|favicon.ico|sitemap.xml|robots.txt).*)',
-	],
+export const proxyConfig = {
+	// Match all pathnames except for:
+	// - api routes
+	// - next assets
+	// - static files (favicon, icon, etc.)
+	matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

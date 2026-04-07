@@ -1,12 +1,12 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { api } from '@/lib/api';
 import { getCookie } from 'cookies-next';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 export function ClaimLinksEffect() {
+	const t = useTranslations('Claim');
 	const { data: session, status } = useSession();
 	const hasClaimed = useRef(false);
 
@@ -24,7 +24,7 @@ export function ClaimLinksEffect() {
 					.then((res) => {
 						if (res.claimedCount > 0) {
 							console.log(`[ClaimLinksEffect] Successfully claimed ${res.claimedCount} links.`);
-							toast.success(`Welcome back! We've added ${res.claimedCount} links to your account.`);
+							toast.success(t('welcome', { count: res.claimedCount }));
 						}
 					})
 					.catch((err) => {
@@ -35,7 +35,7 @@ export function ClaimLinksEffect() {
 				hasClaimed.current = true;
 			}
 		}
-	}, [status, session]);
+	}, [status, session, t]);
 
 	return null;
 }

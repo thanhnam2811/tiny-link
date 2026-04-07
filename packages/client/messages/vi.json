@@ -1,0 +1,126 @@
+{
+	"Metadata": {
+		"title": "TinyLink | Rút gọn link hiện đại",
+		"description": "Rút gọn link, mở rộng quy mô. Trải nghiệm rút gọn siêu tốc, an toàn, chuyên nghiệp kèm phân tích data chuyên sâu."
+	},
+	"Common": {
+		"switchLanguage": "Đổi ngôn ngữ",
+		"languages": {
+			"en": "English",
+			"vi": "Tiếng Việt"
+		}
+	},
+	"Header": {
+		"brand": "TinyLink",
+		"dashboard": "Dashboard",
+		"login": "Đăng nhập",
+		"logout": "Đăng xuất"
+	},
+	"Index": {
+		"title": "Rút gọn link. Kiểm soát toàn diện.",
+		"description": "Công cụ rút gọn link siêu tốc dành cho dân chuyên. Dán URL dài vào bên dưới để bắt đầu ngay.",
+		"version": "TinyLink v1.5.7 Ổn định",
+		"features": {
+			"fast": {
+				"title": "Tốc độ chớp nhoáng",
+				"description": "Chuyển hướng dưới 1 mili-giây với sức mạnh của Redis Cache và Edge Network."
+			},
+			"analytics": {
+				"title": "Phân tích chuyên sâu",
+				"description": "Tracking lượt click, vị trí, thiết bị và xu hướng traffic theo thời gian thực."
+			},
+			"secure": {
+				"title": "Bảo mật mặc định",
+				"description": "Tích hợp sẵn tính năng cài mật khẩu, link tự hủy và giới hạn request (rate limit)."
+			},
+			"global": {
+				"title": "Nhận diện thông minh",
+				"description": "Tự động nhận diện bot, hiển thị preview OpenGraph cực mượt trên mọi nền tảng."
+			}
+		}
+	},
+	"Login": {
+		"title": "Chào mừng bạn quay lại!",
+		"description": "Đăng nhập để quản lý kho link và xem thông số phân tích chi tiết.",
+		"continueGoogle": "Tiếp tục với Google",
+		"continueGitHub": "Tiếp tục với GitHub",
+		"or": "Hoặc",
+		"terms": "Khi bấm tiếp tục, bạn đã đồng ý với Điều khoản Dịch vụ và Chính sách Bảo mật của chúng tôi."
+	},
+	"Form": {
+		"placeholder": "Dán đường link dài vào đây...",
+		"aliasPlaceholder": "Tên link tùy chỉnh (tùy chọn)",
+		"passwordPlaceholder": "Mật khẩu bảo vệ (tùy chọn)",
+		"shortenButton": "Rút gọn ngay",
+		"shortening": "Đang xử lý...",
+		"errorUrl": "Đường link không hợp lệ, check lại nhé!",
+		"errorGeneric": "Ối, có lỗi xảy ra rồi. Thử lại sau nha."
+	},
+	"Result": {
+		"success": "Rút gọn thành công!",
+		"stats": "Thống kê",
+		"copy": "Copy",
+		"copied": "Đã copy!",
+		"qrCode": "Mã QR",
+		"qrHint": "Quét mã để mở link",
+		"shortenAnother": "Rút gọn link khác",
+		"toastCopied": "Đã copy link vào bộ nhớ tạm!"
+	},
+	"Dashboard": {
+		"title": "Link của tôi",
+		"description": "Quản lý và theo dõi các đường link đã rút gọn",
+		"newLink": "Tạo link mới",
+		"searchPlaceholder": "Tìm kiếm link...",
+		"emptyTitle": "Chưa có link nào",
+		"emptyDesc": "Hãy thử rút gọn đường link đầu tiên của bạn nhé!",
+		"emptyButton": "Đi đến trang rút gọn",
+		"statusActive": "Đang hoạt động",
+		"statusInactive": "Tạm dừng",
+		"clicks": "{count} lượt click",
+		"prev": "Trước",
+		"next": "Sau",
+		"confirmDelete": "Bạn chắc chắn muốn xóa /{code} chứ? Thao tác này không thể hoàn tác.",
+		"toastDeleted": "Đã xóa link thành công",
+		"toastDeleteError": "Không thể xóa link lúc này",
+		"toastLoadError": "Lỗi tải danh sách link",
+		"tooltips": {
+			"visit": "Truy cập URL gốc",
+			"stats": "Xem thống kê",
+			"delete": "Xóa liên kết"
+		}
+	},
+	"Stats": {
+		"protectedTitle": "Link có mật khẩu bảo vệ",
+		"protectedDesc": "Nhập mật khẩu để xem thống kê của link này.",
+		"passwordPlaceholder": "Nhập mật khẩu...",
+		"unlockButton": "Mở khóa thống kê",
+		"errorPassword": "Mật khẩu không chính xác",
+		"errorNoPassword": "Bạn chưa nhập mật khẩu kìa",
+		"errorLoad": "Không tải được dữ liệu thống kê",
+		"overviewTitle": "Tổng quan phân tích",
+		"trackingFor": "Thống kê hiệu suất cho",
+		"home": "Trang chủ",
+		"visit": "Truy cập URL gốc",
+		"totalClicks": "Tổng lượt click",
+		"createdOn": "Ngày tạo",
+		"destination": "Đích đến",
+		"trafficTrends": "Xu hướng traffic (7 ngày qua)",
+		"topCountries": "Top Quốc gia",
+		"noGeoData": "Chưa có dữ liệu địa lý",
+		"clicksLabel": "Lượt click"
+	},
+	"NotFound": {
+		"title": "Không tìm thấy link",
+		"description": "Đường link này không tồn tại, đã hết hạn hoặc bị xóa mất rồi.{br}Bạn check lại URL hoặc tạo link mới nhé.",
+		"backHome": "Quay lại Trang chủ"
+	},
+	"Error": {
+		"title": "Đã xảy ra lỗi",
+		"description": "Ối, có lỗi bất ngờ xảy ra rồi! Hệ thống đã ghi nhận và chúng tôi đang tiến hành khắc phục.",
+		"tryAgain": "Thử lại",
+		"home": "Về Trang chủ"
+	},
+	"Claim": {
+		"welcome": "Chào mừng bạn! Hệ thống đã tự động gom {count} link cũ vào tài khoản của bạn."
+	}
+}

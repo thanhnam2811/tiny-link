@@ -17,6 +17,7 @@ import {
 	MousePointerClick,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations, useFormatter } from 'next-intl';
 
 type StatsDashboardProps = {
 	code: string;
@@ -28,6 +29,8 @@ function MetricSkeleton() {
 }
 
 export default function StatsDashboard({ code, isProtected }: StatsDashboardProps) {
+	const t = useTranslations('Stats');
+	const format = useFormatter();
 	const [password, setPassword] = useState('');
 	const [isLocked, setIsLocked] = useState(isProtected ?? false);
 	const [isLoading, setIsLoading] = useState(isProtected ? false : true);
@@ -43,9 +46,9 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 			const error = err as { statusCode?: number; message?: string };
 			if (error.statusCode === 401) {
 				setIsLocked(true);
-				toast.error(error.message || 'Incorrect password');
+				toast.error(t('errorPassword'));
 			} else {
-				toast.error(error.message || 'Failed to load statistics');
+				toast.error(t('errorLoad'));
 				console.error('Stats fetch error:', err);
 			}
 		} finally {
@@ -63,7 +66,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 	const handlePasswordSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!password) {
-			toast.error('Please enter a password');
+			toast.error(t('errorNoPassword'));
 			return;
 		}
 		fetchStats(password);
@@ -84,10 +87,8 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							<div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
 								<Lock className="w-5 h-5 text-primary" />
 							</div>
-							<h1 className="text-xl font-heading font-bold">Protected Analytics</h1>
-							<p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
-								Enter the password to view this link&apos;s metrics.
-							</p>
+							<h1 className="text-xl font-heading font-bold">{t('protectedTitle')}</h1>
+							<p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">{t('protectedDesc')}</p>
 						</div>
 
 						<form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -96,7 +97,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								className="w-full h-11 px-4 rounded-xl glass text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-								placeholder="Enter password"
+								placeholder={t('passwordPlaceholder')}
 								disabled={isLoading}
 							/>
 							<button
@@ -107,7 +108,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								{isLoading && (
 									<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
 								)}
-								Unlock Metrics
+								{t('unlockButton')}
 							</button>
 						</form>
 					</div>
@@ -154,9 +155,9 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 						className="flex flex-col md:flex-row md:items-center justify-between gap-4"
 					>
 						<div>
-							<h1 className="text-2xl font-heading font-bold tracking-tight">Analytics Overview</h1>
+							<h1 className="text-2xl font-heading font-bold tracking-tight">{t('overviewTitle')}</h1>
 							<p className="text-muted-foreground mt-1 text-sm flex items-center gap-2">
-								Tracking performance for
+								{t('trackingFor')}
 								<span className="font-mono bg-primary/10 text-primary px-2 py-0.5 rounded-lg text-xs">
 									/{stats.shortCode}
 								</span>
@@ -167,7 +168,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								href="/"
 								className="px-4 py-2 glass rounded-xl text-sm font-heading font-medium hover:-translate-y-0.5 transition-all"
 							>
-								Home
+								{t('home')}
 							</Link>
 							<a
 								href={stats.originalUrl}
@@ -175,7 +176,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								rel="noreferrer"
 								className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-heading font-medium hover:bg-primary/90 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 shadow-md shadow-primary/20"
 							>
-								Visit URL <ExternalLink className="w-3.5 h-3.5" />
+								{t('visit')} <ExternalLink className="w-3.5 h-3.5" />
 							</a>
 						</div>
 					</motion.div>
@@ -185,15 +186,15 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 						{[
 							{
 								icon: MousePointerClick,
-								label: 'Total Clicks',
-								value: stats.totalClicks,
+								label: t('totalClicks'),
+								value: format.number(stats.totalClicks),
 								color: 'text-primary',
 								bg: 'bg-primary/10',
 							},
 							{
 								icon: Calendar,
-								label: 'Created On',
-								value: new Date(stats.createdAt).toLocaleDateString('en-US', {
+								label: t('createdOn'),
+								value: format.dateTime(new Date(stats.createdAt), {
 									month: 'short',
 									day: 'numeric',
 									year: 'numeric',
@@ -203,7 +204,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							},
 							{
 								icon: LinkIcon,
-								label: 'Destination',
+								label: t('destination'),
 								value: stats.originalUrl,
 								color: 'text-emerald-500',
 								bg: 'bg-emerald-500/10',
@@ -250,7 +251,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 						>
 							<div className="flex items-center gap-2 mb-5">
 								<BarChart3 className="w-4 h-4 text-primary" />
-								<h2 className="text-sm font-heading font-bold">Traffic Trends (Last 7 Days)</h2>
+								<h2 className="text-sm font-heading font-bold">{t('trafficTrends')}</h2>
 							</div>
 							<div className="h-[260px]">
 								<ResponsiveContainer width="100%" height="100%">
@@ -273,7 +274,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 										<XAxis
 											dataKey="date"
 											tickFormatter={(val) =>
-												new Date(val).toLocaleDateString('en-US', {
+												format.dateTime(new Date(val), {
 													month: 'short',
 													day: 'numeric',
 												})
@@ -306,7 +307,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 												boxShadow: '0 8px 24px hsl(var(--foreground) / 0.08)',
 											}}
 											labelFormatter={(val) =>
-												new Date(val as string).toLocaleDateString('en-US', {
+												format.dateTime(new Date(val as string), {
 													weekday: 'long',
 													month: 'long',
 													day: 'numeric',
@@ -316,7 +317,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 										<Area
 											type="monotone"
 											dataKey="count"
-											name="Clicks"
+											name={t('clicksLabel')}
 											stroke="hsl(var(--primary))"
 											strokeWidth={2.5}
 											fillOpacity={1}
@@ -338,7 +339,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 						>
 							<div className="flex items-center gap-2 mb-5">
 								<Globe className="w-4 h-4 text-indigo-500" />
-								<h2 className="text-sm font-heading font-bold">Top Countries</h2>
+								<h2 className="text-sm font-heading font-bold">{t('topCountries')}</h2>
 							</div>
 
 							{countryData.length > 0 ? (
@@ -376,7 +377,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 											/>
 											<Bar
 												dataKey="clicks"
-												name="Clicks"
+												name={t('clicksLabel')}
 												fill="hsl(var(--primary))"
 												radius={[0, 6, 6, 0]}
 												maxBarSize={24}
@@ -387,7 +388,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							) : (
 								<div className="flex-1 flex flex-col items-center justify-center text-muted-foreground/40">
 									<MapPin className="w-10 h-10 mb-2" />
-									<p className="text-sm">No geographic data yet</p>
+									<p className="text-sm">{t('noGeoData')}</p>
 								</div>
 							)}
 						</motion.div>

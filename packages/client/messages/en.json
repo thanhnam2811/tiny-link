@@ -1,0 +1,126 @@
+{
+	"Metadata": {
+		"title": "TinyLink | Modern URL Shortener",
+		"description": "Shorten your links, expand your reach. Fast, secure, and branded short links with advanced analytics."
+	},
+	"Common": {
+		"switchLanguage": "Switch language",
+		"languages": {
+			"en": "English",
+			"vi": "Tiếng Việt"
+		}
+	},
+	"Header": {
+		"brand": "TinyLink",
+		"dashboard": "Dashboard",
+		"login": "Login",
+		"logout": "Logout"
+	},
+	"Index": {
+		"title": "Shorten your links. Track everything.",
+		"description": "A lightning-fast URL shortener built for power users. Enter your long URL below to get started.",
+		"version": "TinyLink v1.5.7 Stable",
+		"features": {
+			"fast": {
+				"title": "Lightning Fast",
+				"description": "Sub-millisecond redirects powered by Redis caching and edge infrastructure."
+			},
+			"analytics": {
+				"title": "Deep Analytics",
+				"description": "Track clicks, geo-location, devices, and traffic trends in real time."
+			},
+			"secure": {
+				"title": "Secure by Default",
+				"description": "Password protection, self-destruct links, and rate limiting built in."
+			},
+			"global": {
+				"title": "Global Reach",
+				"description": "Bot-aware traffic routing with OpenGraph previews for any platform."
+			}
+		}
+	},
+	"Login": {
+		"title": "Welcome back.",
+		"description": "Sign in to your account to manage your links and view detailed analytics.",
+		"continueGoogle": "Continue with Google",
+		"continueGitHub": "Continue with GitHub",
+		"or": "Or",
+		"terms": "By continuing, you agree to our Terms of Service and Privacy Policy."
+	},
+	"Form": {
+		"placeholder": "Paste your long URL here...",
+		"aliasPlaceholder": "Custom alias (optional)",
+		"passwordPlaceholder": "Password (optional)",
+		"shortenButton": "Shorten Now",
+		"shortening": "Shortening...",
+		"errorUrl": "Please enter a valid URL",
+		"errorGeneric": "Something went wrong. Please try again."
+	},
+	"Result": {
+		"success": "Shortened Successfully",
+		"stats": "Stats",
+		"copy": "Copy",
+		"copied": "Copied!",
+		"qrCode": "QR Code",
+		"qrHint": "Scan to open link",
+		"shortenAnother": "Shorten Another",
+		"toastCopied": "Copied to clipboard!"
+	},
+	"Dashboard": {
+		"title": "My Links",
+		"description": "Manage and track your shortened links",
+		"newLink": "New Link",
+		"searchPlaceholder": "Search links...",
+		"emptyTitle": "No links yet",
+		"emptyDesc": "Start by shortening your first URL!",
+		"emptyButton": "Go to Shortener",
+		"statusActive": "Active",
+		"statusInactive": "Inactive",
+		"clicks": "{count} clicks",
+		"prev": "Previous",
+		"next": "Next",
+		"confirmDelete": "Delete /{code}? This cannot be undone.",
+		"toastDeleted": "Link deleted",
+		"toastDeleteError": "Failed to delete link",
+		"toastLoadError": "Failed to load your links",
+		"tooltips": {
+			"visit": "Visit original URL",
+			"stats": "View statistics",
+			"delete": "Delete link"
+		}
+	},
+	"Stats": {
+		"protectedTitle": "Protected Analytics",
+		"protectedDesc": "Enter the password to view this link's metrics.",
+		"passwordPlaceholder": "Enter password",
+		"unlockButton": "Unlock Metrics",
+		"errorPassword": "Incorrect password",
+		"errorNoPassword": "Please enter a password",
+		"errorLoad": "Failed to load statistics",
+		"overviewTitle": "Analytics Overview",
+		"trackingFor": "Tracking performance for",
+		"home": "Home",
+		"visit": "Visit URL",
+		"totalClicks": "Total Clicks",
+		"createdOn": "Created On",
+		"destination": "Destination",
+		"trafficTrends": "Traffic Trends (Last 7 Days)",
+		"topCountries": "Top Countries",
+		"noGeoData": "No geographic data yet",
+		"clicksLabel": "Clicks"
+	},
+	"NotFound": {
+		"title": "Link not found",
+		"description": "This short link doesn't exist, has expired, or has been removed.{br}Double-check the URL or create a new one.",
+		"backHome": "Back to Home"
+	},
+	"Error": {
+		"title": "Something went wrong",
+		"description": "An unexpected error occurred. This has been logged and we're looking into it.",
+		"tryAgain": "Try again",
+		"home": "Home"
+	},
+	"Claim": {
+		"welcome": "Welcome back! We've added {count} links to your account."
+	}
+}

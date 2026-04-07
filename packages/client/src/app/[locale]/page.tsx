@@ -6,33 +6,30 @@ import { ServerLoadingOverlay } from '@/components/ServerLoadingOverlay';
 import { ShortenedLinkInfo } from '@/components/ShortenedLinkInfo';
 import { LinkShortenerForm } from '@/components/LinkShortenerForm';
 import { Zap, Shield, BarChart2, Globe } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const FEATURES = [
 	{
 		icon: Zap,
-		title: 'Lightning Fast',
-		description: 'Sub-millisecond redirects powered by Redis caching and edge infrastructure.',
+		key: 'fast',
 		color: 'text-amber-500',
 		bg: 'bg-amber-500/10',
 	},
 	{
 		icon: BarChart2,
-		title: 'Deep Analytics',
-		description: 'Track clicks, geo-location, devices, and traffic trends in real time.',
+		key: 'analytics',
 		color: 'text-primary',
 		bg: 'bg-primary/10',
 	},
 	{
 		icon: Shield,
-		title: 'Secure by Default',
-		description: 'Password protection, self-destruct links, and rate limiting built in.',
+		key: 'secure',
 		color: 'text-emerald-500',
 		bg: 'bg-emerald-500/10',
 	},
 	{
 		icon: Globe,
-		title: 'Global Reach',
-		description: 'Bot-aware traffic routing with OpenGraph previews for any platform.',
+		key: 'global',
 		color: 'text-indigo-500',
 		bg: 'bg-indigo-500/10',
 	},
@@ -56,6 +53,7 @@ const fadeUp: Variants = {
 export default function Home() {
 	const [shortUrl, setShortUrl] = useState<string | null>(null);
 	const [serverStatus, setServerStatus] = useState<'warming' | 'ready' | 'error'>('warming');
+	const t = useTranslations('Index');
 
 	useEffect(() => {
 		const healthUrl = '/api/proxy/healthz';
@@ -104,8 +102,10 @@ export default function Home() {
 		};
 	}, [serverStatus]);
 
+	const splittedTitle = t('title').split('. ');
+
 	return (
-		<main className="flex min-h-screen flex-col items-center px-4 pb-24 relative overflow-hidden bg-background gradient-mesh">
+		<main className="flex min-h-screen flex-col items-center px-4 pb-24 relative overflow-hidden bg-background gradient-mesh text-pretty">
 			{/* Hero Section */}
 			<section className="w-full max-w-2xl flex flex-col items-center gap-6 text-center mt-16 mb-10 z-10">
 				<motion.div
@@ -116,7 +116,7 @@ export default function Home() {
 					className="inline-flex items-center rounded-full glass px-4 py-1.5 text-xs font-semibold tracking-wide shadow-sm"
 				>
 					<span className="flex h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
-					<span className="text-foreground/80">TinyLink v1.5.7 Stable</span>
+					<span className="text-foreground/80">{t('version')}</span>
 				</motion.div>
 
 				<motion.h1
@@ -126,9 +126,9 @@ export default function Home() {
 					animate="visible"
 					className="text-5xl sm:text-[4rem] font-heading font-black leading-[1.05] tracking-tight text-foreground"
 				>
-					Shorten your links. <br className="hidden sm:block" />
+					{splittedTitle[0]}. <br className="hidden sm:block" />
 					<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent pb-1">
-						Track everything.
+						{splittedTitle[1]}
 					</span>
 				</motion.h1>
 
@@ -137,10 +137,9 @@ export default function Home() {
 					variants={fadeUp}
 					initial="hidden"
 					animate="visible"
-					className="text-base sm:text-lg text-muted-foreground max-w-[540px] font-sans font-medium leading-relaxed"
+					className="text-base sm:text-lg text-muted-foreground max-w-[540px] font-sans font-medium leading-relaxed whitespace-pre-line"
 				>
-					A lightning-fast URL shortener built for power users. <br className="hidden sm:block" />
-					Enter your long URL below to get started.
+					{t('description')}
 				</motion.p>
 			</section>
 
@@ -189,9 +188,9 @@ export default function Home() {
 			{/* Bento-grid Feature Section */}
 			<section className="w-full max-w-2xl mt-12 z-10">
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					{FEATURES.map((feature, i) => (
+					{FEATURES.map((feature, i: number) => (
 						<motion.div
-							key={feature.title}
+							key={feature.key}
 							custom={i + 4}
 							variants={fadeUp}
 							initial="hidden"
@@ -203,9 +202,11 @@ export default function Home() {
 								<feature.icon className={`h-5 w-5 ${feature.color}`} />
 							</div>
 							<div>
-								<h3 className="font-heading font-bold text-foreground text-sm mb-1">{feature.title}</h3>
+								<h3 className="font-heading font-bold text-foreground text-sm mb-1">
+									{t(`features.${feature.key}.title`)}
+								</h3>
 								<p className="text-xs text-muted-foreground leading-relaxed font-sans">
-									{feature.description}
+									{t(`features.${feature.key}.description`)}
 								</p>
 							</div>
 						</motion.div>

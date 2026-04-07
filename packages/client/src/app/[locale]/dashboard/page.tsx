@@ -6,10 +6,10 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { BarChart2, Trash2, Search, Link as LinkIcon, Plus, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useTranslations, useFormatter } from 'next-intl';
 
-interface DashboardLink {
+interface IDashboardLink {
 	id: string;
 	shortCode: string;
 	originalUrl: string;
@@ -24,6 +24,7 @@ function LinkCardSkeleton() {
 }
 
 function EmptyState() {
+	const t = useTranslations('Dashboard');
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 16 }}
@@ -33,11 +34,11 @@ function EmptyState() {
 			<div className="mx-auto w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
 				<LinkIcon className="h-8 w-8 text-muted-foreground/40" />
 			</div>
-			<h3 className="text-lg font-heading font-bold text-foreground mb-2">No links yet</h3>
-			<p className="text-muted-foreground text-sm mb-6">Start by shortening your first URL!</p>
+			<h3 className="text-lg font-heading font-bold text-foreground mb-2">{t('emptyTitle')}</h3>
+			<p className="text-muted-foreground text-sm mb-6">{t('emptyDesc')}</p>
 			<Link href="/">
 				<Button variant="outline" className="glass hover:-translate-y-0.5 transition-all">
-					Go to Shortener
+					{t('emptyButton')}
 				</Button>
 			</Link>
 		</motion.div>
@@ -45,7 +46,9 @@ function EmptyState() {
 }
 
 export default function DashboardPage() {
-	const [links, setLinks] = useState<DashboardLink[]>([]);
+	const t = useTranslations('Dashboard');
+	const format = useFormatter();
+	const [links, setLinks] = useState<IDashboardLink[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [search, setSearch] = useState('');
 	const [page, setPage] = useState(1);
@@ -60,27 +63,27 @@ export default function DashboardPage() {
 			setTotalPages(data.totalPages);
 		} catch (error) {
 			console.error('Failed to fetch links:', error);
-			toast.error('Failed to load your links');
+			toast.error(t('toastLoadError'));
 		} finally {
 			setLoading(false);
 		}
-	}, [page, search]);
+	}, [page, search, t]);
 
 	useEffect(() => {
 		fetchLinks();
 	}, [fetchLinks]);
 
 	const handleDelete = async (id: string, shortCode: string) => {
-		const confirmed = window.confirm(`Delete /${shortCode}? This cannot be undone.`);
+		const confirmed = window.confirm(t('confirmDelete', { code: shortCode }));
 		if (!confirmed) return;
 		setDeletingId(id);
 		try {
 			await api.links.delete(id);
-			toast.success('Link deleted');
+			toast.success(t('toastDeleted'));
 			fetchLinks();
 		} catch (error) {
 			console.error('Failed to delete link:', error);
-			toast.error('Failed to delete link');
+			toast.error(t('toastDeleteError'));
 		} finally {
 			setDeletingId(null);
 		}
@@ -95,13 +98,13 @@ export default function DashboardPage() {
 				className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8"
 			>
 				<div>
-					<h1 className="text-3xl font-heading font-black text-foreground mb-1">My Links</h1>
-					<p className="text-muted-foreground text-sm font-medium">Manage and track your shortened links</p>
+					<h1 className="text-3xl font-heading font-black text-foreground mb-1">{t('title')}</h1>
+					<p className="text-muted-foreground text-sm font-medium">{t('description')}</p>
 				</div>
 				<Link href="/">
 					<Button className="gap-2 h-10 px-5 rounded-xl hover:-translate-y-0.5 transition-all shadow-md shadow-primary/20">
 						<Plus className="h-4 w-4" />
-						New Link
+						{t('newLink')}
 					</Button>
 				</Link>
 			</motion.div>
@@ -116,7 +119,7 @@ export default function DashboardPage() {
 				<Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
 				<input
 					type="text"
-					placeholder="Search links..."
+					placeholder={t('searchPlaceholder')}
 					className="w-full h-11 pl-10 pr-4 rounded-xl glass text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-sans text-sm"
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
@@ -127,11 +130,11 @@ export default function DashboardPage() {
 			<div className="space-y-3">
 				<AnimatePresence mode="popLayout">
 					{loading ? (
-						Array.from({ length: 4 }).map((_, i) => <LinkCardSkeleton key={i} />)
+						Array.from({ length: 4 }).map((_, i: number) => <LinkCardSkeleton key={i} />)
 					) : links.length === 0 ? (
 						<EmptyState key="empty" />
 					) : (
-						links.map((link, i) => (
+						links.map((link: IDashboardLink, i: number) => (
 							<motion.div
 								key={link.id}
 								initial={{ opacity: 0, y: 12 }}
@@ -156,11 +159,11 @@ export default function DashboardPage() {
 											</a>
 											{link.isActive ? (
 												<span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/15">
-													Active
+													{t('statusActive')}
 												</span>
 											) : (
 												<span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-destructive/10 text-destructive border border-destructive/15">
-													Inactive
+													{t('statusInactive')}
 												</span>
 											)}
 										</div>
@@ -170,9 +173,15 @@ export default function DashboardPage() {
 										<div className="flex items-center gap-3 text-[11px] text-muted-foreground/70">
 											<span className="flex items-center gap-1">
 												<BarChart2 className="h-3 w-3" />
-												{link.clicksCount} clicks
+												{t('clicks', { count: link.clicksCount })}
 											</span>
-											<span>{format(new Date(link.createdAt), 'MMM d, yyyy')}</span>
+											<span>
+												{format.dateTime(new Date(link.createdAt), {
+													year: 'numeric',
+													month: 'short',
+													day: 'numeric',
+												})}
+											</span>
 										</div>
 									</div>
 
@@ -182,12 +191,12 @@ export default function DashboardPage() {
 											href={link.originalUrl}
 											target="_blank"
 											rel="noopener noreferrer"
-											title="Visit original URL"
+											title={t('tooltips.visit')}
 											className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all"
 										>
 											<ExternalLink className="h-4 w-4" />
 										</a>
-										<Link href={`/stats/${link.shortCode}`} title="View statistics">
+										<Link href={`/stats/${link.shortCode}`} title={t('tooltips.stats')}>
 											<button className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all">
 												<BarChart2 className="h-4 w-4" />
 											</button>
@@ -195,7 +204,7 @@ export default function DashboardPage() {
 										<button
 											onClick={() => handleDelete(link.id, link.shortCode)}
 											disabled={deletingId === link.id}
-											title="Delete link"
+											title={t('tooltips.delete')}
 											className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-all disabled:opacity-40"
 										>
 											<Trash2 className="h-4 w-4" />
@@ -217,7 +226,7 @@ export default function DashboardPage() {
 						onClick={() => setPage(page - 1)}
 						className="glass hover:-translate-y-0.5 transition-all"
 					>
-						Previous
+						{t('prev')}
 					</Button>
 					<div className="flex items-center px-4 text-sm text-muted-foreground font-medium">
 						{page} / {totalPages}
@@ -228,7 +237,7 @@ export default function DashboardPage() {
 						onClick={() => setPage(page + 1)}
 						className="glass hover:-translate-y-0.5 transition-all"
 					>
-						Next
+						{t('next')}
 					</Button>
 				</div>
 			)}

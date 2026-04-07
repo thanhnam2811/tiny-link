@@ -3,10 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { Link as LinkIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function Header() {
 	const [scrolled, setScrolled] = useState(false);
+	const t = useTranslations('Header');
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 12);
@@ -27,11 +30,12 @@ export function Header() {
 						className="flex items-center gap-2 transition-opacity hover:opacity-80 cursor-pointer"
 					>
 						<LinkIcon className="h-6 w-6 text-primary" />
-						<span className="text-xl font-heading font-bold tracking-tight">TinyLink</span>
+						<span className="text-xl font-heading font-bold tracking-tight">{t('brand')}</span>
 					</Link>
 				</div>
 
 				<div className="flex items-center gap-4">
+					<LanguageSelector />
 					<ThemeToggle />
 				</div>
 			</div>

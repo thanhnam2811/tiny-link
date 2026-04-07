@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 interface ShortenedLinkInfoProps {
 	shortUrl: string;
@@ -13,12 +14,13 @@ interface ShortenedLinkInfoProps {
 }
 
 export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps) {
+	const t = useTranslations('Result');
 	const [isCopied, setIsCopied] = useState(false);
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(shortUrl);
 		setIsCopied(true);
-		toast.success('Copied to clipboard!');
+		toast.success(t('toastCopied'));
 		setTimeout(() => setIsCopied(false), 2000);
 	};
 
@@ -52,7 +54,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 					>
 						<Check className="w-4 h-4 stroke-[3]" />
 					</motion.span>
-					<h2 className="text-xl font-heading font-bold text-foreground">Link Shortened Successfully</h2>
+					<h2 className="text-xl font-heading font-bold text-foreground">{t('success')}</h2>
 					<motion.span
 						initial={{ opacity: 0, x: -8 }}
 						animate={{ opacity: 1, x: 0 }}
@@ -80,7 +82,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 							onClick={() => window.open(`/stats/${shortUrl.split('/').pop()}`, '_blank')}
 							className="shrink-0 h-10 px-4 w-full sm:w-auto font-medium rounded-xl transition-all gap-2 hover:-translate-y-0.5"
 						>
-							<BarChart2 className="h-4 w-4" /> Stats
+							<BarChart2 className="h-4 w-4" /> {t('stats')}
 						</Button>
 						<motion.div whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
 							<Button
@@ -101,7 +103,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 											exit={{ opacity: 0, y: 8 }}
 											className="flex items-center gap-2"
 										>
-											<Check className="h-4 w-4" /> Copied!
+											<Check className="h-4 w-4" /> {t('copied')}
 										</motion.span>
 									) : (
 										<motion.span
@@ -111,7 +113,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 											exit={{ opacity: 0, y: 8 }}
 											className="flex items-center gap-2"
 										>
-											<Copy className="h-4 w-4" /> Copy
+											<Copy className="h-4 w-4" /> {t('copy')}
 										</motion.span>
 									)}
 								</AnimatePresence>
@@ -143,8 +145,8 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 						</Button>
 					</div>
 					<div className="flex flex-col text-sm text-muted-foreground justify-center my-auto">
-						<span className="font-semibold text-foreground leading-tight">QR Code</span>
-						<span className="mt-0.5 leading-tight">Scan to open the link</span>
+						<span className="font-semibold text-foreground leading-tight">{t('qrCode')}</span>
+						<span className="mt-0.5 leading-tight">{t('qrHint')}</span>
 					</div>
 				</div>
 
@@ -153,7 +155,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 					className="text-sm font-medium hover:bg-muted/50 rounded-lg text-muted-foreground w-full sm:w-auto flex items-center justify-center gap-2"
 					onClick={onReset}
 				>
-					<PlusCircle className="w-4 h-4" /> Shorten another
+					<PlusCircle className="w-4 h-4" /> {t('shortenAnother')}
 				</Button>
 			</div>
 		</motion.div>
