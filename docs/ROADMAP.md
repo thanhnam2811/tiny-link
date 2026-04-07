@@ -1,6 +1,6 @@
 # 🗺 TinyLink Development Roadmap
 
-This project is divided into 7 phases, moving from core building blocks to production-level optimization and frontend expansion.
+This project is divided into 12 phases, moving from core building blocks to production-level optimization and frontend expansion.
 
 ---
 
@@ -132,7 +132,17 @@ _Goal: Elevate the platform to a world-class standard with professional aestheti
     - [x] **Dashboard**: Empty-state illustration, `AnimatePresence` link cards, skeleton loading.
     - [x] **Analytics**: Bento metric cards, area gradient Recharts, interactive tooltips, glass password unlock.
 
-### 🟣 Phase 11: Applied AI Integration (The Smart System)
+### 🔵 Phase 11: Client-side Internationalization (i18n)
+
+_Goal: Expand the reach and professional appeal of the platform with multi-language support._
+
+- [ ] **Project Setup**: Integrate `next-intl` (recommended) or `react-i18next` for type-safe translations and locale routing.
+- [ ] **Content Decoupling**: Extract all hardcoded strings into standardized JSON translation files (EN, VI).
+- [ ] **Interactive Switcher**: Implement a minimalist, glassmorphic language switcher component.
+- [ ] **SEO & Metadata**: Ensure dynamic locale-aware metadata (`html lang`, `og:locale`) for all pages.
+- [ ] **Persistence**: Remember user language preferences via cookies or LocalStorage.
+
+### 🟣 Phase 12: Applied AI Integration (The Smart System)
 
 _Goal: Learn practical, cost-effective AI deployment (OpenAI/Gemini) inside a modern backend architecture._
 
