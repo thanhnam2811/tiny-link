@@ -227,19 +227,20 @@ pnpm docker:build # Build Docker image
 GitHub Actions pipeline (`.github/workflows/pipeline.yml`) — 4 stages:
 
 ```
-PR / push to develop or main
-    │
-    ▼
+PR to main ──────────── Lint & Test only (gate)
+Push to main (merge) ──┐
+    │                   │
+    ▼                   │
 1. Lint & Test ──────── ESLint + Vitest (Node 24)
     │
     ▼
 2. Docker Build ──────── Multi-stage image → GHCR
-    │                    tags: staging | latest | vX.Y.Z
+    │                    tags: latest | sha
     ▼
-3. DB Migration ──────── prisma migrate deploy
-    │                    staging (develop) | production (main)
+3. DB Migration ──────── prisma migrate deploy (production)
+    │
     ▼
-4. Deploy ────────────── Render staging | Render production
+4. Deploy ────────────── Render production
 ```
 
 ---
@@ -278,8 +279,9 @@ Analytics are accessible via:
 | Branch                 | Purpose             | Environment              |
 | ---------------------- | ------------------- | ------------------------ |
 | `feature/*` or `fix/*` | Feature development | Local                    |
-| `develop`              | Integration branch  | Staging (auto-deploy)    |
 | `main`                 | Production          | Production (auto-deploy) |
+
+Workflow: branch off `main` → PR into `main` → merge → CI builds, migrates, and deploys automatically.
 
 ### Database changes
 
