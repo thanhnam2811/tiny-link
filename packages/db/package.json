@@ -1,6 +1,6 @@
 {
 	"name": "@tiny-link/db",
-	"version": "1.5.7",
+	"version": "1.6.0",
 	"private": true,
 	"type": "module",
 	"main": "dist/index.js",
