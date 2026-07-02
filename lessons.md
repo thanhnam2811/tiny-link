@@ -2,6 +2,25 @@
 
 ---
 
+## Vercel JSON Schema Compliance & Dashboard-First
+
+### Key Facts
+
+- **`env` is deprecated** in Vercel schema (`patternProperties` string map, `deprecated: true`).
+- **`git.deploymentEnabled`** is valid schema (oneOf boolean or object with boolean additionalProperties), but managing branch deploy rules on Dashboard is preferred.
+- **`rootDirectory`** is NOT a valid property in the Vercel schema — causes deploy failure.
+- **`cleanUrls`** and **`trailingSlash`** are valid boolean properties.
+- **`additionalProperties: false`** at root — every property must be explicitly in schema.
+
+### Prevention Strategy
+
+- Follow **Dashboard-first** principle: manage env vars, domains, and deploy rules on Vercel Dashboard, not in `vercel.json`.
+- Keep `vercel.json` minimal: `$schema`, `framework`, `installCommand`, `buildCommand`, `outputDirectory`.
+- Always verify against the official schema at `https://openapi.vercel.sh/vercel.json`.
+- Use `additionalProperties: false` enforcement — if it's not in the schema, it will fail validation.
+
+---
+
 ## Phase 10: Framer Motion + pnpm Peer Dependency Pitfalls
 
 ### Root Causes
