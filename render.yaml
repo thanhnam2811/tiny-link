@@ -1,0 +1,46 @@
+# Render Blueprint — TinyLink Server
+# ────────────────────────────────────────────────────────────────
+# This deploys the Fastify backend API as a free web service.
+#
+# Database dependencies (external, managed separately):
+#   - PostgreSQL → Neon (free tier, serverless)
+#   - Redis      → Upstash (free tier, 256MB, global replication)
+#
+# Required manual steps after first deploy:
+#   1. Create a Neon project → copy DATABASE_URL
+#   2. Create an Upstash Redis DB → copy REDIS_URL
+#   3. Set all sync:false secrets in Render Dashboard
+#
+# ────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: tiny-link-server
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: false
+    healthCheckPath: /api/healthz
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CLIENT_URL
+        value: https://tnli.vercel.app
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: VERCEL_PROJECT_NAME
+        value: tiny-link-client

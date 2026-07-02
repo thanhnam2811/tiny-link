@@ -19,6 +19,7 @@
 		"lint": "pnpm --recursive run lint",
 		"test": "pnpm --recursive run test",
 		"format": "prettier --write .",
+		"version:bump": "node scripts/bump-version.mjs",
 		"prepare": "husky"
 	},
 	"lint-staged": {

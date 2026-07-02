@@ -5,15 +5,13 @@
 - **Mandatory Planning**: Never initiate code changes without a predefined implementation plan. The Agent must outline the steps and wait for acknowledgment before modifying files.
 - **Branching Strategy**:
     - `feature/xyz` or `fix/abc`: Dedicated branches for work.
-    - `develop`: Integration branch. **STAGING/PREVIEW** environment target.
     - `main`: Production branch. **PRODUCTION** environment target.
 - **Git Workflow**:
-    1. Branch from `develop` for features/fixes.
+    1. Branch from `main` for features/fixes.
     2. Perform full validation by running `pnpm lint`, `pnpm build` and `pnpm test` locally.
-    3. Pull Request to `develop` once work is complete and all checks pass.
-    4. Verify code in the **Preview** environment (auto-deployed from `develop`).
-    5. Pull Request `develop` to `main` once Preview is confirmed stable.
-- **Rule of No-Main-Push**: **NEVER** commit or push directly to `develop` or `main`. All changes MUST go through a PR.
+    3. Pull Request to `main` once work is complete and all checks pass.
+    4. Merging to `main` auto-deploys to production.
+- **Rule of No-Main-Push**: **NEVER** commit or push directly to `main`. All changes MUST go through a PR.
 - **Stable Main**: The `main` branch is the "Source of Truth" and must always reflect the current production state.
 
 ## 2. Resource Management & Sub-Agent Strategy

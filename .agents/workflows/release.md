@@ -1,65 +1,31 @@
-# Release Workflow (2-Branch Model)
+# Release Workflow (Single-Branch Model)
 
-This workflow ensures that code is fully verified in the **Staging/Preview** environment before being promoted to **Production**.
+`main` is always deployable. Every merge to `main` is automatically built, migrated, and deployed to production.
 
-## 1. Feature Development & Integration
+## 1. Feature Development
 
-- All features and fixes start on a dedicated branch (e.g., `feature/xyz`).
-- Once complete, create a Pull Request to the `develop` branch.
-- Merge the PR into `develop`.
+- All features and fixes start on a dedicated branch off `main` (e.g. `feature/xyz`, `fix/abc`).
+- Run `pnpm lint`, `pnpm build`, and `pnpm test` locally before opening a PR.
 
-## 2. Staging Verification (Mandatory Gate)
+## 2. Pull Request
 
-- Merging to `develop` automatically triggers a deployment to the **Staging/Preview** environment via GitHub Actions (`deploy_preview`).
-- **Wait** for the deployment to finish and verify the changes on the Staging URL.
-- Test critical paths: Login, Linking, Analytics, etc.
+- Open a Pull Request targeting `main`.
+- CI (`.github/workflows/pipeline.yml`) runs lint + tests as a merge gate.
 
-## 3. Promotion to Production (Release)
+## 3. Merge & Auto-Deploy
 
-Once Staging is verified as stable:
+- Once checks pass and the PR is approved, merge into `main`.
+- The push to `main` triggers the full pipeline: Docker build/publish → `prisma migrate deploy` → Render production deploy hook.
+- No manual tagging or staging promotion step is required.
 
-### A. Merge Develop to Main
+## 4. Rollback
 
-Create a Pull Request from `develop` to `main` and merge it. This ensures `main` always matches the verified `develop` state.
+If a deploy introduces a regression, revert the offending commit(s) on `main` and push — the revert goes through the same pipeline and redeploys the previous known-good state.
 
-### B. Automated Testing
+## 5. Versioning
 
-Run the test suite one last time locally to ensure workspace integrity.
+There are no git tags or GitHub Releases — the deploy history on `main` is the changelog. A single semver, tracked in the root `package.json`, is mirrored across every workspace package's `package.json` purely for human reference (e.g. shown in `/api/healthz` and the API docs via `APP_VERSION`).
 
-```bash
-pnpm test
-```
-
-### C. Version Bump & Tagging
-
-Execute the version bump script and create a Git Tag. This triggers the `deploy_production` job in GitHub Actions.
-
-```bash
-# 1. Bump workspace packages
-node scripts/bump-version.mjs <version>
-
-# 2. Stage changes
-git add .
-
-# 3. Bump root version & create tag
-npm version <patch|minor|major> --force -m "chore(release): v%s"
-
-# 4. Push to main with tags
-git push origin main --follow-tags
-```
-
-## 4. Auto-Draft GitHub Release
-
-Use the GitHub CLI (`gh`) to create a drafted release for final review.
-
-```bash
-gh release create <tag> --draft --title "<tag>" --notes-file /tmp/release_notes.md
-```
-
-Follow the structure in `docs/RELEASE_TEMPLATE.md` for the release notes.
-
-- `### 🚀 What's New`
-- `### ✨ Features`
-- `### 🐛 Bug Fixes`
-- `---`
-- `**Full Changelog**: https://github.com/thanhnam2811/tiny-link/commits/vX.X.X`
+- Bump it when a PR ships a user-facing change worth noting: `pnpm version:bump <x.y.z>`.
+- This rewrites every `package.json` in the workspace in one shot (uses `scripts/bump-version.mjs`, which discovers packages dynamically — no per-package list to maintain).
+- Commit the bump as part of the same PR; no separate release PR or tag step.
