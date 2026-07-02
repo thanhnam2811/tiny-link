@@ -22,7 +22,7 @@ services:
     plan: free
     region: singapore
     branch: main
-    autoDeploy: true
+    autoDeploy: false
     healthCheckPath: /api/healthz
 
     envVars:
