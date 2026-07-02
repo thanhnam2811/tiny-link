@@ -1,0 +1,40 @@
+# Keep Render Web Service Alive
+# ────────────────────────────────────────────────────────────────
+# Render free web services sleep after 15 minutes of inactivity.
+# This workflow pings the health endpoint every 5 minutes to
+# prevent the server from sleeping, ensuring ~0 cold-start wait
+# for real users.
+#
+# Note: This relies on Render's free tier 750h/month uptime
+# limit being sufficient. If the service stays awake 24/7 it
+# uses ~744h/month — well within the free quota.
+#
+# Required:
+#   - Add RENDER_SERVER_URL as a repository secret in GitHub:
+#     Settings → Secrets and variables → Actions → New secret
+#     Value: https://your-app.onrender.com
+
+name: Keep Render Server Alive
+
+on:
+  schedule:
+    # Every 5 minutes — Render free tier idle timeout is 15 min,
+    # so 5 min intervals keep it warm with comfortable margin.
+    - cron: "*/5 * * * *"
+  # Also allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping health endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call health check
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_SERVER_URL }}/api/healthz" --max-time 10)
+          echo "Health check returned HTTP $response"
+          if [ "$response" != "200" ]; then
+            echo "::warning::Server returned HTTP $response — may be unhealthy"
+          else
+            echo "Server is alive!"
+          fi
