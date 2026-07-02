@@ -20,7 +20,7 @@ interface DashboardLink {
 }
 
 function LinkCardSkeleton() {
-	return <div className="h-28 skeleton rounded-2xl" />;
+	return <div className="h-28 skeleton rounded-lg" />;
 }
 
 function EmptyState() {
@@ -28,17 +28,15 @@ function EmptyState() {
 		<motion.div
 			initial={{ opacity: 0, y: 16 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="text-center py-20 glass-subtle rounded-2xl border border-dashed border-border/50"
+			className="rounded-lg border border-dashed border-border bg-card py-20 text-center"
 		>
-			<div className="mx-auto w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
+			<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-muted">
 				<LinkIcon className="h-8 w-8 text-muted-foreground/40" />
 			</div>
-			<h3 className="text-lg font-heading font-bold text-foreground mb-2">No links yet</h3>
-			<p className="text-muted-foreground text-sm mb-6">Start by shortening your first URL!</p>
+			<h3 className="mb-2 font-heading text-lg font-bold text-foreground">No links yet</h3>
+			<p className="mb-6 text-sm text-muted-foreground">Start by shortening your first URL!</p>
 			<Link href="/">
-				<Button variant="outline" className="glass hover:-translate-y-0.5 transition-all">
-					Go to Shortener
-				</Button>
+				<Button variant="outline">Go to Shortener</Button>
 			</Link>
 		</motion.div>
 	);
@@ -99,7 +97,7 @@ export default function DashboardPage() {
 					<p className="text-muted-foreground text-sm font-medium">Manage and track your shortened links</p>
 				</div>
 				<Link href="/">
-					<Button className="gap-2 h-10 px-5 rounded-xl hover:-translate-y-0.5 transition-all shadow-md shadow-primary/20">
+					<Button className="h-10 gap-2 px-5 shadow-sm">
 						<Plus className="h-4 w-4" />
 						New Link
 					</Button>
@@ -111,13 +109,13 @@ export default function DashboardPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: 0.1 }}
-				className="mb-6 relative"
+				className="relative mb-6"
 			>
-				<Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+				<Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
 				<input
 					type="text"
 					placeholder="Search links..."
-					className="w-full h-11 pl-10 pr-4 rounded-xl glass text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-sans text-sm"
+					className="h-11 w-full rounded-lg border border-border bg-card pr-4 pl-10 font-sans text-sm text-foreground transition-all placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring focus:outline-none"
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 				/>
@@ -138,36 +136,37 @@ export default function DashboardPage() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, x: -16 }}
 								transition={{ delay: i * 0.05 }}
-								whileHover={{ y: -2 }}
-								className="glass-subtle rounded-2xl overflow-hidden group transition-shadow hover:shadow-md"
+								whileHover={{ y: -1 }}
+								className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-md"
 							>
-								<div className="p-5 flex flex-col md:flex-row md:items-center gap-4">
+								<div className="flex flex-col gap-4 p-5 md:flex-row md:items-center">
 									{/* Link info */}
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2 mb-1.5">
-											<LinkIcon className="h-3.5 w-3.5 text-primary shrink-0" />
+									<div className="min-w-0 flex-1">
+										<div className="mb-1.5 flex items-center gap-2">
+											<LinkIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
 											<a
 												href={`${typeof window !== 'undefined' ? window.location.origin : ''}/${link.shortCode}`}
 												target="_blank"
 												rel="noopener noreferrer"
-												className="font-heading font-bold text-foreground hover:text-primary transition-colors truncate text-sm"
+												className="truncate font-heading text-sm font-bold text-foreground transition-colors hover:text-primary"
 											>
 												{link.shortCode}
 											</a>
 											{link.isActive ? (
-												<span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/15">
+												<span className="flex shrink-0 items-center gap-1 rounded-sm border border-success/20 bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">
+													<span className="h-1.5 w-1.5 rounded-full bg-success" />
 													Active
 												</span>
 											) : (
-												<span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-destructive/10 text-destructive border border-destructive/15">
+												<span className="shrink-0 rounded-sm border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
 													Inactive
 												</span>
 											)}
 										</div>
-										<p className="text-xs text-muted-foreground truncate font-sans mb-1.5">
+										<p className="mb-1.5 truncate font-sans text-xs text-muted-foreground">
 											{link.originalUrl}
 										</p>
-										<div className="flex items-center gap-3 text-[11px] text-muted-foreground/70">
+										<div className="flex items-center gap-3 text-[11px] text-muted-foreground/70 tabular-nums">
 											<span className="flex items-center gap-1">
 												<BarChart2 className="h-3 w-3" />
 												{link.clicksCount} clicks
@@ -177,18 +176,18 @@ export default function DashboardPage() {
 									</div>
 
 									{/* Actions */}
-									<div className="flex items-center gap-1.5 shrink-0">
+									<div className="flex shrink-0 items-center gap-1">
 										<a
 											href={link.originalUrl}
 											target="_blank"
 											rel="noopener noreferrer"
 											title="Visit original URL"
-											className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all"
+											className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
 										>
 											<ExternalLink className="h-4 w-4" />
 										</a>
 										<Link href={`/stats/${link.shortCode}`} title="View statistics">
-											<button className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all">
+											<button className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary">
 												<BarChart2 className="h-4 w-4" />
 											</button>
 										</Link>
@@ -196,7 +195,7 @@ export default function DashboardPage() {
 											onClick={() => handleDelete(link.id, link.shortCode)}
 											disabled={deletingId === link.id}
 											title="Delete link"
-											className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-all disabled:opacity-40"
+											className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
 										>
 											<Trash2 className="h-4 w-4" />
 										</button>
@@ -210,24 +209,14 @@ export default function DashboardPage() {
 
 			{/* Pagination */}
 			{totalPages > 1 && (
-				<div className="flex justify-center mt-8 gap-2">
-					<Button
-						variant="outline"
-						disabled={page === 1}
-						onClick={() => setPage(page - 1)}
-						className="glass hover:-translate-y-0.5 transition-all"
-					>
+				<div className="mt-8 flex justify-center gap-2">
+					<Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
 						Previous
 					</Button>
-					<div className="flex items-center px-4 text-sm text-muted-foreground font-medium">
+					<div className="flex items-center px-4 text-sm font-medium text-muted-foreground tabular-nums">
 						{page} / {totalPages}
 					</div>
-					<Button
-						variant="outline"
-						disabled={page === totalPages}
-						onClick={() => setPage(page + 1)}
-						className="glass hover:-translate-y-0.5 transition-all"
-					>
+					<Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
 						Next
 					</Button>
 				</div>

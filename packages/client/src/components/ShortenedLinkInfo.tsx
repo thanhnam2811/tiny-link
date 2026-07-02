@@ -48,7 +48,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.1 }}
-						className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500/15 text-green-600 dark:text-green-400"
+						className="flex items-center justify-center w-6 h-6 rounded-full bg-success/15 text-success"
 					>
 						<Check className="w-4 h-4 stroke-[3]" />
 					</motion.span>
@@ -62,7 +62,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 					</motion.span>
 				</div>
 
-				<div className="w-full flex flex-col sm:flex-row items-center justify-between p-5 rounded-xl glass gap-6 shadow-sm">
+				<div className="w-full flex flex-col sm:flex-row items-center justify-between p-5 rounded-lg glass gap-6 shadow-sm">
 					<div className="relative w-full text-center sm:text-left overflow-hidden">
 						<a
 							href={shortUrl}
@@ -78,7 +78,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 							size="default"
 							variant="secondary"
 							onClick={() => window.open(`/stats/${shortUrl.split('/').pop()}`, '_blank')}
-							className="shrink-0 h-10 px-4 w-full sm:w-auto font-medium rounded-xl transition-all gap-2 hover:-translate-y-0.5"
+							className="shrink-0 h-10 px-4 w-full sm:w-auto font-medium rounded-md transition-all gap-2"
 						>
 							<BarChart2 className="h-4 w-4" /> Stats
 						</Button>
@@ -86,10 +86,10 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 							<Button
 								size="default"
 								onClick={handleCopy}
-								className={`shrink-0 h-10 px-6 w-full font-heading font-bold rounded-xl transition-all gap-2 shadow-md hover:-translate-y-0.5 ${
+								className={`shrink-0 h-10 px-6 w-full font-heading font-bold rounded-md transition-all gap-2 shadow-sm ${
 									isCopied
-										? 'bg-green-600 hover:bg-green-700 text-white shadow-green-600/20'
-										: 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20'
+										? 'bg-success hover:bg-success/90 text-primary-foreground'
+										: 'bg-primary hover:bg-primary/90 text-primary-foreground'
 								}`}
 							>
 								<AnimatePresence mode="wait" initial={false}>

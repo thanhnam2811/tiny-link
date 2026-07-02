@@ -12,8 +12,8 @@ const FEATURES = [
 		icon: Zap,
 		title: 'Lightning Fast',
 		description: 'Sub-millisecond redirects powered by Redis caching and edge infrastructure.',
-		color: 'text-amber-500',
-		bg: 'bg-amber-500/10',
+		color: 'text-warning',
+		bg: 'bg-warning/10',
 	},
 	{
 		icon: BarChart2,
@@ -26,15 +26,15 @@ const FEATURES = [
 		icon: Shield,
 		title: 'Secure by Default',
 		description: 'Password protection, self-destruct links, and rate limiting built in.',
-		color: 'text-emerald-500',
-		bg: 'bg-emerald-500/10',
+		color: 'text-success',
+		bg: 'bg-success/10',
 	},
 	{
 		icon: Globe,
 		title: 'Global Reach',
 		description: 'Bot-aware traffic routing with OpenGraph previews for any platform.',
-		color: 'text-indigo-500',
-		bg: 'bg-indigo-500/10',
+		color: 'text-chart-2',
+		bg: 'bg-chart-2/10',
 	},
 ];
 
@@ -152,7 +152,7 @@ export default function Home() {
 				animate="visible"
 				className="w-full max-w-2xl z-10"
 			>
-				<div className="glass-card rounded-2xl overflow-hidden relative">
+				<div className="glass-card rounded-xl overflow-hidden relative">
 					<div className="p-6 sm:p-10">
 						<AnimatePresence mode="wait">
 							{!shortUrl && (
@@ -197,9 +197,9 @@ export default function Home() {
 							initial="hidden"
 							animate="visible"
 							whileHover={{ y: -3, transition: { duration: 0.2 } }}
-							className="glass-subtle rounded-2xl p-5 flex gap-4 items-start cursor-default"
+							className="glass-subtle rounded-lg p-5 flex gap-4 items-start cursor-default"
 						>
-							<div className={`p-2.5 rounded-xl shrink-0 ${feature.bg}`}>
+							<div className={`p-2.5 rounded-md shrink-0 ${feature.bg}`}>
 								<feature.icon className={`h-5 w-5 ${feature.color}`} />
 							</div>
 							<div>

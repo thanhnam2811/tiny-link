@@ -12,44 +12,43 @@ function LoginForm() {
 	const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
 	return (
-		<main className="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center p-6 bg-background">
-			<div className="z-10 w-full max-w-md flex flex-col items-center gap-6 text-center mb-8">
-				<h1 className="text-4xl font-heading font-black tracking-tight text-foreground">Welcome back.</h1>
-				<p className="text-muted-foreground font-sans font-medium">
-					Sign in to your account to manage your links <br className="hidden sm:block" />
-					and view detailed analytics.
+		<main className="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center bg-background p-6">
+			<div className="z-10 mb-8 flex w-full max-w-md flex-col items-center gap-3 text-center">
+				<h1 className="font-heading text-3xl font-black tracking-tight text-foreground">Welcome back</h1>
+				<p className="text-sm font-medium text-muted-foreground">
+					Sign in to manage your links and view detailed analytics.
 				</p>
 			</div>
 
-			<Card className="w-full max-w-md border border-border/40 bg-card/50 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden relative">
-				<CardContent className="p-8 sm:p-10 flex flex-col gap-4">
+			<Card className="w-full max-w-md shadow-lg">
+				<CardContent className="flex flex-col gap-3 p-6 sm:p-8">
 					<Button
 						variant="outline"
-						className="h-12 text-base font-semibold border-border/40 hover:bg-white/5 transition-all flex gap-3"
+						className="h-11 gap-3 text-sm font-semibold"
 						onClick={() => signIn('google', { callbackUrl })}
 					>
-						<Mail className="h-5 w-5" />
+						<Mail className="h-4 w-4" />
 						Continue with Google
 					</Button>
 					<Button
 						variant="outline"
-						className="h-12 text-base font-semibold border-border/40 hover:bg-white/5 transition-all flex gap-3"
+						className="h-11 gap-3 text-sm font-semibold"
 						onClick={() => signIn('github', { callbackUrl })}
 					>
-						<Github className="h-5 w-5" />
+						<Github className="h-4 w-4" />
 						Continue with GitHub
 					</Button>
 
-					<div className="relative my-4">
+					<div className="relative my-2">
 						<div className="absolute inset-0 flex items-center">
-							<span className="w-full border-t border-border/40" />
+							<span className="w-full border-t border-border" />
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
-							<span className="bg-background px-2 text-muted-foreground">Or</span>
+							<span className="bg-card px-2 text-muted-foreground">Or</span>
 						</div>
 					</div>
 
-					<p className="text-center text-sm text-muted-foreground">
+					<p className="text-center text-xs text-muted-foreground">
 						By continuing, you agree to our Terms of Service <br />
 						and Privacy Policy.
 					</p>
