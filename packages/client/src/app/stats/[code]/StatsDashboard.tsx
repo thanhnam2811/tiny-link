@@ -24,7 +24,7 @@ type StatsDashboardProps = {
 };
 
 function MetricSkeleton() {
-	return <div className="h-28 skeleton rounded-2xl" />;
+	return <div className="h-28 skeleton rounded-lg" />;
 }
 
 export default function StatsDashboard({ code, isProtected }: StatsDashboardProps) {
@@ -72,20 +72,20 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 	// 1. Password Protection
 	if (isLocked) {
 		return (
-			<main className="flex flex-col items-center justify-center min-h-screen p-4 bg-background gradient-mesh">
+			<main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
 				<motion.div
 					initial={{ opacity: 0, y: 24 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.4 }}
 					className="w-full max-w-sm"
 				>
-					<div className="glass-card rounded-2xl p-8">
-						<div className="text-center mb-6">
-							<div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-								<Lock className="w-5 h-5 text-primary" />
+					<div className="rounded-lg border border-border bg-card p-8 shadow-lg">
+						<div className="mb-6 text-center">
+							<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-primary/10">
+								<Lock className="h-5 w-5 text-primary" />
 							</div>
-							<h1 className="text-xl font-heading font-bold">Protected Analytics</h1>
-							<p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+							<h1 className="font-heading text-xl font-bold">Protected Analytics</h1>
+							<p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
 								Enter the password to view this link&apos;s metrics.
 							</p>
 						</div>
@@ -95,14 +95,14 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								className="w-full h-11 px-4 rounded-xl glass text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+								className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground transition-all placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring focus:outline-none"
 								placeholder="Enter password"
 								disabled={isLoading}
 							/>
 							<button
 								type="submit"
 								disabled={isLoading}
-								className="w-full h-11 bg-primary text-primary-foreground rounded-xl font-heading font-semibold text-sm hover:bg-primary/90 hover:-translate-y-0.5 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:translate-y-0 flex items-center justify-center gap-2"
+								className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary text-sm font-heading font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 disabled:opacity-50"
 							>
 								{isLoading && (
 									<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -144,7 +144,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
-				className="min-h-screen bg-background gradient-mesh text-foreground py-10 px-4"
+				className="min-h-screen bg-background text-foreground py-10 px-4"
 			>
 				<div className="max-w-5xl mx-auto space-y-6">
 					{/* Header */}
@@ -157,7 +157,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							<h1 className="text-2xl font-heading font-bold tracking-tight">Analytics Overview</h1>
 							<p className="text-muted-foreground mt-1 text-sm flex items-center gap-2">
 								Tracking performance for
-								<span className="font-mono bg-primary/10 text-primary px-2 py-0.5 rounded-lg text-xs">
+								<span className="font-mono bg-primary/10 text-primary px-2 py-0.5 rounded-sm text-xs">
 									/{stats.shortCode}
 								</span>
 							</p>
@@ -165,7 +165,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 						<div className="flex gap-2">
 							<Link
 								href="/"
-								className="px-4 py-2 glass rounded-xl text-sm font-heading font-medium hover:-translate-y-0.5 transition-all"
+								className="px-4 py-2 rounded-md border border-border bg-card text-sm font-heading font-medium transition-colors hover:bg-muted"
 							>
 								Home
 							</Link>
@@ -173,7 +173,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								href={stats.originalUrl}
 								target="_blank"
 								rel="noreferrer"
-								className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-heading font-medium hover:bg-primary/90 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 shadow-md shadow-primary/20"
+								className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-heading font-medium hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-sm"
 							>
 								Visit URL <ExternalLink className="w-3.5 h-3.5" />
 							</a>
@@ -198,15 +198,15 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 									day: 'numeric',
 									year: 'numeric',
 								}),
-								color: 'text-violet-500',
-								bg: 'bg-violet-500/10',
+								color: 'text-chart-5',
+								bg: 'bg-chart-5/10',
 							},
 							{
 								icon: LinkIcon,
 								label: 'Destination',
 								value: stats.originalUrl,
-								color: 'text-emerald-500',
-								bg: 'bg-emerald-500/10',
+								color: 'text-success',
+								bg: 'bg-success/10',
 								truncate: true,
 							},
 						].map((card, i) => (
@@ -215,9 +215,9 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 								initial={{ opacity: 0, y: 12 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: i * 0.07 }}
-								className="glass-card rounded-2xl p-5 flex items-start gap-4"
+								className="rounded-lg border border-border bg-card p-5 flex items-start gap-4"
 							>
-								<div className={`p-2.5 rounded-xl shrink-0 ${card.bg}`}>
+								<div className={`p-2.5 rounded-md shrink-0 ${card.bg}`}>
 									<card.icon className={`w-5 h-5 ${card.color}`} />
 								</div>
 								<div className="min-w-0">
@@ -232,7 +232,9 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 											{card.value}
 										</p>
 									) : (
-										<p className="text-2xl font-heading font-extrabold">{card.value}</p>
+										<p className="text-2xl font-heading font-extrabold tabular-nums">
+											{card.value}
+										</p>
 									)}
 								</div>
 							</motion.div>
@@ -246,7 +248,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							initial={{ opacity: 0, y: 12 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.2 }}
-							className="lg:col-span-2 glass-card rounded-2xl p-6"
+							className="lg:col-span-2 rounded-lg border border-border bg-card p-6"
 						>
 							<div className="flex items-center gap-2 mb-5">
 								<BarChart3 className="w-4 h-4 text-primary" />
@@ -334,10 +336,10 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							initial={{ opacity: 0, y: 12 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.28 }}
-							className="glass-card rounded-2xl p-6 flex flex-col"
+							className="rounded-lg border border-border bg-card p-6 flex flex-col"
 						>
 							<div className="flex items-center gap-2 mb-5">
-								<Globe className="w-4 h-4 text-indigo-500" />
+								<Globe className="w-4 h-4 text-chart-2" />
 								<h2 className="text-sm font-heading font-bold">Top Countries</h2>
 							</div>
 
@@ -377,7 +379,7 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 											<Bar
 												dataKey="clicks"
 												name="Clicks"
-												fill="hsl(var(--primary))"
+												fill="hsl(var(--chart-2))"
 												radius={[0, 6, 6, 0]}
 												maxBarSize={24}
 											/>

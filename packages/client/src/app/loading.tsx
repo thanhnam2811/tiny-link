@@ -5,15 +5,15 @@ export default function Loading() {
 				{/* Hero skeleton */}
 				<div className="flex flex-col items-center gap-4 mb-8">
 					<div className="h-6 w-36 skeleton rounded-full" />
-					<div className="h-14 w-3/4 skeleton rounded-2xl" />
-					<div className="h-5 w-1/2 skeleton rounded-xl" />
+					<div className="h-14 w-3/4 skeleton rounded-lg" />
+					<div className="h-5 w-1/2 skeleton rounded-md" />
 				</div>
 				{/* Card skeleton */}
-				<div className="h-64 w-full skeleton rounded-2xl" />
+				<div className="h-64 w-full skeleton rounded-xl" />
 				{/* Feature grid skeleton */}
 				<div className="grid grid-cols-2 gap-4 mt-8">
 					{Array.from({ length: 4 }).map((_, i) => (
-						<div key={i} className="h-24 skeleton rounded-2xl" />
+						<div key={i} className="h-24 skeleton rounded-lg" />
 					))}
 				</div>
 			</div>

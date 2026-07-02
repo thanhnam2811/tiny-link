@@ -11,14 +11,14 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
 	}, [error]);
 
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-center px-4 bg-background gradient-mesh">
+		<main className="flex min-h-screen flex-col items-center justify-center px-4 bg-background">
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.4 }}
 				className="text-center max-w-md"
 			>
-				<div className="mx-auto w-16 h-16 glass-card rounded-2xl flex items-center justify-center mb-6">
+				<div className="mx-auto w-16 h-16 rounded-lg bg-destructive/10 flex items-center justify-center mb-6">
 					<AlertCircle className="h-8 w-8 text-destructive" />
 				</div>
 
@@ -30,14 +30,14 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
 				<div className="flex gap-3 justify-center">
 					<button
 						onClick={reset}
-						className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-heading font-semibold text-sm hover:bg-primary/90 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20"
+						className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-md font-heading font-semibold text-sm hover:bg-primary/90 transition-colors shadow-sm"
 					>
 						<RefreshCw className="h-4 w-4" />
 						Try again
 					</button>
 					<Link
 						href="/"
-						className="inline-flex items-center gap-2 px-5 py-2.5 glass rounded-xl font-heading font-semibold text-sm hover:-translate-y-0.5 transition-all"
+						className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-border bg-card font-heading font-semibold text-sm hover:bg-muted transition-colors"
 					>
 						<Home className="h-4 w-4" />
 						Home
