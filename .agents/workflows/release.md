@@ -21,3 +21,11 @@
 ## 4. Rollback
 
 If a deploy introduces a regression, revert the offending commit(s) on `main` and push — the revert goes through the same pipeline and redeploys the previous known-good state.
+
+## 5. Versioning
+
+There are no git tags or GitHub Releases — the deploy history on `main` is the changelog. A single semver, tracked in the root `package.json`, is mirrored across every workspace package's `package.json` purely for human reference (e.g. shown in `/api/healthz` and the API docs via `APP_VERSION`).
+
+- Bump it when a PR ships a user-facing change worth noting: `pnpm version:bump <x.y.z>`.
+- This rewrites every `package.json` in the workspace in one shot (uses `scripts/bump-version.mjs`, which discovers packages dynamically — no per-package list to maintain).
+- Commit the bump as part of the same PR; no separate release PR or tag step.
