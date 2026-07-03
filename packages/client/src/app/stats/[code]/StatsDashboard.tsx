@@ -15,8 +15,11 @@ import {
 	Link as LinkIcon,
 	ExternalLink,
 	MousePointerClick,
+	QrCode,
 } from 'lucide-react';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { LinkQrCode } from '@/components/LinkQrCode';
 
 type StatsDashboardProps = {
 	code: string;
@@ -169,6 +172,20 @@ export default function StatsDashboard({ code, isProtected }: StatsDashboardProp
 							>
 								Home
 							</Link>
+							<Popover>
+								<PopoverTrigger className="px-4 py-2 rounded-md border border-border bg-card text-sm font-heading font-medium transition-colors hover:bg-muted flex items-center gap-1.5">
+									<QrCode className="w-3.5 h-3.5" /> QR Code
+								</PopoverTrigger>
+								<PopoverContent align="end" className="w-auto">
+									<LinkQrCode
+										shortUrl={
+											typeof window !== 'undefined'
+												? `${window.location.origin}/${stats.shortCode}`
+												: `/${stats.shortCode}`
+										}
+									/>
+								</PopoverContent>
+							</Popover>
 							<a
 								href={stats.originalUrl}
 								target="_blank"
