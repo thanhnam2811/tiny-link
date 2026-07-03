@@ -24,6 +24,7 @@ function LoginForm() {
 					<Button
 						variant="outline"
 						className="h-11 gap-3 text-sm font-semibold"
+						nativeButton={false}
 						render={
 							<a href={`/auth/login?connection=google-oauth2&returnTo=${encodeURIComponent(returnTo)}`} />
 						}
@@ -34,6 +35,7 @@ function LoginForm() {
 					<Button
 						variant="outline"
 						className="h-11 gap-3 text-sm font-semibold"
+						nativeButton={false}
 						render={<a href={`/auth/login?connection=github&returnTo=${encodeURIComponent(returnTo)}`} />}
 					>
 						<Github className="h-4 w-4" />
