@@ -154,13 +154,10 @@ export default function Home() {
 			>
 				<div className="glass-card rounded-xl overflow-hidden relative">
 					<div className="p-6 sm:p-10">
+						{!shortUrl && (
+							<ServerLoadingOverlay status={serverStatus} onRetry={() => setServerStatus('warming')} />
+						)}
 						<AnimatePresence mode="wait">
-							{!shortUrl && (
-								<ServerLoadingOverlay
-									status={serverStatus}
-									onRetry={() => setServerStatus('warming')}
-								/>
-							)}
 							{!shortUrl ? (
 								<motion.div
 									key="form"
