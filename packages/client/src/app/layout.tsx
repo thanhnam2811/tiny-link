@@ -3,7 +3,7 @@ import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { SessionProvider } from 'next-auth/react';
+import { Auth0Provider } from '@auth0/nextjs-auth0';
 
 const inter = Inter({
 	variable: '--font-inter',
@@ -33,14 +33,14 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<SessionProvider>
+					<Auth0Provider>
 						<SmoothScrollProvider>
 							<Header />
 							<ClaimLinksEffect />
 							{children}
 							<Toaster position="top-center" />
 						</SmoothScrollProvider>
-					</SessionProvider>
+					</Auth0Provider>
 				</ThemeProvider>
 			</body>
 		</html>

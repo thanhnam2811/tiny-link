@@ -1,13 +1,20 @@
-import { auth } from '@/auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth0 } from '@/lib/auth0';
 
 // Regex for common bots, crawlers, and social media preview fetchers
 const BOT_REGEX =
 	/bot|crawler|spider|crawling|facebookexternalhit|slurp|WhatsApp|Viber|TelegramBot|Discordbot|Twitterbot|Applebot/i;
 
-export default auth((req) => {
+export default async function middleware(req: NextRequest) {
+	// Let the Auth0 SDK handle its own /auth/* routes and refresh the session cookie.
+	const authResponse = await auth0.middleware(req);
+	if (req.nextUrl.pathname.startsWith('/auth')) {
+		return authResponse;
+	}
+
 	const { pathname } = req.nextUrl;
-	const isAuth = !!req.auth;
+	const session = await auth0.getSession(req);
+	const isAuth = !!session;
 
 	// 1. Dashboard Protection (PRIORITY)
 	if (pathname.startsWith('/dashboard') && !isAuth) {
@@ -34,12 +41,16 @@ export default auth((req) => {
 		requestHeaders.set('x-short-code', shortCode);
 	}
 
-	return NextResponse.next({
+	// Preserve Auth0's refreshed session cookies on the passthrough response.
+	const response = NextResponse.next({
 		request: {
 			headers: requestHeaders,
 		},
 	});
-});
+	authResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));
+
+	return response;
+}
 
 export const config = {
 	matcher: [

@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { auth0 } from '@/lib/auth0';
 import { INTERNAL_AUTH } from '@tiny-link/shared';
 import { NextRequest, NextResponse } from 'next/server';
 import { getEnv } from '@/lib/env';
@@ -27,7 +27,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
 }
 
 async function handleProxy(req: NextRequest, pathSegments: string[]) {
-	const session = await auth();
+	const session = await auth0.getSession();
 	const path = pathSegments.join('/');
 	const searchParams = req.nextUrl.searchParams.toString();
 	const url = `${FASTIFY_URL}/api/${path}${searchParams ? `?${searchParams}` : ''}`;
@@ -36,8 +36,8 @@ async function handleProxy(req: NextRequest, pathSegments: string[]) {
 	headers.delete('host'); // Let fetch handle Host header
 	headers.set(INTERNAL_AUTH.HEADER, INTERNAL_API_KEY || '');
 
-	if (session?.user?.id) {
-		headers.set(INTERNAL_AUTH.USER_ID_HEADER, session.user.id);
+	if (session?.user?.sub) {
+		headers.set(INTERNAL_AUTH.USER_ID_HEADER, session.user.sub);
 	}
 
 	try {

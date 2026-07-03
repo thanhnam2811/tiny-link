@@ -6,13 +6,13 @@
 
 ## 1. Tổng quan Monorepo
 
-| Package             | Vai trò                                            | Tech                             |
-| ------------------- | -------------------------------------------------- | -------------------------------- |
-| `@tiny-link/shared` | Types, schemas (Zod/TypeBox), constants dùng chung | TypeScript, TypeBox              |
-| `@tiny-link/db`     | Prisma schema + generated client                   | Prisma 7, PostgreSQL             |
-| `@tiny-link/server` | Backend API chính                                  | Fastify 5, Redis, JWT            |
-| `@tiny-link/client` | Public app + User dashboard                        | Next.js 16, Auth.js, Tailwind v4 |
-| `@tiny-link/admin`  | Admin dashboard riêng                              | Next.js 16, Recharts             |
+| Package             | Vai trò                                            | Tech                           |
+| ------------------- | -------------------------------------------------- | ------------------------------ |
+| `@tiny-link/shared` | Types, schemas (Zod/TypeBox), constants dùng chung | TypeScript, TypeBox            |
+| `@tiny-link/db`     | Prisma schema + generated client                   | Prisma 7, PostgreSQL           |
+| `@tiny-link/server` | Backend API chính                                  | Fastify 5, Redis, JWT          |
+| `@tiny-link/client` | Public app + User dashboard                        | Next.js 16, Auth0, Tailwind v4 |
+| `@tiny-link/admin`  | Admin dashboard riêng                              | Next.js 16, Recharts           |
 
 **Toolchain:** pnpm 10 workspaces, TypeScript 5, ESLint 9, Prettier, Vitest, tsup.
 
@@ -43,10 +43,10 @@ User hits /:code
 
 ### 3.2 `@tiny-link/db`
 
-- **Prisma schema**: 5 models — `Link`, `Click`, `User`, `Account`, `Session`, `VerificationToken`.
+- **Prisma schema**: 3 models — `Link`, `Click`, `User`.
 - **`Link`**: `originalUrl`, `shortCode` (unique), `redirectType` (301/302), `passwordHash`, `maxClicks`, `expiresAt`, `clicksCount`, `metaTitle/Description/Image`, `userId`, `guestId`.
 - **`Click`**: `linkId`, `ipAddress`, `userAgent`, `country`, `city`, `clickedAt` — indexed on `(linkId, clickedAt)`.
-- **`User`**: OAuth user từ Auth.js, có `role` field (user/admin).
+- **`User`**: identity đồng bộ từ Auth0 (`id` = Auth0 `sub`), có `role` field (user/admin).
 - **Prisma adapter**: Dùng `@prisma/adapter-pg` với `pg.Pool` cho kết nối.
 
 ### 3.3 `@tiny-link/server`
@@ -70,13 +70,13 @@ User hits /:code
 - **Framework**: Next.js 16 (App Router) + React 19.
 - **Routing**:
     - `middleware.ts` — 2 lớp: next-intl localization + shadow routing (`/abc` → `/r/abc`).
-    - `proxy.ts` — Auth.js middleware: bảo vệ dashboard, bot detection, inject `x-is-bot` header.
+    - `proxy.ts` — Auth0 middleware: bảo vệ dashboard, bot detection, inject `x-is-bot` header.
 - **Pages**:
     - `/` (landing) — Form tạo link, feature showcase, Framer Motion animations.
     - `/dashboard` — User quản lý link cá nhân (search, delete, pagination).
     - `/stats/[code]` — Chi tiết analytics cho từng link.
     - `/r/[code]` — Redirect page: track click → redirect, hoặc password prompt.
-- **Auth**: Auth.js v5 beta (Google + GitHub OAuth), Prisma adapter, JWT session.
+- **Auth**: Auth0 (Google + GitHub Social Connections via `@auth0/nextjs-auth0`), stateless encrypted-cookie session.
 - **Guest→User Claim**: Khi sign in, tự động gọi API claim các link đã tạo khi chưa đăng nhập.
 - **i18n**: next-intl với 2 locale `en`, `vi`, locale prefix strategy `as-needed`.
 - **UI Components**: shadcn/ui + Base UI, glassmorphism, Framer Motion, Lenis scroll, dark/light theme.
@@ -207,12 +207,11 @@ Render free web service có một hạn chế: **sleep sau 15 phút không hoạ
 - **Root**: `packages/client`
 - **Build order**: `@tiny-link/shared` → `@tiny-link/db` → `@tiny-link/client`
 - **Required env vars** (set trong Vercel Dashboard):
-    - `AUTH_SECRET`, `AUTH_URL`
-    - `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
-    - `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`
+    - `AUTH0_SECRET`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `APP_BASE_URL`
     - `DATABASE_URL` (dùng connection string từ **Neon**)
     - `INTERNAL_API_URL` (URL của **Render** server service, VD: `https://tiny-link-server.onrender.com`)
     - `INTERNAL_API_KEY` (phải khớp với Render)
+    - Auth0 Dashboard: thêm Allowed Callback URL `https://<vercel-domain>/auth/callback` và Allowed Logout URL `https://<vercel-domain>`
 
 ### 7.5 Admin → Vercel (unchanged)
 
