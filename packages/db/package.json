@@ -28,6 +28,7 @@
 		"prisma": "7.6.0"
 	},
 	"devDependencies": {
-		"@types/pg": "^8.11.11"
+		"@types/pg": "^8.11.11",
+		"dotenv": "^17.2.3"
 	}
 }

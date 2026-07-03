@@ -27,7 +27,6 @@ export type UserMinAggregateOutputType = {
 	id: string | null;
 	name: string | null;
 	email: string | null;
-	emailVerified: Date | null;
 	image: string | null;
 	role: string | null;
 	createdAt: Date | null;
@@ -38,7 +37,6 @@ export type UserMaxAggregateOutputType = {
 	id: string | null;
 	name: string | null;
 	email: string | null;
-	emailVerified: Date | null;
 	image: string | null;
 	role: string | null;
 	createdAt: Date | null;
@@ -49,7 +47,6 @@ export type UserCountAggregateOutputType = {
 	id: number;
 	name: number;
 	email: number;
-	emailVerified: number;
 	image: number;
 	role: number;
 	createdAt: number;
@@ -61,7 +58,6 @@ export type UserMinAggregateInputType = {
 	id?: true;
 	name?: true;
 	email?: true;
-	emailVerified?: true;
 	image?: true;
 	role?: true;
 	createdAt?: true;
@@ -72,7 +68,6 @@ export type UserMaxAggregateInputType = {
 	id?: true;
 	name?: true;
 	email?: true;
-	emailVerified?: true;
 	image?: true;
 	role?: true;
 	createdAt?: true;
@@ -83,7 +78,6 @@ export type UserCountAggregateInputType = {
 	id?: true;
 	name?: true;
 	email?: true;
-	emailVerified?: true;
 	image?: true;
 	role?: true;
 	createdAt?: true;
@@ -168,7 +162,6 @@ export type UserGroupByOutputType = {
 	id: string;
 	name: string | null;
 	email: string;
-	emailVerified: Date | null;
 	image: string | null;
 	role: string | null;
 	createdAt: Date;
@@ -197,13 +190,10 @@ export type UserWhereInput = {
 	id?: Prisma.StringFilter<'User'> | string;
 	name?: Prisma.StringNullableFilter<'User'> | string | null;
 	email?: Prisma.StringFilter<'User'> | string;
-	emailVerified?: Prisma.DateTimeNullableFilter<'User'> | Date | string | null;
 	image?: Prisma.StringNullableFilter<'User'> | string | null;
 	role?: Prisma.StringNullableFilter<'User'> | string | null;
 	createdAt?: Prisma.DateTimeFilter<'User'> | Date | string;
 	updatedAt?: Prisma.DateTimeFilter<'User'> | Date | string;
-	accounts?: Prisma.AccountListRelationFilter;
-	sessions?: Prisma.SessionListRelationFilter;
 	links?: Prisma.LinkListRelationFilter;
 };
 
@@ -211,13 +201,10 @@ export type UserOrderByWithRelationInput = {
 	id?: Prisma.SortOrder;
 	name?: Prisma.SortOrderInput | Prisma.SortOrder;
 	email?: Prisma.SortOrder;
-	emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder;
 	image?: Prisma.SortOrderInput | Prisma.SortOrder;
 	role?: Prisma.SortOrderInput | Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
 	updatedAt?: Prisma.SortOrder;
-	accounts?: Prisma.AccountOrderByRelationAggregateInput;
-	sessions?: Prisma.SessionOrderByRelationAggregateInput;
 	links?: Prisma.LinkOrderByRelationAggregateInput;
 };
 
@@ -229,13 +216,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
 		OR?: Prisma.UserWhereInput[];
 		NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[];
 		name?: Prisma.StringNullableFilter<'User'> | string | null;
-		emailVerified?: Prisma.DateTimeNullableFilter<'User'> | Date | string | null;
 		image?: Prisma.StringNullableFilter<'User'> | string | null;
 		role?: Prisma.StringNullableFilter<'User'> | string | null;
 		createdAt?: Prisma.DateTimeFilter<'User'> | Date | string;
 		updatedAt?: Prisma.DateTimeFilter<'User'> | Date | string;
-		accounts?: Prisma.AccountListRelationFilter;
-		sessions?: Prisma.SessionListRelationFilter;
 		links?: Prisma.LinkListRelationFilter;
 	},
 	'id' | 'email'
@@ -245,7 +229,6 @@ export type UserOrderByWithAggregationInput = {
 	id?: Prisma.SortOrder;
 	name?: Prisma.SortOrderInput | Prisma.SortOrder;
 	email?: Prisma.SortOrder;
-	emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder;
 	image?: Prisma.SortOrderInput | Prisma.SortOrder;
 	role?: Prisma.SortOrderInput | Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
@@ -262,7 +245,6 @@ export type UserScalarWhereWithAggregatesInput = {
 	id?: Prisma.StringWithAggregatesFilter<'User'> | string;
 	name?: Prisma.StringNullableWithAggregatesFilter<'User'> | string | null;
 	email?: Prisma.StringWithAggregatesFilter<'User'> | string;
-	emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<'User'> | Date | string | null;
 	image?: Prisma.StringNullableWithAggregatesFilter<'User'> | string | null;
 	role?: Prisma.StringNullableWithAggregatesFilter<'User'> | string | null;
 	createdAt?: Prisma.DateTimeWithAggregatesFilter<'User'> | Date | string;
@@ -270,30 +252,24 @@ export type UserScalarWhereWithAggregatesInput = {
 };
 
 export type UserCreateInput = {
-	id?: string;
+	id: string;
 	name?: string | null;
 	email: string;
-	emailVerified?: Date | string | null;
 	image?: string | null;
 	role?: string | null;
 	createdAt?: Date | string;
 	updatedAt?: Date | string;
-	accounts?: Prisma.AccountCreateNestedManyWithoutUserInput;
-	sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
 	links?: Prisma.LinkCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateInput = {
-	id?: string;
+	id: string;
 	name?: string | null;
 	email: string;
-	emailVerified?: Date | string | null;
 	image?: string | null;
 	role?: string | null;
 	createdAt?: Date | string;
 	updatedAt?: Date | string;
-	accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput;
-	sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
 	links?: Prisma.LinkUncheckedCreateNestedManyWithoutUserInput;
 };
 
@@ -301,13 +277,10 @@ export type UserUpdateInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput;
-	sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
 	links?: Prisma.LinkUpdateManyWithoutUserNestedInput;
 };
 
@@ -315,21 +288,17 @@ export type UserUncheckedUpdateInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
-	sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
 	links?: Prisma.LinkUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateManyInput = {
-	id?: string;
+	id: string;
 	name?: string | null;
 	email: string;
-	emailVerified?: Date | string | null;
 	image?: string | null;
 	role?: string | null;
 	createdAt?: Date | string;
@@ -340,7 +309,6 @@ export type UserUpdateManyMutationInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -351,7 +319,6 @@ export type UserUncheckedUpdateManyInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -367,7 +334,6 @@ export type UserCountOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
 	name?: Prisma.SortOrder;
 	email?: Prisma.SortOrder;
-	emailVerified?: Prisma.SortOrder;
 	image?: Prisma.SortOrder;
 	role?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
@@ -378,7 +344,6 @@ export type UserMaxOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
 	name?: Prisma.SortOrder;
 	email?: Prisma.SortOrder;
-	emailVerified?: Prisma.SortOrder;
 	image?: Prisma.SortOrder;
 	role?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
@@ -389,16 +354,10 @@ export type UserMinOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
 	name?: Prisma.SortOrder;
 	email?: Prisma.SortOrder;
-	emailVerified?: Prisma.SortOrder;
 	image?: Prisma.SortOrder;
 	role?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
 	updatedAt?: Prisma.SortOrder;
-};
-
-export type UserScalarRelationFilter = {
-	is?: Prisma.UserWhereInput;
-	isNot?: Prisma.UserWhereInput;
 };
 
 export type UserCreateNestedOneWithoutLinksInput = {
@@ -420,64 +379,24 @@ export type UserUpdateOneWithoutLinksNestedInput = {
 	>;
 };
 
-export type UserCreateNestedOneWithoutAccountsInput = {
-	create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>;
-	connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput;
-	connect?: Prisma.UserWhereUniqueInput;
-};
-
-export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
-	create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>;
-	connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput;
-	upsert?: Prisma.UserUpsertWithoutAccountsInput;
-	connect?: Prisma.UserWhereUniqueInput;
-	update?: Prisma.XOR<
-		Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountsInput, Prisma.UserUpdateWithoutAccountsInput>,
-		Prisma.UserUncheckedUpdateWithoutAccountsInput
-	>;
-};
-
-export type UserCreateNestedOneWithoutSessionsInput = {
-	create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>;
-	connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput;
-	connect?: Prisma.UserWhereUniqueInput;
-};
-
-export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
-	create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>;
-	connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput;
-	upsert?: Prisma.UserUpsertWithoutSessionsInput;
-	connect?: Prisma.UserWhereUniqueInput;
-	update?: Prisma.XOR<
-		Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>,
-		Prisma.UserUncheckedUpdateWithoutSessionsInput
-	>;
-};
-
 export type UserCreateWithoutLinksInput = {
-	id?: string;
+	id: string;
 	name?: string | null;
 	email: string;
-	emailVerified?: Date | string | null;
 	image?: string | null;
 	role?: string | null;
 	createdAt?: Date | string;
 	updatedAt?: Date | string;
-	accounts?: Prisma.AccountCreateNestedManyWithoutUserInput;
-	sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutLinksInput = {
-	id?: string;
+	id: string;
 	name?: string | null;
 	email: string;
-	emailVerified?: Date | string | null;
 	image?: string | null;
 	role?: string | null;
 	createdAt?: Date | string;
 	updatedAt?: Date | string;
-	accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput;
-	sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutLinksInput = {
@@ -500,162 +419,20 @@ export type UserUpdateWithoutLinksInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput;
-	sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutLinksInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
 	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
-	sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
-};
-
-export type UserCreateWithoutAccountsInput = {
-	id?: string;
-	name?: string | null;
-	email: string;
-	emailVerified?: Date | string | null;
-	image?: string | null;
-	role?: string | null;
-	createdAt?: Date | string;
-	updatedAt?: Date | string;
-	sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
-	links?: Prisma.LinkCreateNestedManyWithoutUserInput;
-};
-
-export type UserUncheckedCreateWithoutAccountsInput = {
-	id?: string;
-	name?: string | null;
-	email: string;
-	emailVerified?: Date | string | null;
-	image?: string | null;
-	role?: string | null;
-	createdAt?: Date | string;
-	updatedAt?: Date | string;
-	sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
-	links?: Prisma.LinkUncheckedCreateNestedManyWithoutUserInput;
-};
-
-export type UserCreateOrConnectWithoutAccountsInput = {
-	where: Prisma.UserWhereUniqueInput;
-	create: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>;
-};
-
-export type UserUpsertWithoutAccountsInput = {
-	update: Prisma.XOR<Prisma.UserUpdateWithoutAccountsInput, Prisma.UserUncheckedUpdateWithoutAccountsInput>;
-	create: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>;
-	where?: Prisma.UserWhereInput;
-};
-
-export type UserUpdateToOneWithWhereWithoutAccountsInput = {
-	where?: Prisma.UserWhereInput;
-	data: Prisma.XOR<Prisma.UserUpdateWithoutAccountsInput, Prisma.UserUncheckedUpdateWithoutAccountsInput>;
-};
-
-export type UserUpdateWithoutAccountsInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
-	links?: Prisma.LinkUpdateManyWithoutUserNestedInput;
-};
-
-export type UserUncheckedUpdateWithoutAccountsInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
-	links?: Prisma.LinkUncheckedUpdateManyWithoutUserNestedInput;
-};
-
-export type UserCreateWithoutSessionsInput = {
-	id?: string;
-	name?: string | null;
-	email: string;
-	emailVerified?: Date | string | null;
-	image?: string | null;
-	role?: string | null;
-	createdAt?: Date | string;
-	updatedAt?: Date | string;
-	accounts?: Prisma.AccountCreateNestedManyWithoutUserInput;
-	links?: Prisma.LinkCreateNestedManyWithoutUserInput;
-};
-
-export type UserUncheckedCreateWithoutSessionsInput = {
-	id?: string;
-	name?: string | null;
-	email: string;
-	emailVerified?: Date | string | null;
-	image?: string | null;
-	role?: string | null;
-	createdAt?: Date | string;
-	updatedAt?: Date | string;
-	accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput;
-	links?: Prisma.LinkUncheckedCreateNestedManyWithoutUserInput;
-};
-
-export type UserCreateOrConnectWithoutSessionsInput = {
-	where: Prisma.UserWhereUniqueInput;
-	create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>;
-};
-
-export type UserUpsertWithoutSessionsInput = {
-	update: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>;
-	create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>;
-	where?: Prisma.UserWhereInput;
-};
-
-export type UserUpdateToOneWithWhereWithoutSessionsInput = {
-	where?: Prisma.UserWhereInput;
-	data: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>;
-};
-
-export type UserUpdateWithoutSessionsInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput;
-	links?: Prisma.LinkUpdateManyWithoutUserNestedInput;
-};
-
-export type UserUncheckedUpdateWithoutSessionsInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	email?: Prisma.StringFieldUpdateOperationsInput | string;
-	emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-	image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-	accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
-	links?: Prisma.LinkUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 /**
@@ -663,16 +440,12 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
  */
 
 export type UserCountOutputType = {
-	accounts: number;
-	sessions: number;
 	links: number;
 };
 
 export type UserCountOutputTypeSelect<
 	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
-	accounts?: boolean | UserCountOutputTypeCountAccountsArgs;
-	sessions?: boolean | UserCountOutputTypeCountSessionsArgs;
 	links?: boolean | UserCountOutputTypeCountLinksArgs;
 };
 
@@ -691,24 +464,6 @@ export type UserCountOutputTypeDefaultArgs<
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAccountsArgs<
-	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-	where?: Prisma.AccountWhereInput;
-};
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountSessionsArgs<
-	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-	where?: Prisma.SessionWhereInput;
-};
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountLinksArgs<
 	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
@@ -721,13 +476,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 			id?: boolean;
 			name?: boolean;
 			email?: boolean;
-			emailVerified?: boolean;
 			image?: boolean;
 			role?: boolean;
 			createdAt?: boolean;
 			updatedAt?: boolean;
-			accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>;
-			sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
 			links?: boolean | Prisma.User$linksArgs<ExtArgs>;
 			_count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 		},
@@ -741,7 +493,6 @@ export type UserSelectCreateManyAndReturn<
 		id?: boolean;
 		name?: boolean;
 		email?: boolean;
-		emailVerified?: boolean;
 		image?: boolean;
 		role?: boolean;
 		createdAt?: boolean;
@@ -757,7 +508,6 @@ export type UserSelectUpdateManyAndReturn<
 		id?: boolean;
 		name?: boolean;
 		email?: boolean;
-		emailVerified?: boolean;
 		image?: boolean;
 		role?: boolean;
 		createdAt?: boolean;
@@ -770,7 +520,6 @@ export type UserSelectScalar = {
 	id?: boolean;
 	name?: boolean;
 	email?: boolean;
-	emailVerified?: boolean;
 	image?: boolean;
 	role?: boolean;
 	createdAt?: boolean;
@@ -779,13 +528,11 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
 	runtime.Types.Extensions.GetOmit<
-		'id' | 'name' | 'email' | 'emailVerified' | 'image' | 'role' | 'createdAt' | 'updatedAt',
+		'id' | 'name' | 'email' | 'image' | 'role' | 'createdAt' | 'updatedAt',
 		ExtArgs['result']['user']
 	>;
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
 	{
-		accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>;
-		sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
 		links?: boolean | Prisma.User$linksArgs<ExtArgs>;
 		_count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 	};
@@ -800,8 +547,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 	{
 		name: 'User';
 		objects: {
-			accounts: Prisma.$AccountPayload<ExtArgs>[];
-			sessions: Prisma.$SessionPayload<ExtArgs>[];
 			links: Prisma.$LinkPayload<ExtArgs>[];
 		};
 		scalars: runtime.Types.Extensions.GetPayloadResult<
@@ -809,7 +554,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 				id: string;
 				name: string | null;
 				email: string;
-				emailVerified: Date | null;
 				image: string | null;
 				role: string | null;
 				createdAt: Date;
@@ -1294,16 +1038,6 @@ export interface Prisma__UserClient<
 	GlobalOmitOptions = {},
 > extends Prisma.PrismaPromise<T> {
 	readonly [Symbol.toStringTag]: 'PrismaPromise';
-	accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(
-		args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>,
-	): Prisma.PrismaPromise<
-		runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, 'findMany', GlobalOmitOptions> | Null
-	>;
-	sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(
-		args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>,
-	): Prisma.PrismaPromise<
-		runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, 'findMany', GlobalOmitOptions> | Null
-	>;
 	links<T extends Prisma.User$linksArgs<ExtArgs> = {}>(
 		args?: Prisma.Subset<T, Prisma.User$linksArgs<ExtArgs>>,
 	): Prisma.PrismaPromise<
@@ -1343,7 +1077,6 @@ export interface UserFieldRefs {
 	readonly id: Prisma.FieldRef<'User', 'String'>;
 	readonly name: Prisma.FieldRef<'User', 'String'>;
 	readonly email: Prisma.FieldRef<'User', 'String'>;
-	readonly emailVerified: Prisma.FieldRef<'User', 'DateTime'>;
 	readonly image: Prisma.FieldRef<'User', 'String'>;
 	readonly role: Prisma.FieldRef<'User', 'String'>;
 	readonly createdAt: Prisma.FieldRef<'User', 'DateTime'>;
@@ -1765,58 +1498,6 @@ export type UserDeleteManyArgs<
 	 * Limit how many Users to delete.
 	 */
 	limit?: number;
-};
-
-/**
- * User.accounts
- */
-export type User$accountsArgs<
-	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-	/**
-	 * Select specific fields to fetch from the Account
-	 */
-	select?: Prisma.AccountSelect<ExtArgs> | null;
-	/**
-	 * Omit specific fields from the Account
-	 */
-	omit?: Prisma.AccountOmit<ExtArgs> | null;
-	/**
-	 * Choose, which related nodes to fetch as well
-	 */
-	include?: Prisma.AccountInclude<ExtArgs> | null;
-	where?: Prisma.AccountWhereInput;
-	orderBy?: Prisma.AccountOrderByWithRelationInput | Prisma.AccountOrderByWithRelationInput[];
-	cursor?: Prisma.AccountWhereUniqueInput;
-	take?: number;
-	skip?: number;
-	distinct?: Prisma.AccountScalarFieldEnum | Prisma.AccountScalarFieldEnum[];
-};
-
-/**
- * User.sessions
- */
-export type User$sessionsArgs<
-	ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-	/**
-	 * Select specific fields to fetch from the Session
-	 */
-	select?: Prisma.SessionSelect<ExtArgs> | null;
-	/**
-	 * Omit specific fields from the Session
-	 */
-	omit?: Prisma.SessionOmit<ExtArgs> | null;
-	/**
-	 * Choose, which related nodes to fetch as well
-	 */
-	include?: Prisma.SessionInclude<ExtArgs> | null;
-	where?: Prisma.SessionWhereInput;
-	orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[];
-	cursor?: Prisma.SessionWhereUniqueInput;
-	take?: number;
-	skip?: number;
-	distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[];
 };
 
 /**

@@ -10,7 +10,4 @@
 export type * from './models/Link';
 export type * from './models/Click';
 export type * from './models/User';
-export type * from './models/Account';
-export type * from './models/Session';
-export type * from './models/VerificationToken';
 export type * from './commonInputTypes';

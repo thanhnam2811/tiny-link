@@ -15,6 +15,10 @@ export const auth0 = new Auth0Client({
 
 		const { user } = session;
 
+		if (!user.email) {
+			return NextResponse.redirect(new URL('/login?error=no_email', getEnv('APP_BASE_URL')));
+		}
+
 		await prisma.user.upsert({
 			where: { id: user.sub },
 			update: {
