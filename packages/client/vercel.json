@@ -4,5 +4,5 @@
 	"installCommand": "cd ../.. && pnpm install --frozen-lockfile",
 	"buildCommand": "cd ../.. && pnpm --filter @tiny-link/shared build && pnpm --filter @tiny-link/db build && pnpm --filter @tiny-link/client build",
 	"outputDirectory": ".next",
-	"ignoreCommand": "npx turbo-ignore"
+	"ignoreCommand": "git diff --quiet HEAD^ HEAD -- packages/client packages/shared packages/db"
 }
