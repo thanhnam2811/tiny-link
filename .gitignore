@@ -16,3 +16,12 @@ coverage/
 tsconfig.tsbuildinfo
 packages/db/generated/
 packages/db/generated-client/
+
+# Local Claude Code state (per-machine)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# AI agent skill content — regenerated from skills-lock.json (see: pnpm skills:install)
+# skills-lock.json itself IS committed; treat these dirs like node_modules/
+.agents/
+.claude/skills/

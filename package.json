@@ -20,6 +20,7 @@
 		"test": "pnpm --recursive run test",
 		"format": "prettier --write .",
 		"version:bump": "node scripts/bump-version.mjs",
+		"skills:install": "npx --yes skills experimental_install -a claude-code -y",
 		"prepare": "husky"
 	},
 	"lint-staged": {

@@ -4,47 +4,56 @@
 		"docker-expert": {
 			"source": "sickn33/antigravity-awesome-skills",
 			"sourceType": "github",
-			"computedHash": "51defa57449d1e7a3e51ae6444c111c4424cd47ed1fb96a3eb1dba0c17971c0d"
+			"skillPath": "skills/docker-expert/SKILL.md",
+			"computedHash": "7be30b1c18b91628dcd8437a89e7e20acce76bae4349533e4ebdeb376a660bcb"
 		},
 		"fastify-best-practices": {
 			"source": "mcollina/skills",
 			"sourceType": "github",
-			"computedHash": "269924684709b8c6f50a569ef988e66031efb822ef92cba6c8dfa160e54ed4d4"
-		},
-		"next-best-practices": {
-			"source": "vercel-labs/next-skills",
-			"sourceType": "github",
-			"computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
+			"skillPath": "skills/fastify/SKILL.md",
+			"computedHash": "b3a771fa66bc5d8dac0af14e99e51fca2ff4a9add56f09d986778528bdf72c4c"
 		},
 		"pnpm": {
 			"source": "antfu/skills",
 			"sourceType": "github",
-			"computedHash": "318f9fca2441a3e06fedc336e195dd18be5dbe901064e4fa71b76b40b096ab3a"
+			"skillPath": "skills/pnpm/SKILL.md",
+			"computedHash": "20bca721bb934e39c8ff2dc3df2cd1712f9efb5419afe2cb847267f6fe0eacbc"
 		},
 		"prisma-database-setup": {
 			"source": "prisma/skills",
 			"sourceType": "github",
-			"computedHash": "b05e88d284c4a754d3624697c2f749e21f7da3fc1f4319b6658df318e84b0dd9"
+			"skillPath": "prisma-database-setup/SKILL.md",
+			"computedHash": "0d6f44ac34b1ed3f8ed2970ecf90483d0f658fd1d204458f62bfefa28f31b095"
 		},
 		"shadcn": {
 			"source": "shadcn/ui",
 			"sourceType": "github",
-			"computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
+			"skillPath": "skills/shadcn/SKILL.md",
+			"computedHash": "4f78ff7cd3a4f637b6fe30dbbab4a80a19dd63fa62d9352bed461ccfdbcbbf43"
 		},
 		"tailwind-design-system": {
 			"source": "wshobson/agents",
 			"sourceType": "github",
-			"computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
+			"skillPath": "plugins/frontend-mobile-development/skills/tailwind-design-system/SKILL.md",
+			"computedHash": "992ab1e874c4f4159aa18d4ff45d1c3f86f322f0bd2a6744cc32f7d6147f9f06"
 		},
 		"typescript-advanced-types": {
 			"source": "wshobson/agents",
 			"sourceType": "github",
-			"computedHash": "3a3be8c925f96ac4e1280db28a01677e7ca5197f3792de2bbf35ab3bb324b6dd"
+			"skillPath": "plugins/javascript-typescript/skills/typescript-advanced-types/SKILL.md",
+			"computedHash": "bc33bc9653d649a461e49abe45634b6b11a7aeeae552b05ec4d54d4589d16739"
 		},
 		"ui-ux-pro-max": {
 			"source": "nextlevelbuilder/ui-ux-pro-max-skill",
 			"sourceType": "github",
-			"computedHash": "0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d"
+			"skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+			"computedHash": "90739ddf380aa66d4fff7ba7767a0a6537a1e8287e5c5c408676e0a9e6b2c21d"
+		},
+		"vitest": {
+			"source": "antfu/skills",
+			"sourceType": "github",
+			"skillPath": "skills/vitest/SKILL.md",
+			"computedHash": "3594bf6d97ca50836c611d8b1907322888c03d2c41b2f26761e644b8e67fe106"
 		}
 	}
 }
