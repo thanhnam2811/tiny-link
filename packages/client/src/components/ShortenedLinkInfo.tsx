@@ -3,9 +3,10 @@
 import { Button } from '@/components/ui/button';
 import { Check, Copy, Download, PlusCircle, BarChart2, Sparkles } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { downloadSvgElement } from '@/lib/download';
 
 interface ShortenedLinkInfoProps {
 	shortUrl: string;
@@ -14,6 +15,7 @@ interface ShortenedLinkInfoProps {
 
 export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps) {
 	const [isCopied, setIsCopied] = useState(false);
+	const qrRef = useRef<SVGSVGElement>(null);
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(shortUrl);
@@ -23,16 +25,8 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 	};
 
 	const downloadQr = () => {
-		const svg = document.getElementById('qr-code-svg');
-		if (!svg) return;
-		const svgData = new XMLSerializer().serializeToString(svg);
-		const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'tinylink-qr.svg';
-		a.click();
-		URL.revokeObjectURL(url);
+		if (!qrRef.current) return;
+		downloadSvgElement(qrRef.current, 'tinylink-qr.svg', 'svg');
 	};
 
 	return (
@@ -125,7 +119,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 				<div className="flex items-center gap-5">
 					<div className="p-2 bg-white rounded-lg border shadow-sm flex items-center justify-center relative group">
 						<QRCodeSVG
-							id="qr-code-svg"
+							ref={qrRef}
 							value={shortUrl}
 							size={60}
 							level="L"

@@ -8,9 +8,9 @@ Add power-user and growth-oriented features on top of the existing link model an
 
 #### 📋 Checklist
 
-- [ ] **QR Code Generation**:
-    - [ ] Generate a QR code per short link (server-side or client-side library).
-    - [ ] Downloadable as PNG/SVG from the Dashboard and Stats pages.
+- [x] **QR Code Generation**:
+    - [x] Generate a QR code per short link (server-side or client-side library).
+    - [x] Downloadable as PNG/SVG from the Dashboard and Stats pages.
 - [ ] **Bulk Link Import/Export**:
     - [ ] CSV upload to batch-create links (validate rows, skip/report malformed entries, reuse existing collision handling).
     - [ ] CSV export of the current user's links from the Dashboard.

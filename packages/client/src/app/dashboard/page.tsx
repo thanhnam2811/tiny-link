@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { BarChart2, Trash2, Search, Link as LinkIcon, Plus, ExternalLink } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { LinkQrCode } from '@/components/LinkQrCode';
+import { BarChart2, Trash2, Search, Link as LinkIcon, Plus, ExternalLink, QrCode } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -13,7 +15,6 @@ interface DashboardLink {
 	id: string;
 	shortCode: string;
 	originalUrl: string;
-	shortUrl: string;
 	clicksCount: number;
 	createdAt: string;
 	isActive: boolean;
@@ -191,6 +192,19 @@ export default function DashboardPage() {
 												<BarChart2 className="h-4 w-4" />
 											</button>
 										</Link>
+										<Popover>
+											<PopoverTrigger
+												title="Generate QR code"
+												className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
+											>
+												<QrCode className="h-4 w-4" />
+											</PopoverTrigger>
+											<PopoverContent align="end" className="w-auto">
+												<LinkQrCode
+													shortUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${link.shortCode}`}
+												/>
+											</PopoverContent>
+										</Popover>
 										<button
 											onClick={() => handleDelete(link.id, link.shortCode)}
 											disabled={deletingId === link.id}
