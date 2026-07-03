@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -70,14 +71,16 @@ export function Header() {
 								</Avatar>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className="w-56" align="end">
-								<DropdownMenuLabel>
-									<div className="flex flex-col gap-0.5">
-										<p className="font-heading text-sm font-bold leading-none text-foreground">
-											{user.name}
-										</p>
-										<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-									</div>
-								</DropdownMenuLabel>
+								<DropdownMenuGroup>
+									<DropdownMenuLabel>
+										<div className="flex flex-col gap-0.5">
+											<p className="font-heading text-sm font-bold leading-none text-foreground">
+												{user.name}
+											</p>
+											<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+										</div>
+									</DropdownMenuLabel>
+								</DropdownMenuGroup>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem render={<Link href="/dashboard" />}>
 									<LayoutDashboard className="h-4 w-4" />
