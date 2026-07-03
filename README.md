@@ -18,7 +18,7 @@
 - **Link expiration** — set TTL per link
 - **QR code generation** — built-in QR for every short link
 - **Guest → user link claiming** — create links as a guest, claim them on sign-in
-- **OAuth authentication** — Google & GitHub via Auth.js v5
+- **OAuth authentication** — Google & GitHub via Auth0
 - **User dashboard** — manage, search, and delete your links
 - **Admin dashboard** — full system analytics, link management, geo distribution charts
 - **Bot detection & edge middleware** — filter bots at the edge, inject OpenGraph metadata
@@ -89,7 +89,7 @@ tiny-link/
 | **Backend**            | Fastify 5, Node.js 24, Pino logging                         |
 | **Database**           | PostgreSQL 17 + Prisma 7 ORM                                |
 | **Cache / Rate Limit** | Redis 7 + ioredis                                           |
-| **Auth**               | Auth.js (NextAuth) v5 beta — Google & GitHub OAuth          |
+| **Auth**               | Auth0 — Google & GitHub OAuth                               |
 | **Charts**             | Recharts                                                    |
 | **UI Components**      | shadcn/ui, Base UI                                          |
 | **Validation**         | Zod (client), TypeBox (server)                              |
