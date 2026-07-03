@@ -192,17 +192,16 @@ The `docker-compose.yml` includes:
 
 ### Client (`packages/client/.env`)
 
-| Variable             | Description                              | Required |
-| -------------------- | ---------------------------------------- | -------- |
-| `AUTH_SECRET`        | NextAuth secret                          | ✅       |
-| `AUTH_URL`           | Public URL of the client app             | ✅       |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID                   | OAuth    |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret               | OAuth    |
-| `AUTH_GITHUB_ID`     | GitHub OAuth client ID                   | OAuth    |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret               | OAuth    |
-| `DATABASE_URL`       | PostgreSQL URL (for Prisma Auth adapter) | ✅       |
-| `INTERNAL_API_URL`   | Fastify server base URL                  | ✅       |
-| `INTERNAL_API_KEY`   | Shared secret matching server            | ✅       |
+| Variable              | Description                                         | Required |
+| --------------------- | --------------------------------------------------- | -------- |
+| `AUTH0_SECRET`        | 32-byte hex secret for encrypting session cookies   | ✅       |
+| `AUTH0_DOMAIN`        | Auth0 tenant domain                                 | ✅       |
+| `AUTH0_CLIENT_ID`     | Auth0 application client ID                         | ✅       |
+| `AUTH0_CLIENT_SECRET` | Auth0 application client secret                     | ✅       |
+| `APP_BASE_URL`        | Public URL of the client app                        | ✅       |
+| `DATABASE_URL`        | PostgreSQL URL (local User table synced from Auth0) | ✅       |
+| `INTERNAL_API_URL`    | Fastify server base URL                             | ✅       |
+| `INTERNAL_API_KEY`    | Shared secret matching server                       | ✅       |
 
 ---
 

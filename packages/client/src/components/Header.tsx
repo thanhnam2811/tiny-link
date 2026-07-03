@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useUser } from '@auth0/nextjs-auth0';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,8 +18,7 @@ import { LayoutDashboard, LogOut, Link as LinkIcon, User } from 'lucide-react';
 
 export function Header() {
 	const [scrolled, setScrolled] = useState(false);
-	const { data: session, status } = useSession();
-	const isLoading = status === 'loading';
+	const { user, isLoading } = useUser();
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 12);
@@ -43,7 +42,7 @@ export function Header() {
 						<span className="text-xl font-heading font-bold tracking-tight">TinyLink</span>
 					</Link>
 
-					{session && (
+					{user && (
 						<nav className="hidden md:flex items-center gap-4">
 							<Link
 								href="/dashboard"
@@ -60,13 +59,13 @@ export function Header() {
 
 					{isLoading ? (
 						<div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
-					) : session ? (
+					) : user ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger className="cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
 								<Avatar>
-									<AvatarImage src={session.user?.image ?? ''} alt={session.user?.name ?? ''} />
+									<AvatarImage src={user.picture ?? ''} alt={user.name ?? ''} />
 									<AvatarFallback className="bg-primary text-primary-foreground font-heading">
-										{session.user?.name?.charAt(0) || <User className="h-4 w-4" />}
+										{user.name?.charAt(0) || <User className="h-4 w-4" />}
 									</AvatarFallback>
 								</Avatar>
 							</DropdownMenuTrigger>
@@ -74,11 +73,9 @@ export function Header() {
 								<DropdownMenuLabel>
 									<div className="flex flex-col gap-0.5">
 										<p className="font-heading text-sm font-bold leading-none text-foreground">
-											{session.user?.name}
+											{user.name}
 										</p>
-										<p className="text-xs leading-none text-muted-foreground">
-											{session.user?.email}
-										</p>
+										<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
@@ -87,7 +84,9 @@ export function Header() {
 									<span>Dashboard</span>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem variant="destructive" onClick={() => signOut({ callbackUrl: '/' })}>
+								{/* Plain anchor: /auth/logout is handled by Auth0 middleware, not a Next.js route */}
+								{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+								<DropdownMenuItem variant="destructive" render={<a href="/auth/logout?returnTo=/" />}>
 									<LogOut className="h-4 w-4" />
 									<span>Sign out</span>
 								</DropdownMenuItem>

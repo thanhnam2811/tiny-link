@@ -1,6 +1,5 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Github, Mail } from 'lucide-react';
@@ -9,7 +8,7 @@ import { Suspense } from 'react';
 
 function LoginForm() {
 	const searchParams = useSearchParams();
-	const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+	const returnTo = searchParams.get('callbackUrl') || '/dashboard';
 
 	return (
 		<main className="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center bg-background p-6">
@@ -25,7 +24,9 @@ function LoginForm() {
 					<Button
 						variant="outline"
 						className="h-11 gap-3 text-sm font-semibold"
-						onClick={() => signIn('google', { callbackUrl })}
+						render={
+							<a href={`/auth/login?connection=google-oauth2&returnTo=${encodeURIComponent(returnTo)}`} />
+						}
 					>
 						<Mail className="h-4 w-4" />
 						Continue with Google
@@ -33,7 +34,7 @@ function LoginForm() {
 					<Button
 						variant="outline"
 						className="h-11 gap-3 text-sm font-semibold"
-						onClick={() => signIn('github', { callbackUrl })}
+						render={<a href={`/auth/login?connection=github&returnTo=${encodeURIComponent(returnTo)}`} />}
 					>
 						<Github className="h-4 w-4" />
 						Continue with GitHub

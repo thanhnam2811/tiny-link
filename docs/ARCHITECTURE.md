@@ -207,12 +207,11 @@ Render free web service có một hạn chế: **sleep sau 15 phút không hoạ
 - **Root**: `packages/client`
 - **Build order**: `@tiny-link/shared` → `@tiny-link/db` → `@tiny-link/client`
 - **Required env vars** (set trong Vercel Dashboard):
-    - `AUTH_SECRET`, `AUTH_URL`
-    - `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
-    - `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`
+    - `AUTH0_SECRET`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `APP_BASE_URL`
     - `DATABASE_URL` (dùng connection string từ **Neon**)
     - `INTERNAL_API_URL` (URL của **Render** server service, VD: `https://tiny-link-server.onrender.com`)
     - `INTERNAL_API_KEY` (phải khớp với Render)
+    - Auth0 Dashboard: thêm Allowed Callback URL `https://<vercel-domain>/auth/callback` và Allowed Logout URL `https://<vercel-domain>`
 
 ### 7.5 Admin → Vercel (unchanged)
 
