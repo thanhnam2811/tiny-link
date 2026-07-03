@@ -2,7 +2,7 @@
 
 @docs/lessons.md
 
-TinyLink is a full-stack URL shortener: pnpm monorepo, Fastify API + two Next.js apps (public client, admin), Prisma/PostgreSQL, Redis. Full design docs: `docs/ARCHITECTURE.md` (system design), `docs/ROADMAP.md` (phase status), `docs/workflow.md` (dev/test/preview loop), `docs/release.md` (branch → PR → deploy flow — read before cutting a release or bumping version), `README.md` (setup, env vars, scripts).
+TinyLink is a full-stack URL shortener: pnpm monorepo, Fastify API + two Next.js apps (public client, admin), Prisma/PostgreSQL, Redis. Full design docs: `docs/ARCHITECTURE.md` (system design), `docs/roadmap/` (phase status, one file per phase — see `docs/roadmap/README.md` for the index and `docs/roadmap/backlog-ideas.md` for unscheduled ideas), `docs/workflow.md` (dev/test/preview loop), `docs/release.md` (branch → PR → deploy flow — read before cutting a release or bumping version), `README.md` (setup, env vars, scripts).
 
 ## Operating protocol (binding)
 
