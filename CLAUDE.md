@@ -1,6 +1,6 @@
 # TinyLink — Claude Code Guide
 
-@lessons.md
+@docs/lessons.md
 
 TinyLink is a full-stack URL shortener: pnpm monorepo, Fastify API + two Next.js apps (public client, admin), Prisma/PostgreSQL, Redis. Full design docs: `docs/ARCHITECTURE.md` (system design), `docs/ROADMAP.md` (phase status), `docs/workflow.md` (dev/test/preview loop), `docs/release.md` (branch → PR → deploy flow — read before cutting a release or bumping version), `README.md` (setup, env vars, scripts).
 
@@ -28,9 +28,9 @@ TinyLink is a full-stack URL shortener: pnpm monorepo, Fastify API + two Next.js
 
 ### 3. Continuous Self-Improvement Loop
 
-- **Knowledge Distillation**: Upon task completion or solving a complex bug, the Agent must document the findings in `lessons.md` (imported above).
+- **Knowledge Distillation**: Upon task completion or solving a complex bug, the Agent must document the findings in `docs/lessons.md` (imported above).
 - **Lean Learning**: Insights must be concise, focusing on the "Root Cause" and "Prevention Strategy" to avoid repeating the same mistakes.
-- **Pre-flight Review**: Before starting any new task, the Agent must review `lessons.md` to ensure past errors are not reintroduced.
+- **Pre-flight Review**: Before starting any new task, the Agent must review `docs/lessons.md` to ensure past errors are not reintroduced.
 
 ### 4. Definition of Done (DoD)
 
@@ -90,7 +90,7 @@ pnpm build                  # clean + shared → db → recursive build
 - **Two separate DB URLs matter**: server uses `packages/server/.env`, client also talks to Postgres directly via `packages/client/.env` (`DATABASE_URL`) to sync the Auth0-derived `User` table — check both when touching connection config.
 - **`INTERNAL_API_KEY`** must match between `client`/`admin` and `server` env files — client/admin never call Postgres/Redis directly for link/analytics data, only through the Fastify API.
 - **Windows shell**: Bash tool runs Git Bash (POSIX); PowerShell tool is also available. `entrypoint.sh` and Docker-related scripts are POSIX-only and only run inside containers, not natively on Windows.
-- More detailed root-cause writeups (Prisma monorepo builds, Framer Motion typing, pnpm peer deps, Fastify DI decorators) are in `lessons.md`, imported above.
+- More detailed root-cause writeups (Prisma monorepo builds, Framer Motion typing, pnpm peer deps, Fastify DI decorators) are in `docs/lessons.md`, imported above.
 
 ## Skills available for this project
 
