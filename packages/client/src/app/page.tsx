@@ -116,7 +116,7 @@ export default function Home() {
 					className="inline-flex items-center rounded-full glass px-4 py-1.5 text-xs font-semibold tracking-wide shadow-sm"
 				>
 					<span className="flex h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
-					<span className="text-foreground/80">TinyLink v1.5.7 Stable</span>
+					<span className="text-foreground/80">TinyLink v{process.env.NEXT_PUBLIC_APP_VERSION} Stable</span>
 				</motion.div>
 
 				<motion.h1
