@@ -15,9 +15,10 @@ _(Demoted from the former "Phase 11" — not started, no committed timeline.)_
 
 ## Growth & Monetization
 
-> Custom/Vanity Domains, QR Code Generation, and Bulk Link Import/Export were promoted to [Phase 11](phase-11_growth-power-features.md).
+> QR Code Generation and Bulk Link Import/Export were promoted to [Phase 11](phase-11_growth-power-features.md).
 
-- [ ] **Paid Tier / Billing**: gate custom domains, higher rate limits, and longer link retention behind a subscription (e.g. Stripe). Natural follow-up once Phase 11's custom domains ship.
+- [ ] **Custom/Vanity Domains**: domain ownership verification (DNS TXT/CNAME challenge), wildcard TLS/certificate handling, and redirect resolution matching `(domain, code)` pairs. Demoted back from Phase 11 — needs ongoing per-domain DNS/certificate infrastructure and ideally a billing model to cover the cost, which isn't a good fit for a free side project. Revisit if/when **Paid Tier / Billing** below is picked up.
+- [ ] **Paid Tier / Billing**: gate custom domains, higher rate limits, and longer link retention behind a subscription (e.g. Stripe). Natural precursor for Custom/Vanity Domains above.
 
 ## Platform & Infra
 
