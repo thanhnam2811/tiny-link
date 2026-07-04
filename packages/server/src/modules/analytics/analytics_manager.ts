@@ -30,6 +30,10 @@ export class AnalyticsManager {
 		}
 	}
 
+	getQueueStats(): { depth: number; maxSize: number } {
+		return { depth: this.currentQueue.length, maxSize: this.MAX_QUEUE_SIZE };
+	}
+
 	push(event: ClickEvent) {
 		if (this.isShuttingDown) return;
 

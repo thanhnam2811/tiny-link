@@ -19,13 +19,15 @@ import {
 	AdminAnalyticsQueryType,
 	AdminAnalyticsResponseSchema,
 	AdminAnalyticsResponseType,
+	AdminHealthResponseSchema,
+	AdminHealthResponseType,
 	ErrorResponseSchema,
 	ErrorResponseType,
 } from '@tiny-link/shared';
 import { getEnv } from '../../shared/env';
 
 export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
-	const { prisma } = server;
+	const { prisma, analyticsManager } = server;
 
 	// Public routes
 	server.post<{ Body: AdminLoginBodyType }>(
@@ -90,6 +92,47 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				return {
 					totalLinks,
 					totalClicks,
+				};
+			},
+		);
+
+		protectedServer.get<{ Reply: AdminHealthResponseType }>(
+			'/health',
+			{
+				schema: {
+					response: {
+						200: AdminHealthResponseSchema,
+					},
+					tags: ['Admin'],
+					description: 'Get live health of Redis, Postgres, and the in-memory analytics queue',
+					security: [{ bearerAuth: [] }],
+				},
+			},
+			async () => {
+				const timed = async (check: () => Promise<unknown>) => {
+					const start = Date.now();
+					try {
+						await check();
+						return { status: 'up' as const, latencyMs: Date.now() - start };
+					} catch {
+						return { status: 'down' as const };
+					}
+				};
+
+				const [redisResult, postgresResult] = await Promise.all([
+					timed(() => server.redis.ping()),
+					timed(() => prisma.$queryRaw`SELECT 1`),
+				]);
+
+				const queueStats = analyticsManager.getQueueStats();
+
+				return {
+					redis: redisResult,
+					postgres: postgresResult,
+					queue: {
+						...queueStats,
+						processMemoryMb: Math.round(process.memoryUsage().rss / (1024 * 1024)),
+					},
 				};
 			},
 		);

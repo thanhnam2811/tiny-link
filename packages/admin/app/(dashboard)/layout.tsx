@@ -1,6 +1,6 @@
 import { logoutAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard, Link as LinkIcon, BarChart3, Settings } from 'lucide-react';
+import { LogOut, LayoutDashboard, Link as LinkIcon, BarChart3, Settings, Activity } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +33,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 						<BarChart3 className="w-5 h-5" />
 						Analytics (Soon)
 					</div>
+					<Link
+						href="/health"
+						className="flex items-center gap-3 p-3 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-900 dark:hover:text-zinc-50 rounded-lg transition-colors"
+					>
+						<Activity className="w-5 h-5" />
+						System Health
+					</Link>
 					<div className="flex items-center gap-3 p-3 text-zinc-400 dark:text-zinc-600 rounded-lg cursor-not-allowed">
 						<Settings className="w-5 h-5" />
 						Settings (Soon)
