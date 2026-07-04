@@ -11,6 +11,7 @@ import {
 	LinkPreviewResponseSchema,
 	TrackPublicResponseSchema,
 	ClaimLinksBodySchema,
+	BulkImportResponseSchema,
 	HTTP_STATUS,
 	SYSTEM_CONFIG,
 } from '@tiny-link/shared';
@@ -199,5 +200,48 @@ export const linkRoutes: FastifyPluginAsyncTypebox = async (server) => {
 			},
 		},
 		controller.deleteLink,
+	);
+
+	// Bulk Import Links from CSV
+	server.post(
+		'/bulk-import',
+		{
+			config: {
+				rateLimit: {
+					max: SYSTEM_CONFIG.RATE_LIMIT_BULK_IMPORT,
+					timeWindow: SYSTEM_CONFIG.RATE_LIMIT_WINDOW,
+				},
+			},
+			preHandler: [internalAuthMiddleware],
+			schema: {
+				tags: ['Links'],
+				summary: 'Bulk Import Links from CSV',
+				description:
+					'Uploads a CSV file (columns: originalUrl, customCode, maxClicks, expiresAt) and batch-creates links for the authenticated user. Invalid rows are reported individually without aborting the rest of the batch.',
+				response: {
+					[HTTP_STATUS.OK]: BulkImportResponseSchema,
+					[HTTP_STATUS.BAD_REQUEST]: ErrorResponseSchema,
+					[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
+				},
+			},
+		},
+		controller.bulkImport,
+	);
+
+	// Export User Links as CSV
+	server.get(
+		'/export',
+		{
+			preHandler: [internalAuthMiddleware],
+			schema: {
+				tags: ['Links'],
+				summary: 'Export Authenticated User Links as CSV',
+				description: 'Downloads all links owned by the authenticated user as a CSV file.',
+				response: {
+					[HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema,
+				},
+			},
+		},
+		controller.exportLinks,
 	);
 };

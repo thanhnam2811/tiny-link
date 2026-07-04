@@ -10,6 +10,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyCors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
+import fastifyMultipart from '@fastify/multipart';
 import { apiRoutes } from './modules/api.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
@@ -65,6 +66,14 @@ export const buildServer = async () => {
 	// Register JWT
 	await server.register(fastifyJwt, {
 		secret: getEnv('JWT_SECRET', 'super-secret-key-for-admin-jwt'),
+	});
+
+	// Register Multipart (CSV file uploads for bulk link import)
+	await server.register(fastifyMultipart, {
+		limits: {
+			fileSize: SYSTEM_CONFIG.BULK_IMPORT_MAX_FILE_SIZE_BYTES,
+			files: 1,
+		},
 	});
 
 	// Decorate server with global dependencies (Dependency Injection)

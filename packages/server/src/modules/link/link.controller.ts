@@ -1,6 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { LinkService } from './link.service';
-import { HTTP_STATUS, CreateLinkBodyType, INTERNAL_AUTH, ERROR_MESSAGES } from '@tiny-link/shared';
+import { HTTP_STATUS, CreateLinkBodyType, INTERNAL_AUTH, ERROR_MESSAGES, SYSTEM_CONFIG } from '@tiny-link/shared';
+import { AppError } from '../../shared/app-error';
+import { parseImportCsv } from './csv.util';
 
 export class LinkController {
 	constructor(private readonly linkService: LinkService) {}
@@ -145,5 +147,80 @@ export class LinkController {
 		}
 
 		return reply.status(HTTP_STATUS.OK).send({ success: true });
+	};
+
+	bulkImport = async (request: FastifyRequest, reply: FastifyReply) => {
+		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
+		if (!userId) {
+			return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
+				statusCode: HTTP_STATUS.UNAUTHORIZED,
+				error: 'Unauthorized',
+				code: ERROR_MESSAGES.UNAUTHORIZED,
+				message: 'User ID missing in header',
+			});
+		}
+
+		let file: Awaited<ReturnType<typeof request.file>>;
+		try {
+			file = await request.file();
+		} catch {
+			// @fastify/multipart throws (rather than returning undefined) when the request
+			// isn't multipart at all, e.g. no Content-Type or an empty body.
+			file = undefined;
+		}
+
+		if (!file) {
+			throw new AppError(HTTP_STATUS.BAD_REQUEST, ERROR_MESSAGES.BULK_IMPORT_NO_FILE, 'A CSV file is required');
+		}
+
+		const buffer = await file.toBuffer();
+
+		let rows: Record<string, string>[];
+		try {
+			rows = parseImportCsv(buffer);
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : 'Malformed CSV file';
+			throw new AppError(
+				HTTP_STATUS.BAD_REQUEST,
+				ERROR_MESSAGES.VALIDATION_ERROR,
+				`Malformed CSV file: ${message}`,
+			);
+		}
+
+		if (rows.length === 0) {
+			throw new AppError(HTTP_STATUS.BAD_REQUEST, ERROR_MESSAGES.VALIDATION_ERROR, 'CSV file has no data rows');
+		}
+
+		if (rows.length > SYSTEM_CONFIG.BULK_IMPORT_MAX_ROWS) {
+			throw new AppError(
+				HTTP_STATUS.BAD_REQUEST,
+				ERROR_MESSAGES.BULK_IMPORT_TOO_MANY_ROWS,
+				`CSV file exceeds the maximum of ${SYSTEM_CONFIG.BULK_IMPORT_MAX_ROWS} rows`,
+			);
+		}
+
+		const result = await this.linkService.bulkImportLinks(userId, rows);
+		return reply.status(HTTP_STATUS.OK).send(result);
+	};
+
+	exportLinks = async (request: FastifyRequest, reply: FastifyReply) => {
+		const userId = request.headers[INTERNAL_AUTH.USER_ID_HEADER] as string;
+		if (!userId) {
+			return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
+				statusCode: HTTP_STATUS.UNAUTHORIZED,
+				error: 'Unauthorized',
+				code: ERROR_MESSAGES.UNAUTHORIZED,
+				message: 'User ID missing in header',
+			});
+		}
+
+		const csv = await this.linkService.exportUserLinksCsv(userId);
+		const filename = `tinylink-export-${new Date().toISOString().split('T')[0]}.csv`;
+
+		return reply
+			.header('Content-Type', 'text/csv; charset=utf-8')
+			.header('Content-Disposition', `attachment; filename="${filename}"`)
+			.status(HTTP_STATUS.OK)
+			.send(csv);
 	};
 }

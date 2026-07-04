@@ -1,6 +1,6 @@
 ### 🟢 Phase 11: Growth & Power-User Features
 
-**Status:** ⏳ Not Started
+**Status:** 🚧 In Progress (2 of 3 items done — Custom/Vanity Domains remaining)
 
 #### 🎯 Goal
 
@@ -11,9 +11,9 @@ Add power-user and growth-oriented features on top of the existing link model an
 - [x] **QR Code Generation**:
     - [x] Generate a QR code per short link (server-side or client-side library).
     - [x] Downloadable as PNG/SVG from the Dashboard and Stats pages.
-- [ ] **Bulk Link Import/Export**:
-    - [ ] CSV upload to batch-create links (validate rows, skip/report malformed entries, reuse existing collision handling).
-    - [ ] CSV export of the current user's links from the Dashboard.
+- [x] **Bulk Link Import/Export**:
+    - [x] CSV upload to batch-create links (validate rows, skip/report malformed entries, reuse existing collision handling).
+    - [x] CSV export of the current user's links from the Dashboard.
 - [ ] **Custom/Vanity Domains**:
     - [ ] Domain ownership verification flow (DNS TXT or CNAME challenge).
     - [ ] Wildcard TLS / certificate handling for verified domains.
@@ -23,9 +23,9 @@ Add power-user and growth-oriented features on top of the existing link model an
 
 - [ ] All checklist items above are complete and merged to `main`.
 - [ ] A generated QR code scans correctly (verified with a real device/reader) and resolves to the same URL as the text short link.
-- [ ] CSV import creates only valid links (malformed rows are rejected with a clear per-row error, not a silent partial failure); CSV export downloads a file matching the dashboard's current link set.
+- [x] CSV import creates only valid links (malformed rows are rejected with a clear per-row error, not a silent partial failure); CSV export downloads a file matching the dashboard's current link set.
 - [ ] Domain verification rejects unverified domains and only activates redirects once DNS ownership is confirmed.
-- [ ] Existing default-domain redirect flow (`GET /:code`) has no regressions — confirmed via the Vitest suite plus a manual smoke test.
+- [x] Existing default-domain redirect flow (`GET /:code`) has no regressions — confirmed via the Vitest suite plus a manual smoke test.
 
 #### 🔗 Dependencies
 

@@ -369,3 +369,35 @@ export const ClaimLinksBodySchema = Type.Object({
 	guestId: Type.String({ description: 'The guest ID to claim links from' }),
 });
 export type ClaimLinksBodyType = Static<typeof ClaimLinksBodySchema>;
+
+// Bulk Import/Export Schemas
+export const BulkImportRowSchema = Type.Object({
+	originalUrl: CreateLinkBodySchema.properties.originalUrl,
+	customCode: CreateLinkBodySchema.properties.customCode,
+	maxClicks: CreateLinkBodySchema.properties.maxClicks,
+	expiresAt: CreateLinkBodySchema.properties.expiresAt,
+});
+export type BulkImportRowType = Static<typeof BulkImportRowSchema>;
+
+export const BulkImportResultItemSchema = Type.Object({
+	row: Type.Number({ description: '1-indexed data row number in the uploaded CSV (excluding header)' }),
+	success: Type.Boolean(),
+	originalUrl: Type.Optional(Type.String()),
+	shortCode: Type.Optional(Type.String()),
+	shortUrl: Type.Optional(Type.String()),
+	error: Type.Optional(Type.String()),
+});
+export type BulkImportResultItemType = Static<typeof BulkImportResultItemSchema>;
+
+export const BulkImportResponseSchema = Type.Object(
+	{
+		totalRows: Type.Number(),
+		successCount: Type.Number(),
+		failureCount: Type.Number(),
+		results: Type.Array(BulkImportResultItemSchema),
+	},
+	{
+		description: 'Per-row result summary of a bulk CSV link import',
+	},
+);
+export type BulkImportResponseType = Static<typeof BulkImportResponseSchema>;
