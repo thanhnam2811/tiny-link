@@ -33,6 +33,8 @@ export const SYSTEM_CONFIG = {
 	BULK_IMPORT_MAX_ROWS: 500,
 	BULK_IMPORT_MAX_FILE_SIZE_BYTES: 2 * 1024 * 1024, // 2MB
 	BULK_EXPORT_MAX_ROWS: 5000,
+	RATE_LIMIT_PUBLIC_API_CREATE_LINK: 20,
+	RATE_LIMIT_PUBLIC_API_GLOBAL: 60,
 } as const;
 
 /**
@@ -51,6 +53,8 @@ export const ERROR_MESSAGES = {
 	BULK_IMPORT_NO_FILE: 'BULK_IMPORT_NO_FILE',
 	BULK_IMPORT_TOO_MANY_ROWS: 'BULK_IMPORT_TOO_MANY_ROWS',
 	BULK_IMPORT_FILE_TOO_LARGE: 'BULK_IMPORT_FILE_TOO_LARGE',
+	API_KEY_INVALID: 'API_KEY_INVALID',
+	API_KEY_NOT_FOUND: 'API_KEY_NOT_FOUND',
 } as const;
 
 /**
@@ -69,4 +73,12 @@ export const INTERNAL_AUTH = {
 	TEST_KEY: 'test-internal-key',
 	HEADER: 'x-internal-key',
 	USER_ID_HEADER: 'x-user-id',
+} as const;
+
+/**
+ * Public API Key Constants
+ */
+export const PUBLIC_API_KEY = {
+	PREFIX: 'tlk_live_',
+	PREFIX_DISPLAY_LENGTH: 12,
 } as const;

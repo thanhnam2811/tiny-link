@@ -103,7 +103,7 @@ tiny-link/
 
 ### Prerequisites
 
-- Node.js ≥ 20
+- Node.js ≥ 24 (matches CI and production; see `.node-version` — `fnm use` / `nvm use` picks it up automatically)
 - pnpm ≥ 10
 - Docker & Docker Compose
 

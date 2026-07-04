@@ -59,3 +59,8 @@ export type Click = Prisma.ClickModel;
  *
  */
 export type User = Prisma.UserModel;
+/**
+ * Model ApiKey
+ *
+ */
+export type ApiKey = Prisma.ApiKeyModel;

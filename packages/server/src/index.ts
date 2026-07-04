@@ -132,6 +132,11 @@ export const buildServer = async () => {
 						scheme: 'bearer',
 						bearerFormat: 'JWT',
 					},
+					apiKeyAuth: {
+						type: 'http',
+						scheme: 'bearer',
+						description: 'Public API key (Authorization: Bearer <key>). Issued via POST /api/keys.',
+					},
 				},
 			},
 		},

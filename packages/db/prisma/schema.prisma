@@ -59,7 +59,26 @@ model User {
   image     String?
   role      String?  @default("user")
   links     Link[]
+  apiKeys   ApiKey[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------------
+// ApiKey (per-account public API credential — separate from the internal M2M channel)
+// ---------------------------------------------------------------------------------
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  name       String
+  keyPrefix  String
+  keyHash    String    @unique
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+
+  @@index([userId])
 }

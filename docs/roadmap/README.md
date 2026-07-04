@@ -15,7 +15,7 @@ Phase status is split into one file per phase for easier tracking. Each file fol
 | 9     | [Private Accounts & User Dashboard](phase-9_private-accounts.md)       | ✅ Done                                     |
 | 10    | [UI/UX Premium](phase-10_ui-ux-premium.md)                             | ✅ Done                                     |
 | 11    | [Growth & Power-User Features](phase-11_growth-power-features.md)      | ✅ Done                                     |
-| 12    | [Platform & Infra](phase-12_platform-infra.md)                         | ⏳ Not Started                              |
+| 12    | [Platform & Infra](phase-12_platform-infra.md)                         | 🚧 In Progress (Stage 1 done)               |
 | 13    | [Developer & User Experience](phase-13_developer-user-experience.md)   | ⏳ Not Started                              |
 
 Ideas not yet scheduled into a phase — including AI Integration ideas and a future billing/paid-tier phase — live in [backlog-ideas.md](backlog-ideas.md).

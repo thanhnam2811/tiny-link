@@ -1,6 +1,6 @@
 ### 🔵 Phase 12: Platform & Infra
 
-**Status:** ⏳ Not Started
+**Status:** 🚧 In Progress (Stage 1 done — Admin Health Metrics, Webhooks, Multi-region Redis remain)
 
 #### 🎯 Goal
 
@@ -8,10 +8,10 @@ Turn TinyLink into a platform other systems can integrate with, and harden the i
 
 #### 📋 Checklist
 
-- [ ] **Public API + API Keys**:
-    - [ ] Issue per-account API keys, separate from the internal `INTERNAL_API_KEY` M2M channel used by `client`/`admin`.
-    - [ ] Per-key rate limiting (Redis-backed, reusing the Phase 2 rate-limiter pattern).
-    - [ ] Public-facing API docs (extend the existing Swagger/OpenAPI setup from Phase 5).
+- [x] **Public API + API Keys**:
+    - [x] Issue per-account API keys, separate from the internal `INTERNAL_API_KEY` M2M channel used by `client`/`admin`.
+    - [x] Per-key rate limiting (Redis-backed, reusing the Phase 2 rate-limiter pattern).
+    - [x] Public-facing API docs (extend the existing Swagger/OpenAPI setup from Phase 5).
 - [ ] **Admin System Health Metrics**:
     - [ ] Surface Redis and Postgres connection health in the Admin dashboard.
     - [ ] Surface click-queue depth and memory usage (the in-memory queue from Phase 2).
