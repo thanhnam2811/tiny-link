@@ -4,7 +4,7 @@
 
 #### 🎯 Goal
 
-Turn TinyLink into a platform other systems can integrate with, and harden the infrastructure for traffic beyond a single free-tier region — building on the vanity domains from [Phase 11](phase-11_growth-power-features.md), which become more valuable once third parties can create links programmatically.
+Turn TinyLink into a platform other systems can integrate with, and harden the infrastructure for traffic beyond a single free-tier region.
 
 #### 📋 Checklist
 
@@ -31,4 +31,4 @@ Turn TinyLink into a platform other systems can integrate with, and harden the i
 
 #### 🔗 Dependencies
 
-Builds on the rate-limiting infrastructure from [Phase 2](phase-2_reliability-performance.md), the API docs from [Phase 5](phase-5_refactoring-optimization.md), the Admin dashboard from [Phase 8](phase-8_admin-dashboard.md), and the vanity domains from [Phase 11](phase-11_growth-power-features.md).
+Builds on the rate-limiting infrastructure from [Phase 2](phase-2_reliability-performance.md), the API docs from [Phase 5](phase-5_refactoring-optimization.md), and the Admin dashboard from [Phase 8](phase-8_admin-dashboard.md).

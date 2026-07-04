@@ -25,3 +25,6 @@ packages/db/generated-client/
 # skills-lock.json itself IS committed; treat these dirs like node_modules/
 .agents/
 .claude/skills/
+
+# tokensave MCP code-graph cache (local dev tool, regenerable, not a project dependency)
+.tokensave/
