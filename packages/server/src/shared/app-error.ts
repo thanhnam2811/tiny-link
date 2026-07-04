@@ -5,7 +5,10 @@ export type AppErrorCode =
 	| 'LINK_CODE_CONFLICT'
 	| 'RATE_LIMIT_EXCEEDED'
 	| 'VALIDATION_ERROR'
-	| 'INTERNAL_ERROR';
+	| 'INTERNAL_ERROR'
+	| 'BULK_IMPORT_NO_FILE'
+	| 'BULK_IMPORT_TOO_MANY_ROWS'
+	| 'BULK_IMPORT_FILE_TOO_LARGE';
 
 export class AppError extends Error {
 	readonly statusCode: number;

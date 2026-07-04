@@ -1,11 +1,20 @@
 import { nanoid } from 'nanoid';
+import { Value } from '@sinclair/typebox/value';
 import { LinkRepository } from './link.repository';
 import { AnalyticsManager } from '../analytics/analytics_manager';
 import { Redis } from 'ioredis';
 import { AppError } from '../../shared/app-error';
 import * as argon2 from 'argon2';
-import { SYSTEM_CONFIG, HTTP_STATUS, ERROR_MESSAGES } from '@tiny-link/shared';
+import {
+	SYSTEM_CONFIG,
+	HTTP_STATUS,
+	ERROR_MESSAGES,
+	BulkImportRowSchema,
+	BulkImportResponseType,
+	BulkImportResultItemType,
+} from '@tiny-link/shared';
 import { scrapeUrlMetadata } from './metadata.scraper';
+import { toCsv } from './csv.util';
 
 // Sentinel values used to distinguish edge cases from "cache miss"
 // This protects against Cache Penetration attacks
@@ -460,5 +469,110 @@ export class LinkService {
 			}
 		}
 		return success;
+	}
+
+	async bulkImportLinks(userId: string, rows: Record<string, string>[]): Promise<BulkImportResponseType> {
+		const results: BulkImportResultItemType[] = [];
+		const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+		let successCount = 0;
+
+		for (let i = 0; i < rows.length; i++) {
+			const rowNumber = i + 1;
+			const row = rows[i];
+
+			const originalUrl = row.originalUrl?.trim();
+			const customCode = row.customCode?.trim() || undefined;
+			const maxClicksRaw = row.maxClicks?.trim();
+			const expiresAtRaw = row.expiresAt?.trim() || undefined;
+
+			let maxClicks: number | undefined;
+			if (maxClicksRaw) {
+				const parsed = Number(maxClicksRaw);
+				if (Number.isNaN(parsed)) {
+					results.push({
+						row: rowNumber,
+						success: false,
+						originalUrl,
+						error: '"maxClicks" must be a number',
+					});
+					continue;
+				}
+				maxClicks = parsed;
+			}
+
+			const candidate = { originalUrl, customCode, maxClicks, expiresAt: expiresAtRaw };
+			if (!Value.Check(BulkImportRowSchema, candidate)) {
+				const firstError = Value.Errors(BulkImportRowSchema, candidate).First();
+				results.push({
+					row: rowNumber,
+					success: false,
+					originalUrl,
+					error: firstError
+						? `${firstError.path.replace('/', '') || 'row'}: ${firstError.message}`
+						: 'Invalid row data',
+				});
+				continue;
+			}
+
+			try {
+				const link = await this.createShortLink(
+					originalUrl,
+					customCode,
+					maxClicks,
+					expiresAtRaw ? new Date(expiresAtRaw) : undefined,
+					undefined,
+					userId,
+					undefined,
+				);
+
+				results.push({
+					row: rowNumber,
+					success: true,
+					originalUrl: link.originalUrl,
+					shortCode: link.shortCode,
+					shortUrl: `${clientUrl}/${link.shortCode}`,
+				});
+				successCount++;
+			} catch (error: unknown) {
+				const message = error instanceof AppError ? error.message : 'Failed to create link';
+				results.push({ row: rowNumber, success: false, originalUrl, error: message });
+			}
+		}
+
+		return {
+			totalRows: rows.length,
+			successCount,
+			failureCount: rows.length - successCount,
+			results,
+		};
+	}
+
+	async exportUserLinksCsv(userId: string): Promise<string> {
+		const links = await this.linkRepository.findByUserId(userId, 0, SYSTEM_CONFIG.BULK_EXPORT_MAX_ROWS);
+		const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+
+		const header = [
+			'originalUrl',
+			'shortCode',
+			'shortUrl',
+			'createdAt',
+			'expiresAt',
+			'maxClicks',
+			'clicksCount',
+			'isActive',
+		];
+
+		const rows = links.map((link) => [
+			link.originalUrl,
+			link.shortCode,
+			`${clientUrl}/${link.shortCode}`,
+			link.createdAt.toISOString(),
+			link.expiresAt ? link.expiresAt.toISOString() : '',
+			link.maxClicks?.toString() ?? '',
+			link.clicksCount.toString(),
+			link.isActive.toString(),
+		]);
+
+		return toCsv([header, ...rows]);
 	}
 }

@@ -41,26 +41,38 @@ async function handleProxy(req: NextRequest, pathSegments: string[]) {
 	}
 
 	try {
-		const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.text() : undefined;
+		// Read as raw bytes (not text) so binary/multipart payloads (e.g. CSV file uploads) survive the proxy unmangled.
+		const body = req.method !== 'GET' && req.method !== 'HEAD' ? await req.arrayBuffer() : undefined;
 
 		// If body is empty, remove content-type to avoid Fastify errors
-		if (body === '' || body === undefined) {
+		if (!body || body.byteLength === 0) {
 			headers.delete('content-type');
 		}
 
 		const response = await fetch(url, {
 			method: req.method,
 			headers,
-			body: body || undefined,
+			body: body && body.byteLength > 0 ? body : undefined,
 			cache: 'no-store',
 		});
+
+		const contentType = response.headers.get('Content-Type') || 'application/json';
+
+		// Binary/CSV responses (e.g. link export) must also be forwarded as raw bytes, not decoded text.
+		if (!contentType.includes('application/json') && !contentType.includes('text/')) {
+			const data = await response.arrayBuffer();
+			return new NextResponse(data, { status: response.status, headers: { 'Content-Type': contentType } });
+		}
 
 		const data = await response.text();
 
 		return new NextResponse(data, {
 			status: response.status,
 			headers: {
-				'Content-Type': response.headers.get('Content-Type') || 'application/json',
+				'Content-Type': contentType,
+				...(response.headers.get('Content-Disposition') && {
+					'Content-Disposition': response.headers.get('Content-Disposition') as string,
+				}),
 			},
 		});
 	} catch (error) {

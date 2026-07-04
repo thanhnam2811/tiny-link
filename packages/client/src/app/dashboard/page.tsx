@@ -6,7 +6,9 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LinkQrCode } from '@/components/LinkQrCode';
-import { BarChart2, Trash2, Search, Link as LinkIcon, Plus, ExternalLink, QrCode } from 'lucide-react';
+import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { downloadBlob } from '@/lib/download';
+import { BarChart2, Trash2, Search, Link as LinkIcon, Plus, ExternalLink, QrCode, Download } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -69,6 +71,16 @@ export default function DashboardPage() {
 		fetchLinks();
 	}, [fetchLinks]);
 
+	const handleExport = async () => {
+		try {
+			const blob = await api.links.exportCsv();
+			downloadBlob(blob, `tinylink-export-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+		} catch (error) {
+			console.error('Failed to export links:', error);
+			toast.error('Failed to export links');
+		}
+	};
+
 	const handleDelete = async (id: string, shortCode: string) => {
 		const confirmed = window.confirm(`Delete /${shortCode}? This cannot be undone.`);
 		if (!confirmed) return;
@@ -97,12 +109,19 @@ export default function DashboardPage() {
 					<h1 className="text-3xl font-heading font-black text-foreground mb-1">My Links</h1>
 					<p className="text-muted-foreground text-sm font-medium">Manage and track your shortened links</p>
 				</div>
-				<Link href="/">
-					<Button className="h-10 gap-2 px-5 shadow-sm">
-						<Plus className="h-4 w-4" />
-						New Link
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="outline" className="h-10 gap-2 px-5" onClick={handleExport}>
+						<Download className="h-4 w-4" />
+						Export
 					</Button>
-				</Link>
+					<BulkImportDialog onImported={fetchLinks} />
+					<Link href="/">
+						<Button className="h-10 gap-2 px-5 shadow-sm">
+							<Plus className="h-4 w-4" />
+							New Link
+						</Button>
+					</Link>
+				</div>
 			</motion.div>
 
 			{/* Search */}

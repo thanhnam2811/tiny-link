@@ -5,6 +5,7 @@ import {
 	LinkPreviewResponseType,
 	VerifyPasswordResponseType,
 	TrackPublicResponseType,
+	BulkImportResponseType,
 } from '@tiny-link/shared';
 
 import { getEnv } from './env';
@@ -129,5 +130,53 @@ export const api = {
 			fetcher<{ success: boolean }>(`/links/${id}`, {
 				method: 'DELETE',
 			}),
+		/**
+		 * Bulk import links from a CSV file
+		 */
+		bulkImport: async (file: File): Promise<BulkImportResponseType> => {
+			const formData = new FormData();
+			formData.append('file', file);
+
+			const response = await fetch(`${BASE_URL}/links/bulk-import`, {
+				method: 'POST',
+				body: formData,
+				cache: 'no-store',
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new ApiError(
+					data.statusCode || response.status,
+					data.code || 'UNKNOWN_ERROR',
+					data.message || 'Bulk import failed',
+					data.details,
+				);
+			}
+
+			return data as BulkImportResponseType;
+		},
+		/**
+		 * Export the authenticated user's links as a CSV file
+		 */
+		exportCsv: async (): Promise<Blob> => {
+			const response = await fetch(`${BASE_URL}/links/export`, {
+				method: 'GET',
+				cache: 'no-store',
+			});
+
+			if (!response.ok) {
+				let message = 'Failed to export links';
+				try {
+					const data = await response.json();
+					message = data.message || message;
+				} catch {
+					// Non-JSON error body; keep the generic message.
+				}
+				throw new ApiError(response.status, ERROR_MESSAGES.INTERNAL_SERVER_ERROR, message);
+			}
+
+			return response.blob();
+		},
 	},
 };
