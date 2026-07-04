@@ -3,6 +3,8 @@ import { Type } from '@sinclair/typebox';
 import { linkRoutes } from './link/link.routes';
 import { adminRoutes } from './admin/admin.routes';
 import { statsRoutes } from './link/stats.routes';
+import { apiKeyRoutes } from './api-key/api-key.routes';
+import { publicApiRoutes } from './public-api/public-api.routes';
 
 /**
  * Master Router for the /api namespace.
@@ -43,4 +45,10 @@ export const apiRoutes: FastifyPluginAsyncTypebox = async (server) => {
 
 	// User/Admin Management
 	server.register(adminRoutes, { prefix: '/admin' });
+
+	// Public API Key Management (internal-auth protected, dashboard-facing)
+	server.register(apiKeyRoutes, { prefix: '/keys' });
+
+	// Public API (Authorization: Bearer <key> protected, third-party facing)
+	server.register(publicApiRoutes, { prefix: '/v1' });
 };

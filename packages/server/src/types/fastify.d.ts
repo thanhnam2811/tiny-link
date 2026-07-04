@@ -8,4 +8,11 @@ declare module 'fastify' {
 		analyticsManager: AnalyticsManager;
 		redis: Redis;
 	}
+
+	interface FastifyRequest {
+		/** Set by apiKeyAuthMiddleware. The owning user's id, resolved from the API key — the only trusted identity source for public API routes. */
+		apiKeyUserId?: string;
+		/** Set by apiKeyAuthMiddleware. Used as the rate-limit bucket key so limits are independent of the internal M2M channel. */
+		apiKeyId?: string;
+	}
 }

@@ -1,17 +1,17 @@
 packages:
-    - packages/*
-
-onlyBuiltDependencies:
-    - '@prisma/client'
-    - '@prisma/engines'
-    - argon2
-    - esbuild
-    - msw
-    - prisma
-    - sharp
-    - unrs-resolver
-
-syncInjectedDepsAfterScripts:
-    - build
+  - packages/*
 
 injectWorkspacePackages: true
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - argon2
+  - esbuild
+  - msw
+  - prisma
+  - sharp
+  - unrs-resolver
+
+syncInjectedDepsAfterScripts:
+  - build

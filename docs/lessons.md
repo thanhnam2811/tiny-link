@@ -2,6 +2,24 @@
 
 ---
 
+## Phase 12: Prisma CLI Broken on Windows (`@prisma/dev` → ESM-only `zeptomatch`) + First-Ever Migration Baselining
+
+### Root Causes
+
+1. **Prisma CLI 7.x unconditionally crashes on Windows/Node 20** the moment _any_ subcommand runs (`generate`, `migrate dev`, etc. — not just ones touching the new local-dev-database feature). `@prisma/dev` (a bundled dependency used for the "Prisma Postgres local dev server" feature we don't use) does `require("zeptomatch")` at module top-level, but every published version of `zeptomatch` is ESM-only (`"type": "module"`), so Node throws `ERR_REQUIRE_ESM` before the CLI even parses args. This is upstream and version-independent (still present in `@prisma/dev@0.24.14`, the latest as of writing).
+2. **The repo's local dev Postgres (Docker) had silently drifted from the committed migration history.** `packages/db/prisma/migrations/` already had 7 real migrations (contrary to a first glance suggesting none existed — check with `git ls-files`, not just a fresh `Glob`, if a migrations dir looks suspiciously empty), but the local dev DB had been kept in sync via `prisma db push` (per the documented local workflow) rather than by replaying those migrations, so `_prisma_migrations` bookkeeping never matched the live schema. Running `prisma migrate dev` for a new schema change surfaces this as "drift detected" and refuses to proceed without a reset.
+3. Prisma's CLI itself now refuses to run `migrate reset` (or other destructive ops) when it detects it's being invoked by an AI agent, unless a `PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION` env var is set to the literal text of the user's consent message — and the agent harness's own auto-mode classifier separately blocks command variations that look like manufactured consent. The only reliable path is to stop, explain the exact command/risk/scope (dev-only vs. production) in plain chat, and get the user to run the destructive command themselves in their own terminal, or to state consent as a fresh literal message the agent can pass through verbatim.
+
+### Prevention Strategy
+
+- The `ERR_REQUIRE_ESM` crash only reproduces on Node <22 — Node 22+ added synchronous `require()` support for (simple) ESM modules, so `@prisma/dev`'s `require("zeptomatch")` just works there. Since this project now pins `engines: { node: ">=24" }` (see `.nvmrc`), no patch is needed; a `pnpm patch` workaround was tried and later removed once the Node pin made it redundant. If this resurfaces on an older Node, wrapping the `require()` in `state.cjs` in a try/catch (fallback `{ default: () => true }`, since the feature it guards — local-dev-server directory listing — is unused here) is the known fix; do not bother downgrading `prisma`/`zeptomatch`, no published `zeptomatch` version avoids the underlying ESM-only-ness.
+- Keep the repo's actual Node requirement (CI/production run Node 24) in sync across `.nvmrc`, `package.json engines`, and the README prerequisites — they had drifted (README said "≥ 20") and caused exactly this kind of confusion.
+- Before assuming a schema change is "the first migration ever," check `git ls-files packages/db/prisma/migrations/` (not just a directory listing/Glob) — the folder can look empty to a quick tool call while being fully populated and tracked.
+- Never run `prisma migrate reset` (or other DB-destructive commands) autonomously, even against an obviously-local Docker DB — surface the exact command, blast radius, and dev-vs-prod scope, and either get a fresh literal consent message from the user or have them run it in their own terminal.
+- CI runs `prisma migrate deploy` against production (see `.github/workflows/pipeline.yml`) while local dev historically used `db push` — any new schema change **must** go through `prisma migrate dev` to produce a real migration file, or the next production deploy will silently no-op and drift further from `schema.prisma`.
+
+---
+
 ## Vercel JSON Schema Compliance & Dashboard-First
 
 ### Key Facts

@@ -401,3 +401,107 @@ export const BulkImportResponseSchema = Type.Object(
 	},
 );
 export type BulkImportResponseType = Static<typeof BulkImportResponseSchema>;
+
+// API Key Management Schemas (internal-auth protected, dashboard-facing)
+export const CreateApiKeyBodySchema = Type.Object(
+	{
+		name: Type.String({
+			minLength: 1,
+			maxLength: 100,
+			description: 'A label to help identify this key later (e.g. "CI pipeline")',
+			examples: ['CI pipeline'],
+		}),
+	},
+	{
+		description: 'Payload for issuing a new public API key',
+	},
+);
+export type CreateApiKeyBodyType = Static<typeof CreateApiKeyBodySchema>;
+
+export const CreateApiKeyResponseSchema = Type.Object(
+	{
+		id: Type.String(),
+		name: Type.String(),
+		keyPrefix: Type.String(),
+		plaintext: Type.String({
+			description: 'The full API key — shown only once, never retrievable again',
+		}),
+		createdAt: Type.String({ format: 'date-time' }),
+	},
+	{
+		examples: [
+			{
+				id: '123e4567-e89b-12d3-a456-426614174000',
+				name: 'CI pipeline',
+				keyPrefix: 'tlk_live_ab1',
+				plaintext: 'tlk_live_ab1c2d3e4f5g6h7i8j9k0l1m2n3o4p5q',
+				createdAt: '2026-07-04T10:00:00.000Z',
+			},
+		],
+	},
+);
+export type CreateApiKeyResponseType = Static<typeof CreateApiKeyResponseSchema>;
+
+export const ApiKeySummarySchema = Type.Object({
+	id: Type.String(),
+	name: Type.String(),
+	keyPrefix: Type.String(),
+	createdAt: Type.String({ format: 'date-time' }),
+	lastUsedAt: Type.Optional(Type.String({ format: 'date-time' })),
+	revokedAt: Type.Optional(Type.String({ format: 'date-time' })),
+});
+export type ApiKeySummaryType = Static<typeof ApiKeySummarySchema>;
+
+export const ListApiKeysResponseSchema = Type.Object({
+	apiKeys: Type.Array(ApiKeySummarySchema),
+});
+export type ListApiKeysResponseType = Static<typeof ListApiKeysResponseSchema>;
+
+export const ApiKeyIdParamsSchema = Type.Object({
+	id: Type.String({ format: 'uuid' }),
+});
+export type ApiKeyIdParamsType = Static<typeof ApiKeyIdParamsSchema>;
+
+// Public API Schemas (Authorization: Bearer <key> protected)
+export const PublicCreateLinkBodySchema = Type.Object(
+	{
+		originalUrl: CreateLinkBodySchema.properties.originalUrl,
+		customCode: CreateLinkBodySchema.properties.customCode,
+		maxClicks: CreateLinkBodySchema.properties.maxClicks,
+		expiresAt: CreateLinkBodySchema.properties.expiresAt,
+		password: CreateLinkBodySchema.properties.password,
+	},
+	{
+		description: 'Payload for creating a short link via the public API',
+	},
+);
+export type PublicCreateLinkBodyType = Static<typeof PublicCreateLinkBodySchema>;
+
+export const PublicGetLinksQuerySchema = Type.Object({
+	page: Type.Optional(Type.Number({ minimum: 1, default: 1 })),
+	limit: Type.Optional(Type.Number({ minimum: 1, maximum: 100, default: 10 })),
+	search: Type.Optional(Type.String()),
+});
+export type PublicGetLinksQueryType = Static<typeof PublicGetLinksQuerySchema>;
+
+export const PublicGetLinksResponseSchema = Type.Object({
+	links: Type.Array(
+		Type.Object({
+			id: Type.String(),
+			originalUrl: Type.String(),
+			shortCode: Type.String(),
+			createdAt: Type.String({ format: 'date-time' }),
+			clicksCount: Type.Number(),
+			isActive: Type.Boolean(),
+		}),
+	),
+	totalCount: Type.Number(),
+	totalPages: Type.Number(),
+	currentPage: Type.Number(),
+});
+export type PublicGetLinksResponseType = Static<typeof PublicGetLinksResponseSchema>;
+
+export const PublicLinkIdParamsSchema = Type.Object({
+	id: Type.String({ format: 'uuid' }),
+});
+export type PublicLinkIdParamsType = Static<typeof PublicLinkIdParamsSchema>;
