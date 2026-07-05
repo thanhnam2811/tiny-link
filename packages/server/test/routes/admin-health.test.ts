@@ -16,12 +16,9 @@ describe('Phase 12 Stage 2: Admin System Health', () => {
 		analyticsManager = built.analyticsManager;
 		await app.ready();
 
-		const loginRes = await app.inject({
-			method: 'POST',
-			url: '/api/admin/login',
-			payload: { password: process.env.ADMIN_PASSWORD },
-		});
-		adminToken = loginRes.json().token;
+		// Mint an admin JWT directly (same claim /admin/login issues) so this test
+		// doesn't depend on ADMIN_PASSWORD, which CI's generated .env.test omits.
+		adminToken = app.jwt.sign({ role: 'admin' });
 	});
 
 	afterAll(async () => {
