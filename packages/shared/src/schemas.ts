@@ -288,6 +288,37 @@ export const AdminStatsResponseSchema = Type.Object(
 
 export type AdminStatsResponseType = Static<typeof AdminStatsResponseSchema>;
 
+// System Health Schemas
+const HealthCheckResultSchema = Type.Object({
+	status: Type.Union([Type.Literal('up'), Type.Literal('down')]),
+	latencyMs: Type.Optional(Type.Number()),
+});
+
+export const AdminHealthResponseSchema = Type.Object(
+	{
+		redis: HealthCheckResultSchema,
+		postgres: HealthCheckResultSchema,
+		queue: Type.Object({
+			depth: Type.Number(),
+			maxSize: Type.Number(),
+			processMemoryMb: Type.Number({
+				description: 'Resident set size (RSS) of the whole server process, in MB — not queue-only memory',
+			}),
+		}),
+	},
+	{
+		description: 'Live health snapshot of Redis, Postgres, and the in-memory click-analytics queue',
+		examples: [
+			{
+				redis: { status: 'up', latencyMs: 2 },
+				postgres: { status: 'up', latencyMs: 5 },
+				queue: { depth: 0, maxSize: 10000, processMemoryMb: 128 },
+			},
+		],
+	},
+);
+export type AdminHealthResponseType = Static<typeof AdminHealthResponseSchema>;
+
 // Link Management Schemas
 export const AdminGetLinksQuerySchema = Type.Object({
 	page: Type.Optional(Type.Number({ minimum: 1, default: 1 })),

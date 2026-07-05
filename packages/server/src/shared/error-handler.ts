@@ -43,6 +43,24 @@ export const globalErrorHandler = (error: FastifyError | Error, request: Fastify
 		});
 	}
 
+	// Framework-thrown client errors we don't wrap in AppError (e.g. @fastify/jwt verify
+	// failures from missing/invalid Authorization headers) — pass their statusCode through
+	// instead of masking as 500.
+	if (
+		'statusCode' in error &&
+		typeof error.statusCode === 'number' &&
+		error.statusCode >= 400 &&
+		error.statusCode < 500
+	) {
+		const code = 'code' in error && typeof error.code === 'string' ? error.code : ERROR_MESSAGES.UNAUTHORIZED;
+		return reply.status(error.statusCode).send({
+			statusCode: error.statusCode,
+			error: http.STATUS_CODES[error.statusCode] ?? 'Error',
+			code,
+			message: error.message,
+		});
+	}
+
 	// Unknown / unexpected error — log full details, mask from client
 	request.log.error(error);
 	return reply.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({
