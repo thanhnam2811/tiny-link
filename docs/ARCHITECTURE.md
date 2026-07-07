@@ -177,6 +177,7 @@ Vì server always-on trên VPS (không sleep như free-tier PaaS), **không cầ
     - `JWT_SECRET` — secret ký admin JWT
     - `ADMIN_PASSWORD` — mật khẩu dashboard admin
     - `INTERNAL_API_KEY` — key M2M giữa client/server
+    - `VERCEL_PROJECT_NAME` — tên project Vercel của client (`tiny-link-client`), dùng để build danh sách CORS origin cho preview deployments
 - **GitHub Secrets cần thiết cho pipeline**: `VPS_SSH_PRIVATE_KEY`, `VPS_SSH_USER`, `VPS_SSH_HOSTNAME`, `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET`, `DATABASE_URL` (cho bước migrate)
 
 ### 7.2 PostgreSQL → Neon (Serverless)
