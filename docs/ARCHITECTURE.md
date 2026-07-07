@@ -98,12 +98,12 @@ User hits /:code
 
 > **Local development** — Docker Compose. Xem section 7 cho production stack.
 
-| Component | Công nghệ                             |
-| --------- | ------------------------------------- |
-| Database  | PostgreSQL 17 (Docker)                |
-| Cache     | Redis 7 (50mb max, allkeys-lru)       |
-| Container | Docker Compose (3 services)           |
-| Deploy    | Render (server, preview + production) |
+| Component | Công nghệ                                          |
+| --------- | --------------------------------------------------- |
+| Database  | PostgreSQL 17 (Docker)                             |
+| Cache     | Redis 7 (50mb max, allkeys-lru)                    |
+| Container | Docker Compose (3 services)                        |
+| Deploy    | Self-hosted VPS (Docker, always-on, no cold start) |
 
 ### Docker services:
 
@@ -144,60 +144,60 @@ User hits /:code
 
 ### Stack kiến nghị (2026)
 
-| Component      | Platform    | Plan | Lý do chọn                                       |
-| -------------- | ----------- | ---- | ------------------------------------------------ |
-| **Server**     | **Render**  | Free | Docker hosting, 512MB RAM, auto-deploy từ GitHub |
-| **PostgreSQL** | **Neon**    | Free | Serverless, Prisma-native, auto-pause            |
-| **Redis**      | **Upstash** | Free | 256MB, global replication, REST API              |
-| **Client**     | **Vercel**  | Free | Next.js native, ISR, middleware                  |
-| **Admin**      | **Vercel**  | Free | Next.js native, ISR, middleware                  |
+| Component      | Platform            | Plan | Lý do chọn                                                    |
+| -------------- | -------------------- | ---- | -------------------------------------------------------------- |
+| **Server**     | **Self-hosted VPS**  | -    | Docker, always-on (không cold start), full control tài nguyên |
+| **PostgreSQL** | **Neon**              | Free | Serverless, Prisma-native, auto-pause                          |
+| **Redis**      | **Upstash**           | Free | 256MB, global replication, hỗ trợ cả REST lẫn TCP (`rediss://`) |
+| **Client**     | **Vercel**            | Free | Next.js native, ISR, middleware                                |
+| **Admin**      | **Vercel**            | Free | Next.js native, ISR, middleware                                |
 
-### Lưu ý về Render free tier
+### Ghi chú về VPS + Cloudflare Tunnel
 
-Render free web service có một hạn chế: **sleep sau 15 phút không hoạt động**. Khi có request mới, Render mất 30-60s để cold-start lại container.
+VPS chạy sau NAT (không có inbound port công khai), nên không expose port trực tiếp. Traffic public đi qua **Cloudflare Tunnel** (outbound-only từ VPS) — cả HTTP (API) lẫn SSH (deploy) đều đi qua tunnel này, không mở port 22/3001 ra internet.
 
-**Giải pháp**: Một GitHub Action (`keep-alive.yml`) tự động ping `/api/healthz` mỗi 5 phút để giữ server luôn warm. Render free tier có 750 giờ/tháng — nếu chạy 24/7 (~744h) là vừa đủ.
+Vì server always-on trên VPS (không sleep như free-tier PaaS), **không cần** cơ chế keep-alive/ping định kỳ.
 
-> **Tại sao không dùng Koyeb?** Koyeb từng có free tier (always-on Docker, không sleep) nhưng đã bị loại bỏ sau khi Mistral AI mua lại. Hiện chỉ còn gói Pro $29/tháng.
+> **Tại sao không dùng Render/Koyeb?** Free tier PaaS đều có giới hạn (sleep sau X phút, hoặc gói free bị loại bỏ — Koyeb bỏ free tier sau khi Mistral AI mua lại). VPS tự quản cho toàn quyền kiểm soát, không giới hạn giờ chạy.
 
-> **Tại sao không dùng Render PostgreSQL/Redis?** Render free DBs hết hạn sau 90 ngày. Neon và Upstash là serverless, không hết hạn, tích hợp Prisma tốt.
+> **Tại sao không tự host Postgres/Redis trên VPS?** VPS cấu hình thấp (1 vCPU/1.7GB RAM) — Neon và Upstash serverless, miễn phí, không tốn RAM/CPU của VPS, để dành tài nguyên cho app server.
 
 ---
 
-### 7.1 Server → Render (Docker)
+### 7.1 Server → Self-hosted VPS (Docker + Cloudflare Tunnel)
 
-- **File**: `render.yaml` (root)
-- **Runtime**: `docker` — dùng lại multi-stage `Dockerfile` có sẵn
-- **Plan**: `free` (512MB RAM, 0.1 vCPU) — sleep sau 15 phút (được GitHub Action giữ warm)
-- **Port**: `3001`, health check tại `/api/healthz`
-- **Region**: `oregon`
-- **Auto-deploy**: Từ branch `main` — push code tự động deploy
-- **Env vars cần set dạng `sync: false`** (set trong Render Dashboard sau deploy):
+- **Files**: `docker-compose.prod.yml` (root, chỉ chạy service `app`), `.env.production.example` (template)
+- **Image**: build multi-stage `Dockerfile` có sẵn, push lên **GHCR** (`ghcr.io/thanhnam2811/tiny-link`)
+- **Deploy flow**: GitHub Actions build+push image → SSH vào VPS (qua Cloudflare Tunnel + Access Service Token, không cần mở port 22) → `docker compose -f docker-compose.prod.yml pull && up -d`
+- **Port**: `3001` trong container, expose ra ngoài qua Cloudflare Tunnel ingress rule (hostname riêng, VD `link-api.namtt.dev`)
+- **Auto-deploy**: Từ branch `main` — push code tự động build + deploy
+- **Env vars** (set trong `.env.production` trên VPS, không commit vào repo):
     - `DATABASE_URL` — connection string từ Neon
-    - `REDIS_URL` — connection string từ Upstash (định dạng `rediss://`)
+    - `REDIS_URL` — connection string từ Upstash (định dạng `rediss://`, dùng TCP protocol chuẩn chứ không phải REST API)
     - `JWT_SECRET` — secret ký admin JWT
     - `ADMIN_PASSWORD` — mật khẩu dashboard admin
     - `INTERNAL_API_KEY` — key M2M giữa client/server
+- **GitHub Secrets cần thiết cho pipeline**: `VPS_SSH_PRIVATE_KEY`, `VPS_SSH_USER`, `VPS_SSH_HOSTNAME`, `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET`, `DATABASE_URL` (cho bước migrate)
 
 ### 7.2 PostgreSQL → Neon (Serverless)
 
 - **Connection string**: `postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require`
 - **Tạo database**:
     1. Vào https://console.neon.tech → Create project
-    2. Copy connection string → dán vào `DATABASE_URL` trong Render Dashboard
+    2. Copy connection string → dán vào `DATABASE_URL` trong `.env.production` trên VPS + GitHub Secret (cho bước migrate)
 - **Migrate data** (nếu có data cũ):
-    1. Dump từ Render PostgreSQL: `pg_dump <OLD_DATABASE_URL> > dump.sql`
+    1. Dump từ DB cũ: `pg_dump <OLD_DATABASE_URL> > dump.sql`
     2. Restore lên Neon: `psql <NEON_DATABASE_URL> < dump.sql`
 - **Apply schema**: `pnpm --filter @tiny-link/db exec prisma migrate deploy`
 - **Lưu ý**: Neon auto-pause sau 5 phút không hoạt động. Có thể disable trong Dashboard nếu muốn always-on.
 
 ### 7.3 Redis → Upstash (Serverless)
 
-- **Connection string**: `rediss://default:password@us1-xxx.upstash.io:6379` (TLS)
+- **Connection string**: `rediss://default:password@ap-xxx.upstash.io:6379` (TLS, TCP protocol chuẩn — tương thích trực tiếp với `ioredis`/`@fastify/redis`, không cần đổi code)
 - **Tạo database**:
     1. Vào https://console.upstash.com → Create database
-    2. Chọn region gần Render (VD: `us-east-1` hoặc `us-west-1`)
-    3. Copy connection string → dán vào `REDIS_URL` trong Render Dashboard
+    2. Chọn region gần VPS (VPS đặt tại Singapore qua Cloudflare — chọn `ap-southeast-1` hoặc gần nhất)
+    3. Copy connection string dạng `rediss://` (không phải REST URL) → dán vào `REDIS_URL` trong `.env.production` trên VPS
 - **Free tier**: 256MB, 10k commands/ngày — đủ cho rate limiting + cache + analytics queue
 
 ### 7.4 Client → Vercel (unchanged)
@@ -209,8 +209,8 @@ Render free web service có một hạn chế: **sleep sau 15 phút không hoạ
 - **Required env vars** (set trong Vercel Dashboard):
     - `AUTH0_SECRET`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `APP_BASE_URL`
     - `DATABASE_URL` (dùng connection string từ **Neon**)
-    - `INTERNAL_API_URL` (URL của **Render** server service, VD: `https://tiny-link-server.onrender.com`)
-    - `INTERNAL_API_KEY` (phải khớp với Render)
+    - `INTERNAL_API_URL` (URL của server trên VPS qua Cloudflare Tunnel, VD: `https://link-api.namtt.dev`)
+    - `INTERNAL_API_KEY` (phải khớp với server trên VPS)
     - Auth0 Dashboard: thêm Allowed Callback URL `https://<vercel-domain>/auth/callback` và Allowed Logout URL `https://<vercel-domain>`
 
 ### 7.5 Admin → Vercel (unchanged)
@@ -220,17 +220,19 @@ Render free web service có một hạn chế: **sleep sau 15 phút không hoạ
 - **Root**: `packages/admin`
 - **Build order**: `@tiny-link/shared` → `@tiny-link/db` → `@tiny-link/admin`
 - **Required env vars**:
-    - `INTERNAL_API_URL` (URL của **Render** server service)
+    - `INTERNAL_API_URL` (URL của server trên VPS qua Cloudflare Tunnel)
 
 ### 7.6 Luồng deploy
 
 ```mermaid
 graph LR
     A[Push to main] --> B{Vercel auto-deploy}
-    A --> C{Render auto-deploy}
-    B --> D[Client: tiny-link-client.vercel.app]
+    A --> C{GitHub Actions}
+    B --> D[Client: link.namtt.dev]
     B --> E[Admin: tiny-link-admin.vercel.app]
-    C --> F[Server: tiny-link-server.onrender.com]
+    C --> G[Build + Push image to GHCR]
+    G --> H[SSH via Cloudflare Tunnel]
+    H --> F[VPS: docker compose pull + up -d]
     D -- "/api/proxy" --> F
     E -- "INTERNAL_API_URL" --> F
 ```

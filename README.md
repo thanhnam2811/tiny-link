@@ -94,7 +94,7 @@ tiny-link/
 | **UI Components**      | shadcn/ui, Base UI                                          |
 | **Validation**         | Zod (client), TypeBox (server)                              |
 | **Testing**            | Vitest + React Testing Library                              |
-| **DevOps**             | Docker, GitHub Actions, Render                              |
+| **DevOps**             | Docker, GitHub Actions, Self-hosted VPS (Cloudflare Tunnel) |
 | **Package Manager**    | pnpm 10 workspaces                                          |
 
 ---
@@ -239,7 +239,7 @@ Push to main (merge) ──┐
 3. DB Migration ──────── prisma migrate deploy (production)
     │
     ▼
-4. Deploy ────────────── Render production
+4. Deploy ────────────── SSH (via Cloudflare Tunnel) → VPS pulls & restarts
 ```
 
 ---
