@@ -15,7 +15,7 @@
 ## 3. Merge & Auto-Deploy
 
 - Once checks pass and the PR is approved, merge into `main`.
-- The push to `main` triggers the full pipeline: Docker build/publish → `prisma migrate deploy` → Render production deploy hook.
+- The push to `main` triggers the full pipeline: Docker build/publish to GHCR → `prisma migrate deploy` → SSH deploy (over Cloudflare Tunnel) to the VPS, which pulls the new image and restarts.
 - No manual tagging or staging promotion step is required.
 
 ## 4. Rollback
