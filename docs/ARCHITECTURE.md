@@ -166,12 +166,12 @@ Vì server always-on trên VPS (không sleep như free-tier PaaS), **không cầ
 
 ### 7.1 Server → Self-hosted VPS (Docker + Cloudflare Tunnel)
 
-- **Files**: `docker-compose.prod.yml` (root, chỉ chạy service `app`), `.env.production.example` (template)
+- **Files**: `docker-compose.prod.yml` (root, chỉ chạy service `app`), `packages/server/.env.example` (template — dùng chung với dev, `VERCEL_PROJECT_NAME` chỉ cần khi production)
 - **Image**: build multi-stage `Dockerfile` có sẵn, push lên **GHCR** (`ghcr.io/thanhnam2811/tiny-link`)
 - **Deploy flow**: GitHub Actions build+push image → SSH vào VPS (qua Cloudflare Tunnel + Access Service Token, không cần mở port 22) → `docker compose -f docker-compose.prod.yml pull && up -d`
 - **Port**: `3001` trong container, expose ra ngoài qua Cloudflare Tunnel ingress rule (hostname riêng, VD `link-api.namtt.dev`)
 - **Auto-deploy**: Từ branch `main` — push code tự động build + deploy
-- **Env vars** (set trong `.env.production` trên VPS, không commit vào repo):
+- **Env vars** (set trong `packages/server/.env.production` trên VPS, không commit vào repo — cùng thư mục với `.env.example`, chỉ khác tên/giá trị):
     - `DATABASE_URL` — connection string từ Neon
     - `REDIS_URL` — connection string từ Upstash (định dạng `rediss://`, dùng TCP protocol chuẩn chứ không phải REST API)
     - `JWT_SECRET` — secret ký admin JWT
@@ -185,7 +185,7 @@ Vì server always-on trên VPS (không sleep như free-tier PaaS), **không cầ
 - **Connection string**: `postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require`
 - **Tạo database**:
     1. Vào https://console.neon.tech → Create project
-    2. Copy connection string → dán vào `DATABASE_URL` trong `.env.production` trên VPS + GitHub Secret (cho bước migrate)
+    2. Copy connection string → dán vào `DATABASE_URL` trong `packages/server/.env.production` trên VPS + GitHub Secret (cho bước migrate)
 - **Migrate data** (nếu có data cũ):
     1. Dump từ DB cũ: `pg_dump <OLD_DATABASE_URL> > dump.sql`
     2. Restore lên Neon: `psql <NEON_DATABASE_URL> < dump.sql`
@@ -198,7 +198,7 @@ Vì server always-on trên VPS (không sleep như free-tier PaaS), **không cầ
 - **Tạo database**:
     1. Vào https://console.upstash.com → Create database
     2. Chọn region gần VPS (VPS đặt tại Singapore qua Cloudflare — chọn `ap-southeast-1` hoặc gần nhất)
-    3. Copy connection string dạng `rediss://` (không phải REST URL) → dán vào `REDIS_URL` trong `.env.production` trên VPS
+    3. Copy connection string dạng `rediss://` (không phải REST URL) → dán vào `REDIS_URL` trong `packages/server/.env.production` trên VPS
 - **Free tier**: 256MB, 10k commands/ngày — đủ cho rate limiting + cache + analytics queue
 
 ### 7.4 Client → Vercel (unchanged)
