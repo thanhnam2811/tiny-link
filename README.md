@@ -8,6 +8,16 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss)
 
+**Live:** [link.namtt.dev](https://link.namtt.dev)
+
+---
+
+## 📸 Demo
+
+<p align="center">
+  <img src="docs/screenshots/landing.jpg" width="80%" alt="TinyLink landing page" />
+</p>
+
 ---
 
 ## ✨ Features
