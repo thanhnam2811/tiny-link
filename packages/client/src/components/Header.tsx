@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useMotionValueEvent, useScroll } from 'framer-motion';
 import { useUser } from '@auth0/nextjs-auth0';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -24,12 +25,9 @@ export function Header() {
 	const t = useTranslations('common');
 	const [scrolled, setScrolled] = useState(false);
 	const { user, isLoading } = useUser();
+	const { scrollY } = useScroll();
 
-	useEffect(() => {
-		const onScroll = () => setScrolled(window.scrollY > 12);
-		window.addEventListener('scroll', onScroll, { passive: true });
-		return () => window.removeEventListener('scroll', onScroll);
-	}, []);
+	useMotionValueEvent(scrollY, 'change', (latest) => setScrolled(latest > 12));
 
 	return (
 		<header
@@ -69,7 +67,7 @@ export function Header() {
 						<DropdownMenu>
 							<DropdownMenuTrigger className="cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
 								<Avatar>
-									<AvatarImage src={user.picture ?? ''} alt={user.name ?? ''} />
+									<AvatarImage src={user.picture ?? ''} alt={user.name || 'User avatar'} />
 									<AvatarFallback className="bg-primary text-primary-foreground font-heading">
 										{user.name?.charAt(0) || <User className="h-4 w-4" />}
 									</AvatarFallback>

@@ -1,11 +1,9 @@
 ---
 name: TinyLink Design System
-description: Modern, clean, high-performance UI system for TinyLink (Zinc + Emerald / Indigo accents)
+description: Modern, clean, high-performance UI system for TinyLink (Indigo accent, single radius scale)
 colors:
-    primary: '#18181b'
-    primary-hover: '#27272a'
-    accent: '#10b981'
-    accent-hover: '#059669'
+    primary: 'hsl(243 75% 59%)'
+    primary-dark: 'hsl(243 85% 67%)'
     background: '#ffffff'
     surface: '#f4f4f5'
     text-primary: '#09090b'
@@ -14,19 +12,21 @@ colors:
     danger: '#ef4444'
 typography:
     headline:
-        fontFamily: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+        fontFamily: Outfit, ui-sans-serif, system-ui, sans-serif
         fontSize: 32px
         fontWeight: 700
         lineHeight: 1.2
     body:
-        fontFamily: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+        fontFamily: Geist, ui-sans-serif, system-ui, sans-serif
         fontSize: 14px
         fontWeight: 400
         lineHeight: 1.5
-rounded:
-    sm: 6px
-    md: 8px
-    lg: 12px
+radius:
+    base: 0.875rem
+    sm: 'calc(base * 0.6)'
+    md: 'calc(base * 0.8)'
+    lg: 'base'
+    xl: 'calc(base * 1.4)'
     full: 9999px
 spacing:
     xs: 4px
@@ -40,20 +40,34 @@ spacing:
 
 ## Overview
 
-TinyLink uses a minimalist, modern, precision-engineered aesthetic built on Tailwind CSS (Zinc neutrals, crisp borders, refined emerald & neutral accents).
+TinyLink uses a single Indigo accent on a neutral zinc-adjacent base, one radius
+scale derived from a `0.875rem` base, and one accent per page (taste §4.2/§4.4).
+Both `@tiny-link/client` and `@tiny-link/admin` share the same token values —
+see `packages/client/src/app/globals.css` and `packages/admin/app/globals.css`
+for the source of truth; this file documents intent, the CSS is authoritative.
 
 ## Colors
 
-- **Neutral Base:** Zinc scales (`zinc-900` / `zinc-950` for dark themes, `white` / `zinc-50` for light themes).
-- **Accents:** Emerald (`emerald-500` / `emerald-600`) for active status, badges, and positive actions.
-- **Borders & Dividers:** Subtle `zinc-200` (light) / `zinc-800` (dark).
+- **Accent:** Indigo (`hsl(243 75% 59%)` light / `hsl(243 85% 67%)` dark) — the
+  only accent hue used across both apps. Semantic status colors
+  (`--success`, `--warning`, `--destructive`) exist for state (active/inactive,
+  errors) but are never used as decorative accents on marketing surfaces.
+- **Neutral Base:** Zinc-adjacent grays for background/border/muted tokens.
 
 ## Typography
 
-Clean sans-serif (`Inter`, system fallbacks) with high readability and tabular figures for numbers.
+`Geist` for body text, `Outfit` for headings — both via `next/font/google`.
+
+## Radius
+
+One scale, base `0.875rem`, derived via Tailwind's `--radius-sm/md/lg/xl/2xl`
+(see `@theme inline` in `globals.css`). Don't use arbitrary `rounded-[Npx]`.
 
 ## Do's and Don'ts
 
 - **DO:** Use standard responsive Tailwind classes and tokens.
+- **DO:** Use exactly one accent color per page/surface.
 - **DO:** Dynamic base URLs instead of hardcoded hostnames.
 - **DON'T:** Use generic purple gradients or hardcoded localhost URLs.
+- **DON'T:** Introduce a second accent hue (e.g. warning/success) for
+  decorative use — those are reserved for status semantics only.

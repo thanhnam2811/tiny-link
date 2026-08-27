@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter, Outfit } from 'next/font/google';
+import { Geist, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Auth0Provider } from '@auth0/nextjs-auth0';
 
-const inter = Inter({
-	variable: '--font-inter',
+const geist = Geist({
+	variable: '--font-geist',
 	subsets: ['latin'],
 });
 
@@ -36,7 +36,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang={locale} suppressHydrationWarning>
-			<body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
+			<body className={`${geist.variable} ${outfit.variable} font-sans antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<Auth0Provider>
 						<NextIntlClientProvider locale={locale} messages={messages}>

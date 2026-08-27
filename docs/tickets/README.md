@@ -26,10 +26,17 @@ This directory organizes all engineering tickets into domain-specific subdirecto
 | [`TL-SEC-07`](./security/P2_TL-SEC-07_tighten-cors-regex-helmet-headers.md)              | [Tighten Vercel Preview CORS Origin Regex & Add Helmet Security Headers](./security/P2_TL-SEC-07_tighten-cors-regex-helmet-headers.md)             | `security/`         | 🟡 `P2`  | `Security Vulnerability` | ✅ Done |
 | [`TL-FE-05`](./frontend/P2_TL-FE-05_implement-i18n-next-intl.md)                         | [Implement Internationalization (`next-intl`) for Client App](./frontend/P2_TL-FE-05_implement-i18n-next-intl.md)                                  | `frontend/`         | 🟡 `P2`  |        `Feature`         | ✅ Done |
 | [`TL-FE-06`](./frontend/P2_TL-FE-06_dynamic-import-recharts-bundle-size.md)              | [Dynamic Import Recharts to Reduce Initial Bundle Size](./frontend/P2_TL-FE-06_dynamic-import-recharts-bundle-size.md)                             | `frontend/`         | 🟡 `P2`  |      `Performance`       | ✅ Done |
+| [`TL-UI-08`](./frontend/P1_TL-UI-08_fix-taste-token-drift-color-shape-lock.md)           | [Fix Taste Design Token Drift — Color/Shape/Theme Lock Violations](./frontend/P1_TL-UI-08_fix-taste-token-drift-color-shape-lock.md)               | `frontend/`         | 🟠 `P1`  |       `Tech Debt`        | ⏳ Open |
+| [`TL-UI-09`](./frontend/P2_TL-UI-09_fix-landing-taste-hero-a11y-violations.md)           | [Fix Landing Taste Hero Violations — Version Pill, Glass, Typography & A11y](./frontend/P2_TL-UI-09_fix-landing-taste-hero-a11y-violations.md)     | `frontend/`         | 🟡 `P2`  |          `Bug`           | ⏳ Open |
+| [`TL-FE-08`](./frontend/P1_TL-FE-08_fix-env-getEnv-top-level-crash.md)                   | [Fix Top-Level `getEnv` Crash on Build — Lazy Env Evaluation](./frontend/P1_TL-FE-08_fix-env-getEnv-top-level-crash.md)                            | `frontend/`         | 🟠 `P1`  |          `Bug`           | ⏳ Open |
+| [`TL-FE-09`](./frontend/P1_TL-FE-09_fix-landing-polling-rsc-leak.md)                     | [Fix Landing Polling Leak — Extract RSC HealthGate & Abortable Poll](./frontend/P1_TL-FE-09_fix-landing-polling-rsc-leak.md)                       | `frontend/`         | 🟠 `P1`  |          `Bug`           | ⏳ Open |
+| [`TL-FE-10`](./frontend/P2_TL-FE-10_refactor-linkshortener-god-form.md)                  | [Refactor LinkShortenerForm God Form — Hook Extraction & Hydration Fix](./frontend/P2_TL-FE-10_refactor-linkshortener-god-form.md)                 | `frontend/`         | 🟡 `P2`  |       `Tech Debt`        | ⏳ Open |
+| [`TL-FE-11`](./frontend/P2_TL-FE-11_fix-dashboard-debounce-race.md)                      | [Fix Dashboard Fetch Storm — Debounce, Abort & Dialog Confirm](./frontend/P2_TL-FE-11_fix-dashboard-debounce-race.md)                              | `frontend/`         | 🟡 `P2`  |          `Bug`           | ⏳ Open |
 | [`TL-OPS-04`](./devops/P2_TL-OPS-04_activate-frontend-tests-in-ci.md)                    | [Activate Frontend Test Suite in Package Scripts and CI](./devops/P2_TL-OPS-04_activate-frontend-tests-in-ci.md)                                   | `devops/`           | 🟡 `P2`  |         `DevOps`         | ✅ Done |
 | [`TL-OPS-05`](./devops/P2_TL-OPS-05_block-server-startup-dangerous-defaults.md)          | [Block Server Startup on Dangerous Secret Defaults in Production](./devops/P2_TL-OPS-05_block-server-startup-dangerous-defaults.md)                | `devops/`           | 🟡 `P2`  |        `Security`        | ✅ Done |
 | [`TL-ARCH-03`](./quality-arch/P2_TL-ARCH-03_remove-phantom-db-dependency-admin.md)       | [Remove Phantom Dependency `@tiny-link/db` from `@tiny-link/admin`](./quality-arch/P2_TL-ARCH-03_remove-phantom-db-dependency-admin.md)            | `quality-arch/`     | 🟡 `P2`  |       `Tech Debt`        | ✅ Done |
 | [`TL-ARCH-04`](./quality-arch/P2_TL-ARCH-04_refactor-admin-routes-controller-service.md) | [Refactor `admin.routes` Monolith to Controller-Service-Repository](./quality-arch/P2_TL-ARCH-04_refactor-admin-routes-controller-service.md)      | `quality-arch/`     | 🟡 `P2`  |       `Tech Debt`        | ✅ Done |
+| [`TL-ARCH-05`](./quality-arch/P2_TL-ARCH-05_unify-tailwind-color-model.md)               | [Unify Tailwind Color Model — Migrate HSL to OKLCH & Deduplicate Tokens](./quality-arch/P2_TL-ARCH-05_unify-tailwind-color-model.md)               | `quality-arch/`     | 🟡 `P2`  |       `Tech Debt`        | ⏳ Open |
 | [`TL-BE-08`](./backend/P3_TL-BE-08_optimize-prisma-indexes-postgres-pool.md)             | [Optimize Prisma Indexes & Configure Postgres Connection Pool](./backend/P3_TL-BE-08_optimize-prisma-indexes-postgres-pool.md)                     | `backend/`          | 🟢 `P3`  |      `Performance`       | ✅ Done |
 | [`TL-UI-07`](./frontend/P3_TL-UI-07_clean-guest-cookie-remove-redirect-lag.md)           | [Clean Guest ID Cookie After Claim & Remove Artificial 800ms Redirect Lag](./frontend/P3_TL-UI-07_clean-guest-cookie-remove-redirect-lag.md)       | `frontend/`         | 🟢 `P3`  |           `UX`           | ✅ Done |
 | [`TL-OPS-06`](./devops/P3_TL-OPS-06_add-admin-env-example-lint-staged.md)                | [Add Missing `admin/.env.example` & Root Lint-Staged Monorepo Coverage](./devops/P3_TL-OPS-06_add-admin-env-example-lint-staged.md)                | `devops/`           | 🟢 `P3`  |   `Quality Assurance`    | ✅ Done |
@@ -59,6 +66,12 @@ This directory organizes all engineering tickets into domain-specific subdirecto
 - [`P2_TL-FE-05_implement-i18n-next-intl.md`](./frontend/P2_TL-FE-05_implement-i18n-next-intl.md)
 - [`P2_TL-FE-06_dynamic-import-recharts-bundle-size.md`](./frontend/P2_TL-FE-06_dynamic-import-recharts-bundle-size.md)
 - [`P3_TL-UI-07_clean-guest-cookie-remove-redirect-lag.md`](./frontend/P3_TL-UI-07_clean-guest-cookie-remove-redirect-lag.md)
+- [`P1_TL-UI-08_fix-taste-token-drift-color-shape-lock.md`](./frontend/P1_TL-UI-08_fix-taste-token-drift-color-shape-lock.md)
+- [`P2_TL-UI-09_fix-landing-taste-hero-a11y-violations.md`](./frontend/P2_TL-UI-09_fix-landing-taste-hero-a11y-violations.md)
+- [`P1_TL-FE-08_fix-env-getEnv-top-level-crash.md`](./frontend/P1_TL-FE-08_fix-env-getEnv-top-level-crash.md)
+- [`P1_TL-FE-09_fix-landing-polling-rsc-leak.md`](./frontend/P1_TL-FE-09_fix-landing-polling-rsc-leak.md)
+- [`P2_TL-FE-10_refactor-linkshortener-god-form.md`](./frontend/P2_TL-FE-10_refactor-linkshortener-god-form.md)
+- [`P2_TL-FE-11_fix-dashboard-debounce-race.md`](./frontend/P2_TL-FE-11_fix-dashboard-debounce-race.md)
 
 ### 🛡️ [admin/](./admin/)
 
@@ -81,4 +94,5 @@ This directory organizes all engineering tickets into domain-specific subdirecto
 - [`P1_TL-QA-02_harmonize-custom-alias-form-regex.md`](./quality-arch/P1_TL-QA-02_harmonize-custom-alias-form-regex.md)
 - [`P2_TL-ARCH-03_remove-phantom-db-dependency-admin.md`](./quality-arch/P2_TL-ARCH-03_remove-phantom-db-dependency-admin.md)
 - [`P2_TL-ARCH-04_refactor-admin-routes-controller-service.md`](./quality-arch/P2_TL-ARCH-04_refactor-admin-routes-controller-service.md)
+- [`P2_TL-ARCH-05_unify-tailwind-color-model.md`](./quality-arch/P2_TL-ARCH-05_unify-tailwind-color-model.md)
 - [`P3_TL-QA-05_standardize-tsconfig-hierarchy-project-refs.md`](./quality-arch/P3_TL-QA-05_standardize-tsconfig-hierarchy-project-refs.md)

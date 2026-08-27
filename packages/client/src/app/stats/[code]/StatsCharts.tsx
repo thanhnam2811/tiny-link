@@ -29,14 +29,14 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 						<AreaChart data={stats.timeSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
 							<defs>
 								<linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.35} />
-									<stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+									<stop offset="5%" stopColor="var(--primary)" stopOpacity={0.35} />
+									<stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
 								</linearGradient>
 							</defs>
 							<CartesianGrid
 								strokeDasharray="3 3"
 								vertical={false}
-								stroke="hsl(var(--muted-foreground))"
+								stroke="var(--muted-foreground)"
 								opacity={0.15}
 							/>
 							<XAxis
@@ -47,14 +47,14 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 										day: 'numeric',
 									})
 								}
-								stroke="hsl(var(--muted-foreground))"
+								stroke="var(--muted-foreground)"
 								fontSize={11}
 								tickLine={false}
 								axisLine={false}
 								dy={10}
 							/>
 							<YAxis
-								stroke="hsl(var(--muted-foreground))"
+								stroke="var(--muted-foreground)"
 								fontSize={11}
 								tickLine={false}
 								axisLine={false}
@@ -62,17 +62,17 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 							/>
 							<Tooltip
 								cursor={{
-									stroke: 'hsl(var(--primary))',
+									stroke: 'var(--primary)',
 									strokeWidth: 1.5,
 									strokeDasharray: '4 4',
 								}}
 								contentStyle={{
 									borderRadius: '12px',
-									border: '1px solid hsl(var(--border))',
-									backgroundColor: 'hsl(var(--card))',
-									color: 'hsl(var(--card-foreground))',
+									border: '1px solid var(--border)',
+									backgroundColor: 'var(--card)',
+									color: 'var(--card-foreground)',
 									fontSize: '12px',
-									boxShadow: '0 8px 24px hsl(var(--foreground) / 0.08)',
+									boxShadow: '0 8px 24px color-mix(in oklch, var(--foreground) 8%, transparent)',
 								}}
 								labelFormatter={(val) =>
 									new Date(val as string).toLocaleDateString('en-US', {
@@ -86,7 +86,7 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 								type="monotone"
 								dataKey="count"
 								name="Clicks"
-								stroke="hsl(var(--primary))"
+								stroke="var(--primary)"
 								strokeWidth={2.5}
 								fillOpacity={1}
 								fill="url(#colorCount)"
@@ -121,7 +121,7 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 								<CartesianGrid
 									strokeDasharray="3 3"
 									horizontal={false}
-									stroke="hsl(var(--muted-foreground))"
+									stroke="var(--muted-foreground)"
 									opacity={0.15}
 								/>
 								<XAxis type="number" hide />
@@ -134,19 +134,19 @@ export function StatsCharts({ stats, countryData }: StatsChartsProps) {
 									width={72}
 								/>
 								<Tooltip
-									cursor={{ fill: 'hsl(var(--muted))', opacity: 0.35 }}
+									cursor={{ fill: 'var(--muted)', opacity: 0.35 }}
 									contentStyle={{
 										borderRadius: '10px',
-										border: '1px solid hsl(var(--border))',
-										backgroundColor: 'hsl(var(--card))',
-										color: 'hsl(var(--card-foreground))',
+										border: '1px solid var(--border)',
+										backgroundColor: 'var(--card)',
+										color: 'var(--card-foreground)',
 										fontSize: '12px',
 									}}
 								/>
 								<Bar
 									dataKey="clicks"
 									name="Clicks"
-									fill="hsl(var(--chart-2))"
+									fill="var(--chart-2)"
 									radius={[0, 6, 6, 0]}
 									maxBarSize={24}
 								/>
