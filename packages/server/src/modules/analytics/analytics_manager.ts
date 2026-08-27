@@ -72,6 +72,8 @@ export class AnalyticsManager {
 	}
 
 	private async processBatch(events: ClickEvent[]) {
+		if (events.length === 0) return;
+
 		// 2. In-memory Aggregation: Group clicks by linkId for efficient counting
 		const aggregation = events.reduce(
 			(acc, event) => {
@@ -82,41 +84,55 @@ export class AnalyticsManager {
 		);
 
 		await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-			// 3. Batch Insert raw click data
-			await tx.click.createMany({
-				data: events.map((e) => {
-					let country = 'Unknown';
-					let city = 'Unknown';
-
-					if (e.ipAddress) {
-						const geo = geoip.lookup(e.ipAddress);
-						if (geo) {
-							country = geo.country || 'Unknown';
-							city = geo.city || 'Unknown';
-						}
-					}
-
-					return {
-						linkId: e.linkId,
-						ipAddress: e.ipAddress,
-						userAgent: e.userAgent,
-						country,
-						city,
-					};
-				}),
+			// Find existing links to prevent Foreign Key violations and P2025 on deleted links
+			const targetLinkIds = Object.keys(aggregation);
+			const existingLinks = await tx.link.findMany({
+				where: { id: { in: targetLinkIds } },
+				select: { id: true },
 			});
 
-			// 4. Update Link counters (Aggregation results)
-			// We do multiple updates, but grouped by unique linkId
-			for (const [linkId, count] of Object.entries(aggregation)) {
-				await tx.link.update({
-					where: { id: linkId },
-					data: {
-						clicksCount: {
-							increment: count,
-						},
-					},
+			const existingLinkIds = new Set(existingLinks.map((l) => l.id));
+			const validEvents = events.filter((e) => existingLinkIds.has(e.linkId));
+
+			// 3. Batch Insert raw click data for active/existing links
+			if (validEvents.length > 0) {
+				await tx.click.createMany({
+					data: validEvents.map((e) => {
+						let country = 'Unknown';
+						let city = 'Unknown';
+
+						if (e.ipAddress) {
+							const geo = geoip.lookup(e.ipAddress);
+							if (geo) {
+								country = geo.country || 'Unknown';
+								city = geo.city || 'Unknown';
+							}
+						}
+
+						return {
+							linkId: e.linkId,
+							ipAddress: e.ipAddress,
+							userAgent: e.userAgent,
+							country,
+							city,
+						};
+					}),
 				});
+			}
+
+			// 4. Update Link counters using updateMany (safe against record deletion race conditions)
+			for (const link of existingLinks) {
+				const count = aggregation[link.id];
+				if (count) {
+					await tx.link.updateMany({
+						where: { id: link.id },
+						data: {
+							clicksCount: {
+								increment: count,
+							},
+						},
+					});
+				}
 			}
 		});
 	}
