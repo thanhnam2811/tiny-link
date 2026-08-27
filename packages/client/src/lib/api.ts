@@ -206,4 +206,12 @@ export const api = {
 			return response.blob();
 		},
 	},
+
+	health: {
+		/**
+		 * Check whether the backend is up (used to gate the landing page while a
+		 * free-tier backend spins up).
+		 */
+		check: (signal?: AbortSignal) => fetcher<{ status: string }>('/healthz', { method: 'GET', signal }),
+	},
 };
