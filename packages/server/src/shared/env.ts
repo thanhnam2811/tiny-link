@@ -10,10 +10,11 @@ export const isDev = process.env.NODE_ENV === ENV_NAMES.DEVELOPMENT || !process.
  * Ensures that critical secrets are not missing or using dangerous defaults in non-dev environments.
  */
 export const getEnv = (key: string, fallback?: string): string => {
+	const currentIsProd = process.env.NODE_ENV === ENV_NAMES.PRODUCTION;
 	const value = process.env[key];
 
 	if (!value) {
-		if (isProduction) {
+		if (currentIsProd) {
 			throw new Error(`CRITICAL: Environment variable ${key} is required in production!`);
 		}
 		if (fallback === undefined) {
@@ -28,12 +29,12 @@ export const getEnv = (key: string, fallback?: string): string => {
 		'super-secret-key-for-admin-jwt',
 		'secret',
 		'test-internal-key',
-		INTERNAL_AUTH.TEST_KEY, // Added for extra safety
+		INTERNAL_AUTH.TEST_KEY,
 	];
 
-	if (isProduction && dangerousDefaults.includes(value)) {
-		console.warn(
-			`[CAUTION] Environment variable ${key} is using a well-known default value. This is highly discouraged in production!`,
+	if (currentIsProd && dangerousDefaults.includes(value)) {
+		throw new Error(
+			`CRITICAL: Environment variable ${key} is using a dangerous default value ('${value}') in production. Startup blocked!`,
 		);
 	}
 
