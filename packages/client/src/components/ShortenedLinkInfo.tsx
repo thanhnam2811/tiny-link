@@ -130,7 +130,7 @@ export function ShortenedLinkInfo({ shortUrl, onReset }: ShortenedLinkInfoProps)
 							variant="secondary"
 							size="icon-xs"
 							type="button"
-							className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 rounded-full shadow-md z-10"
+							className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity h-6 w-6 rounded-full shadow-md z-10"
 							onClick={downloadQr}
 						>
 							<Download className="h-3 w-3" />

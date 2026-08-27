@@ -54,7 +54,7 @@ export function HealthGate() {
 		<motion.div
 			initial={{ opacity: 0, y: 12 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.4, delay: 0.24 }}
+			transition={{ duration: 0.4, delay: 0.16 }}
 			className="w-full max-w-2xl z-10"
 		>
 			<div className="glass-card rounded-xl overflow-hidden relative">

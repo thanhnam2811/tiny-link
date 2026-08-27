@@ -29,18 +29,10 @@ export default async function Home() {
 	];
 
 	return (
-		<main className="flex min-h-screen flex-col items-center px-4 pb-24 relative overflow-hidden bg-background gradient-mesh">
+		<main className="flex min-h-screen flex-col items-center px-4 pb-24 relative overflow-hidden bg-background">
 			{/* Hero Section */}
 			<section className="w-full max-w-2xl flex flex-col items-center gap-6 text-center mt-16 mb-10 z-10">
-				<div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 inline-flex items-center rounded-full glass px-4 py-1.5 text-xs font-semibold tracking-wide shadow-sm">
-					<span className="flex h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
-					<span className="text-foreground/80">TinyLink v{process.env.NEXT_PUBLIC_APP_VERSION} Stable</span>
-				</div>
-
-				<h1
-					className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 text-5xl sm:text-[4rem] font-heading font-black leading-[1.05] tracking-tight text-foreground"
-					style={{ animationDelay: '80ms' }}
-				>
+				<h1 className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 text-balance text-5xl sm:text-[4rem] font-heading font-black leading-[1.05] tracking-tight text-foreground">
 					{t('heroTitle1')} <br className="hidden sm:block" />
 					<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent pb-1">
 						{t('heroTitle2')}
@@ -49,7 +41,7 @@ export default async function Home() {
 
 				<p
 					className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 text-base sm:text-lg text-muted-foreground max-w-[540px] font-sans font-medium leading-relaxed"
-					style={{ animationDelay: '160ms' }}
+					style={{ animationDelay: '80ms' }}
 				>
 					{t('heroSubtitle')}
 				</p>
@@ -65,7 +57,7 @@ export default async function Home() {
 						<div
 							key={feature.title}
 							className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 motion-safe:hover:-translate-y-1 transition-transform glass-subtle rounded-lg p-5 flex gap-4 items-start cursor-default"
-							style={{ animationDelay: `${(i + 4) * 80}ms` }}
+							style={{ animationDelay: `${(i + 3) * 80}ms` }}
 						>
 							<div className="p-2.5 rounded-md shrink-0 bg-primary/10">
 								<feature.icon className="h-5 w-5 text-primary" />
