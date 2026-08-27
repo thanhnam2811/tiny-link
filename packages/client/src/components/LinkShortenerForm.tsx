@@ -23,8 +23,8 @@ const formSchema = z
 		customCode: z
 			.string()
 			.optional()
-			.refine((val) => !val || /^[a-zA-Z0-9-_]+$/.test(val), {
-				message: 'Custom alias can only contain letters, numbers, hyphens, and underscores',
+			.refine((val) => !val || (val.length >= 3 && val.length <= 30 && /^[a-zA-Z0-9-]+$/.test(val)), {
+				message: 'Custom alias must be 3-30 characters and can only contain letters, numbers, and hyphens',
 			}),
 		password: z.string().optional(),
 		passwordConfirm: z.string().optional(),
