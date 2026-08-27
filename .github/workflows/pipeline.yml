@@ -71,8 +71,11 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Build
-              run: pnpm --filter @tiny-link/server... build
+            - name: Build All Packages
+              env:
+                  INTERNAL_API_URL: http://127.0.0.1:3001
+                  INTERNAL_API_KEY: ci-test-internal-key
+              run: pnpm build
 
             - name: Create test env file
               run: |
