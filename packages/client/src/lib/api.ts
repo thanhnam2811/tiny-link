@@ -13,7 +13,7 @@ import {
 import { getEnv } from './env';
 
 const isServer = typeof window === 'undefined';
-const BASE_URL = isServer ? `${getEnv('INTERNAL_API_URL').replace(/\/+$/, '')}/api` : '/api/proxy';
+const getBaseUrl = () => (isServer ? `${getEnv('INTERNAL_API_URL').replace(/\/+$/, '')}/api` : '/api/proxy');
 
 export class ApiError extends Error {
 	constructor(
@@ -28,7 +28,7 @@ export class ApiError extends Error {
 }
 
 async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-	const url = `${BASE_URL}${endpoint}`;
+	const url = `${getBaseUrl()}${endpoint}`;
 
 	const headers = new Headers(options.headers);
 	if (!headers.has('Content-Type')) {
@@ -156,7 +156,7 @@ export const api = {
 				headers.set(INTERNAL_AUTH.HEADER, getEnv('INTERNAL_API_KEY'));
 			}
 
-			const response = await fetch(`${BASE_URL}/links/bulk-import`, {
+			const response = await fetch(`${getBaseUrl()}/links/bulk-import`, {
 				method: 'POST',
 				body: formData,
 				headers,
@@ -186,7 +186,7 @@ export const api = {
 				headers.set(INTERNAL_AUTH.HEADER, getEnv('INTERNAL_API_KEY'));
 			}
 
-			const response = await fetch(`${BASE_URL}/links/export`, {
+			const response = await fetch(`${getBaseUrl()}/links/export`, {
 				method: 'GET',
 				headers,
 				cache: 'no-store',

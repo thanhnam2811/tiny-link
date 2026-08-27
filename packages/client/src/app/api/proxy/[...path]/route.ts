@@ -3,9 +3,6 @@ import { INTERNAL_AUTH } from '@tiny-link/shared';
 import { NextRequest, NextResponse } from 'next/server';
 import { getEnv } from '@/lib/env';
 
-const FASTIFY_URL = getEnv('INTERNAL_API_URL');
-const INTERNAL_API_KEY = getEnv('INTERNAL_API_KEY');
-
 export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
 	const { path } = await params;
 	return handleProxy(req, path);
@@ -27,6 +24,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
 }
 
 async function handleProxy(req: NextRequest, pathSegments: string[]) {
+	const FASTIFY_URL = getEnv('INTERNAL_API_URL');
+	const INTERNAL_API_KEY = getEnv('INTERNAL_API_KEY');
+
 	const session = await auth0.getSession();
 	const path = pathSegments.join('/');
 	const searchParams = req.nextUrl.searchParams.toString();
