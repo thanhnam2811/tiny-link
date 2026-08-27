@@ -2,6 +2,41 @@
 
 ---
 
+## Security & Architecture: BFF Identity Sanitization & Next.js App Router Middleware Standards (P0 Resolutions)
+
+### Root Causes
+
+1. **BFF Header Injection (`TL-SEC-01`)**: When cloning incoming client request headers (`new Headers(req.headers)`) in a Next.js API proxy route without explicitly stripping internal auth headers (like `x-user-id`), untrusted client-supplied headers are forwarded verbatim to the backend alongside the trusted `x-internal-key`, enabling unauthenticated attackers to spoof arbitrary user identities.
+2. **Non-Standard Next.js Middleware File & Narrow Route Check (`TL-ADM-01`)**: Naming the middleware file `proxy.ts` with custom named exports `proxy` and `proxyConfig` instead of the canonical `middleware.ts` (`export function middleware` / `export const config`) caused Next.js to bypass execution entirely. Additionally, checking only `pathname === '/'` instead of applying a default-deny policy left sensitive nested routes like `/links` and `/health` unguarded.
+
+### Prevention Strategy
+
+- **Header Sanitization Before Session Binding**: In BFF proxy routes, unconditionally delete any sensitive internal header (`headers.delete(INTERNAL_AUTH.USER_ID_HEADER)`) before evaluating the authenticated session. Only inject internal user identifiers if the server-side session contains a verified identifier.
+- **Canonical Middleware Exports & Default-Deny Route Guarding**: Always use the standard `middleware.ts` filename and `export function middleware(request: NextRequest)` in Next.js apps. For authenticated portals (such as admin panels), adopt a default-deny strategy (`const isProtected = pathname !== '/login'`) so that new dashboard routes are protected automatically.
+
+---
+
+## P1 Resolutions: Multi-Layer SSRF Defense, Constant-Time Auth, Queue Poison Pills & CI Build Gates
+
+### Root Causes & Insights
+
+1. **SSRF via Metadata Scraper (`TL-SEC-02`)**: Fetching arbitrary user-provided URLs without DNS pre-flight checks permits requests to cloud metadata services (`169.254.169.254`), private RFC1918 networks (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), CGNAT, loopback, and IPv6 link-local addresses. Relying on HTTP redirects also risks redirection to private targets.
+2. **Timing Side-Channels & Indefinite Admin Tokens (`TL-SEC-03`)**: Direct string comparison (`===`) leaks timing information based on password length and matching prefixes. Omitting JWT expiration creates eternal administrator tokens.
+3. **Queue Poison Pill & Transaction Rollbacks (`TL-BE-04`)**: When an asynchronous buffer worker flushes batch analytics clicks, if a link was deleted in PostgreSQL, `Click.createMany` violates Foreign Key constraints and `Link.update` throws `RecordNotFound (P2025)`, rolling back the entire multi-item batch indefinitely.
+4. **M2M Secret Isolation in Hybrid RSC/Client Fetchers (`TL-FE-02`)**: When unified API fetchers run across both RSC (server-side) and browser (client-side), spreading headers without standard `Headers` API handling or referencing private server secrets in client bundles risks token leaks or failed internal authentication.
+5. **Partial CI Build Gates & Missing Prebuild Triggers (`TL-OPS-01`, `TL-OPS-02`, `TL-OPS-03`)**: Running server-only builds in CI misses Next.js type/JSX compilation errors in client/admin apps. Not attaching `"prebuild": "prisma generate"` to `@tiny-link/db` breaks clean builds. Ending deploy jobs without healthcheck verification fails to catch crash loops.
+6. **Schema Validation Drift (`TL-QA-02`)**: Discrepancies between frontend Zod validation (`/^[a-zA-Z0-9-_]+$/`) and backend TypeBox validation (`^[a-zA-Z0-9-]+$`) cause unexpected 400 Bad Request rejections on submit.
+
+### Prevention Strategies
+
+- **DNS Pre-Flight & Strict Fetch Settings**: Always resolve hostnames via `dns.lookup` and test every resolved IP against all private/link-local/multicast IP CIDRs. Set `redirect: 'error'` and bounded timeout via `AbortSignal.timeout(2000)`.
+- **SHA-256 Digest Constant-Time Comparison**: Hash both secrets with `crypto.createHash('sha256')` before invoking `crypto.timingSafeEqual` to avoid buffer length mismatches while guaranteeing constant-time evaluation. Set strict JWT expiry (`expiresIn: '8h'`) and route-level rate limiting.
+- **Pre-Filtering Foreign Keys & Non-Throwing Batch Updates**: In queue worker flushes, query existing link IDs with `findMany({ where: { id: { in: linkIds } } })`, write clicks only for active links, and use `updateMany` for atomic counter increments without throwing on missing records.
+- **Full Workspace CI Gate & Post-Deploy Health Probing**: Enforce `pnpm build` across all monorepo packages in CI, wire `"prebuild": "prisma generate"`, and probe `/api/healthz` via `ssh ... docker compose exec -T app wget` after deployments.
+- **Schema Harmonization**: Ensure field constraints (regex, min/max lengths, allowed characters) in client schemas match server/shared TypeBox definitions exactly.
+
+---
+
 ## Phase 12: Prisma CLI Broken on Windows (`@prisma/dev` → ESM-only `zeptomatch`) + First-Ever Migration Baselining
 
 ### Root Causes
