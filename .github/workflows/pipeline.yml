@@ -85,8 +85,8 @@ jobs:
                   NODE_ENV=test
                   EOF
 
-            - name: Run tests
-              run: pnpm --filter @tiny-link/server test
+            - name: Run All Tests
+              run: pnpm test
 
     db_migrate:
         name: Database Migration
