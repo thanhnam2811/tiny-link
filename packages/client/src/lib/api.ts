@@ -120,7 +120,7 @@ export const api = {
 		/**
 		 * Get links created by current authenticated user
 		 */
-		getUserLinks: (page: number = 1, limit: number = 10, search?: string) => {
+		getUserLinks: (page: number = 1, limit: number = 10, search?: string, signal?: AbortSignal) => {
 			const query = new URLSearchParams({
 				page: page.toString(),
 				limit: limit.toString(),
@@ -133,6 +133,7 @@ export const api = {
 				currentPage: number;
 			}>(`/links/user?${query.toString()}`, {
 				method: 'GET',
+				signal,
 			});
 		},
 
