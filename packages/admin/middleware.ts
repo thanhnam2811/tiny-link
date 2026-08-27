@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
 	const token = request.cookies.get('admin_token')?.value;
 	const { pathname } = request.nextUrl;
 
@@ -9,16 +9,16 @@ export function proxy(request: NextRequest) {
 		return NextResponse.redirect(new URL('/', request.url));
 	}
 
-	// 2. If trying to access protected pages without token
-	// Add other protected paths to the condition if needed
-	if (pathname === '/' && !token) {
+	// 2. If trying to access protected pages without token (default-deny for all non-login pages)
+	const isProtected = pathname !== '/login';
+	if (isProtected && !token) {
 		return NextResponse.redirect(new URL('/login', request.url));
 	}
 
 	return NextResponse.next();
 }
 
-export const proxyConfig = {
+export const config = {
 	matcher: [
 		/*
 		 * Match all request paths except for the ones starting with:
