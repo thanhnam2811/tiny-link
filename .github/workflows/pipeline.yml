@@ -189,3 +189,8 @@ jobs:
                     docker compose -f docker-compose.prod.yml pull && \
                     docker compose -f docker-compose.prod.yml up -d && \
                     docker image prune -f"
+
+            - name: Verify Container Health
+              run: |
+                  ssh vps-deploy "cd /root/apps/tiny-link && \
+                    docker compose -f docker-compose.prod.yml exec -T app wget -q -O - http://localhost:3001/api/healthz || exit 1"
