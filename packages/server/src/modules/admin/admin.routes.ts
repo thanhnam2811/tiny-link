@@ -26,6 +26,8 @@ import {
 } from '@tiny-link/shared';
 import { getEnv } from '../../shared/env';
 
+import crypto from 'node:crypto';
+
 export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 	const { prisma, analyticsManager } = server;
 
@@ -33,6 +35,12 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 	server.post<{ Body: AdminLoginBodyType }>(
 		'/login',
 		{
+			config: {
+				rateLimit: {
+					max: 5,
+					timeWindow: 60000,
+				},
+			},
 			schema: {
 				body: AdminLoginBodySchema,
 				response: {
@@ -43,18 +51,23 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 			},
 		},
 		async (request, reply) => {
-			const { password } = request.body as AdminLoginBodyType;
+			const { password } = request.body;
 			const adminPassword = getEnv('ADMIN_PASSWORD', 'admin123');
 
-			if (password !== adminPassword) {
+			const inputHash = crypto.createHash('sha256').update(password).digest();
+			const expectedHash = crypto.createHash('sha256').update(adminPassword).digest();
+
+			const isValid = crypto.timingSafeEqual(inputHash, expectedHash);
+
+			if (!isValid) {
 				return reply.code(401).send({
 					error: 'Unauthorized',
 					message: 'Invalid admin password',
 				});
 			}
 
-			// Sign JWT token
-			const token = server.jwt.sign({ role: 'admin' });
+			// Sign JWT token with 8h expiry
+			const token = server.jwt.sign({ role: 'admin' }, { expiresIn: '8h' });
 
 			return { token };
 		},
@@ -183,7 +196,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				]);
 
 				return {
-					links: links.map((link: any) => ({
+					links: links.map((link) => ({
 						id: link.id,
 						originalUrl: link.originalUrl,
 						shortCode: link.shortCode,
