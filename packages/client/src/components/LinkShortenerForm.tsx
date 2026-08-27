@@ -145,7 +145,8 @@ export function LinkShortenerForm({ disabled, onSuccess }: LinkShortenerFormProp
 							</InputGroup>
 							<Button
 								type="submit"
-								className={`h-14 w-full sm:w-auto px-7 font-heading font-bold text-base transition-all rounded-xl z-10 ${
+								size="xl"
+								className={`w-full sm:w-auto font-heading font-bold transition-all rounded-xl z-10 ${
 									!loading && urlValue
 										? 'bg-primary hover:bg-primary/90 text-primary-foreground hover:-translate-y-0.5'
 										: 'bg-muted text-muted-foreground cursor-not-allowed opacity-60'
