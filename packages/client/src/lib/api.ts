@@ -1,8 +1,10 @@
 import {
 	ERROR_MESSAGES,
+	INTERNAL_AUTH,
 	CreateLinkBodyType,
 	LinkResponseType,
 	LinkPreviewResponseType,
+	LinkStatsResponseType,
 	VerifyPasswordResponseType,
 	TrackPublicResponseType,
 	BulkImportResponseType,
@@ -11,7 +13,7 @@ import {
 import { getEnv } from './env';
 
 const isServer = typeof window === 'undefined';
-const BASE_URL = isServer ? getEnv('INTERNAL_API_URL') + '/api' : '/api/proxy';
+const BASE_URL = isServer ? `${getEnv('INTERNAL_API_URL').replace(/\/+$/, '')}/api` : '/api/proxy';
 
 export class ApiError extends Error {
 	constructor(
@@ -27,10 +29,14 @@ export class ApiError extends Error {
 
 async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
 	const url = `${BASE_URL}${endpoint}`;
-	const headers = {
-		'Content-Type': 'application/json',
-		...options.headers,
-	};
+
+	const headers = new Headers(options.headers);
+	if (!headers.has('Content-Type')) {
+		headers.set('Content-Type', 'application/json');
+	}
+	if (isServer) {
+		headers.set(INTERNAL_AUTH.HEADER, getEnv('INTERNAL_API_KEY'));
+	}
 
 	const response = await fetch(url, { ...options, headers, cache: 'no-store' });
 
@@ -67,21 +73,24 @@ export const api = {
 				method: 'POST',
 				body: JSON.stringify(payload),
 			}),
+
 		/**
-		 * Get stats for a short link
+		 * Retrieve analytics and stats for a short link
 		 */
 		getStats: (code: string, password?: string) =>
-			fetcher<unknown>(`/stats/${code}`, {
+			fetcher<LinkStatsResponseType>(`/stats/${code}`, {
 				method: 'POST',
 				body: JSON.stringify({ password }),
 			}),
+
 		/**
-		 * Track a public link click
+		 * Track a click and retrieve the target URL
 		 */
 		track: (code: string) =>
 			fetcher<TrackPublicResponseType>(`/links/${code}/track`, {
 				method: 'POST',
 			}),
+
 		/**
 		 * Verify password for a protected link
 		 */
@@ -90,23 +99,26 @@ export const api = {
 				method: 'POST',
 				body: JSON.stringify({ password }),
 			}),
+
 		/**
-		 * Get preview metadata for a link
+		 * Fetch link preview metadata
 		 */
 		getPreview: (code: string) =>
 			fetcher<LinkPreviewResponseType>(`/links/${code}/preview`, {
 				method: 'GET',
 			}),
+
 		/**
-		 * Claim guest links (called automatically on login)
+		 * Claim guest links for the authenticated user
 		 */
 		claim: (guestId: string) =>
 			fetcher<{ success: boolean; claimedCount: number }>('/links/claim', {
 				method: 'POST',
 				body: JSON.stringify({ guestId }),
 			}),
+
 		/**
-		 * Get links for the authenticated user
+		 * Get links created by current authenticated user
 		 */
 		getUserLinks: (page: number = 1, limit: number = 10, search?: string) => {
 			const query = new URLSearchParams({
@@ -123,23 +135,31 @@ export const api = {
 				method: 'GET',
 			});
 		},
+
 		/**
-		 * Delete (Soft Delete) a link
+		 * Delete a link by ID
 		 */
 		delete: (id: string) =>
 			fetcher<{ success: boolean }>(`/links/${id}`, {
 				method: 'DELETE',
 			}),
+
 		/**
-		 * Bulk import links from a CSV file
+		 * Bulk import links via CSV upload
 		 */
 		bulkImport: async (file: File): Promise<BulkImportResponseType> => {
 			const formData = new FormData();
 			formData.append('file', file);
 
+			const headers = new Headers();
+			if (isServer) {
+				headers.set(INTERNAL_AUTH.HEADER, getEnv('INTERNAL_API_KEY'));
+			}
+
 			const response = await fetch(`${BASE_URL}/links/bulk-import`, {
 				method: 'POST',
 				body: formData,
+				headers,
 				cache: 'no-store',
 			});
 
@@ -156,12 +176,19 @@ export const api = {
 
 			return data as BulkImportResponseType;
 		},
+
 		/**
 		 * Export the authenticated user's links as a CSV file
 		 */
 		exportCsv: async (): Promise<Blob> => {
+			const headers = new Headers();
+			if (isServer) {
+				headers.set(INTERNAL_AUTH.HEADER, getEnv('INTERNAL_API_KEY'));
+			}
+
 			const response = await fetch(`${BASE_URL}/links/export`, {
 				method: 'GET',
+				headers,
 				cache: 'no-store',
 			});
 
