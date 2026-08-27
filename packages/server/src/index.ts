@@ -11,6 +11,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyCors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
 import fastifyMultipart from '@fastify/multipart';
+import fastifyHelmet from '@fastify/helmet';
 import { apiRoutes } from './modules/api.routes';
 import { AnalyticsManager } from './modules/analytics/analytics_manager';
 import { globalErrorHandler, notFoundHandler } from './shared/error-handler';
@@ -33,6 +34,11 @@ export const buildServer = async () => {
 	server.setErrorHandler(globalErrorHandler);
 	server.setNotFoundHandler(notFoundHandler);
 
+	// Register Helmet Security Headers
+	await server.register(fastifyHelmet, {
+		contentSecurityPolicy: false,
+	});
+
 	// Register CORS (Allow Next.js client to call the API)
 	await server.register(fastifyCors, {
 		origin: (origin, cb) => {
@@ -43,9 +49,10 @@ export const buildServer = async () => {
 
 			const clientUrl = getEnv('CLIENT_URL', 'http://localhost:3000');
 
-			// Strict Vercel Domain Check (Placeholder for project safety)
-			const vercelProjectName = getEnv('VERCEL_PROJECT_NAME', 'tiny-link-client');
-			const vercelRegex = new RegExp(`^${vercelProjectName}.*\\.vercel\\.app$`);
+			// Strict Vercel Domain Check
+			const rawProjectName = getEnv('VERCEL_PROJECT_NAME', 'tiny-link-client');
+			const vercelProjectName = rawProjectName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const vercelRegex = new RegExp(`^(https?:\\/\\/)?${vercelProjectName}(-[a-z0-9-]+)?\\.vercel\\.app$`);
 
 			// Allow all in development/test, or strict match in production
 			if (!isProduction || !origin || origin === clientUrl || vercelRegex.test(origin)) {
