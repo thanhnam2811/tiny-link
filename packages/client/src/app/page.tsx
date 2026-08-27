@@ -32,8 +32,8 @@ export default function Home() {
 			icon: Zap,
 			title: t('features.lightning.title'),
 			description: t('features.lightning.description'),
-			color: 'text-warning',
-			bg: 'bg-warning/10',
+			color: 'text-primary',
+			bg: 'bg-primary/10',
 		},
 		{
 			icon: BarChart2,
@@ -46,15 +46,15 @@ export default function Home() {
 			icon: Shield,
 			title: t('features.security.title'),
 			description: t('features.security.description'),
-			color: 'text-success',
-			bg: 'bg-success/10',
+			color: 'text-primary',
+			bg: 'bg-primary/10',
 		},
 		{
 			icon: Globe,
 			title: t('features.global.title'),
 			description: t('features.global.description'),
-			color: 'text-chart-2',
-			bg: 'bg-chart-2/10',
+			color: 'text-primary',
+			bg: 'bg-primary/10',
 		},
 	];
 
