@@ -43,7 +43,7 @@ describe('RedirectHandler', () => {
 		await waitFor(
 			() => {
 				expect(global.fetch).toHaveBeenCalledWith(
-					expect.stringContaining('/api/links/abc/track'),
+					expect.stringContaining('/api/proxy/links/abc/track'),
 					expect.any(Object),
 				);
 				expect(window.location.href).toBe('https://example.com');
@@ -73,7 +73,7 @@ describe('RedirectHandler', () => {
 
 		await waitFor(() => {
 			expect(global.fetch).toHaveBeenCalledWith(
-				expect.stringContaining('/api/links/abc/verify'),
+				expect.stringContaining('/api/proxy/links/abc/verify'),
 				expect.any(Object),
 			);
 			expect(toast.success).toHaveBeenCalledWith('Password verified. Redirecting...');
@@ -94,7 +94,7 @@ describe('RedirectHandler', () => {
 
 		await waitFor(() => {
 			expect(global.fetch).toHaveBeenCalledWith(
-				expect.stringContaining('/api/links/abc/verify'),
+				expect.stringContaining('/api/proxy/links/abc/verify'),
 				expect.any(Object),
 			);
 			expect(toast.error).toHaveBeenCalledWith('Incorrect password');

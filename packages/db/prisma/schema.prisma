@@ -30,7 +30,6 @@ model Link {
 
   clicks          Click[]
 
-  @@index([shortCode]) // Optimize lookup
   @@index([userId])    // Optimize dashboard queries
   @@index([guestId])   // Optimize claiming logic
 }
@@ -46,6 +45,7 @@ model Click {
   clickedAt  DateTime @default(now())
 
   @@index([linkId, clickedAt]) // Optimize stats queries
+  @@index([clickedAt]) // Optimize timeline/aggregate queries not scoped to a single link
 }
 
 // ---------------------------------------------------------------------------------

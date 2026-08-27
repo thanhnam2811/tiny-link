@@ -6,38 +6,7 @@ import { ServerLoadingOverlay } from '@/components/ServerLoadingOverlay';
 import { ShortenedLinkInfo } from '@/components/ShortenedLinkInfo';
 import { LinkShortenerForm } from '@/components/LinkShortenerForm';
 import { Zap, Shield, BarChart2, Globe } from 'lucide-react';
-
-const FEATURES = [
-	{
-		icon: Zap,
-		title: 'Lightning Fast',
-		description: 'Sub-millisecond redirects powered by Redis caching and edge infrastructure.',
-		color: 'text-warning',
-		bg: 'bg-warning/10',
-	},
-	{
-		icon: BarChart2,
-		title: 'Deep Analytics',
-		description: 'Track clicks, geo-location, devices, and traffic trends in real time.',
-		color: 'text-primary',
-		bg: 'bg-primary/10',
-	},
-	{
-		icon: Shield,
-		title: 'Secure by Default',
-		description: 'Password protection, self-destruct links, and rate limiting built in.',
-		color: 'text-success',
-		bg: 'bg-success/10',
-	},
-	{
-		icon: Globe,
-		title: 'Global Reach',
-		description: 'Bot-aware traffic routing with OpenGraph previews for any platform.',
-		color: 'text-chart-2',
-		bg: 'bg-chart-2/10',
-	},
-];
-
+import { useTranslations } from 'next-intl';
 import { type Variants } from 'framer-motion';
 
 const fadeUp: Variants = {
@@ -54,8 +23,40 @@ const fadeUp: Variants = {
 };
 
 export default function Home() {
+	const t = useTranslations('home');
 	const [shortUrl, setShortUrl] = useState<string | null>(null);
 	const [serverStatus, setServerStatus] = useState<'warming' | 'ready' | 'error'>('warming');
+
+	const FEATURES = [
+		{
+			icon: Zap,
+			title: t('features.lightning.title'),
+			description: t('features.lightning.description'),
+			color: 'text-warning',
+			bg: 'bg-warning/10',
+		},
+		{
+			icon: BarChart2,
+			title: t('features.analytics.title'),
+			description: t('features.analytics.description'),
+			color: 'text-primary',
+			bg: 'bg-primary/10',
+		},
+		{
+			icon: Shield,
+			title: t('features.security.title'),
+			description: t('features.security.description'),
+			color: 'text-success',
+			bg: 'bg-success/10',
+		},
+		{
+			icon: Globe,
+			title: t('features.global.title'),
+			description: t('features.global.description'),
+			color: 'text-chart-2',
+			bg: 'bg-chart-2/10',
+		},
+	];
 
 	useEffect(() => {
 		const healthUrl = '/api/proxy/healthz';
@@ -126,9 +127,9 @@ export default function Home() {
 					animate="visible"
 					className="text-5xl sm:text-[4rem] font-heading font-black leading-[1.05] tracking-tight text-foreground"
 				>
-					Shorten your links. <br className="hidden sm:block" />
+					{t('heroTitle1')} <br className="hidden sm:block" />
 					<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent pb-1">
-						Track everything.
+						{t('heroTitle2')}
 					</span>
 				</motion.h1>
 
@@ -139,8 +140,7 @@ export default function Home() {
 					animate="visible"
 					className="text-base sm:text-lg text-muted-foreground max-w-[540px] font-sans font-medium leading-relaxed"
 				>
-					A lightning-fast URL shortener built for power users. <br className="hidden sm:block" />
-					Enter your long URL below to get started.
+					{t('heroSubtitle')}
 				</motion.p>
 			</section>
 

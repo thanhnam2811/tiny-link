@@ -46,6 +46,12 @@ interface LinksTableProps {
 	};
 }
 
+function getClientUrl(shortCode: string): string {
+	const rawBase = process.env.NEXT_PUBLIC_CLIENT_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+	const cleanBase = rawBase.replace(/\/+$/, '');
+	return `${cleanBase}/${shortCode}`;
+}
+
 export function LinksTable({ data, searchParams }: LinksTableProps) {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -192,23 +198,24 @@ export function LinksTable({ data, searchParams }: LinksTableProps) {
 													<DropdownMenuGroup>
 														<DropdownMenuLabel>Actions</DropdownMenuLabel>
 														<DropdownMenuItem
-															onClick={() =>
+															onClick={() => {
 																navigator.clipboard.writeText(
-																	`http://localhost:3000/${link.shortCode}`,
-																)
-															}
+																	getClientUrl(link.shortCode),
+																);
+															}}
 															className="cursor-pointer"
 														>
 															<Copy className="mr-2 h-4 w-4" />
 															Copy Link
 														</DropdownMenuItem>
 														<DropdownMenuItem
-															onClick={() =>
+															onClick={() => {
 																window.open(
-																	`http://localhost:3000/${link.shortCode}`,
+																	getClientUrl(link.shortCode),
 																	'_blank',
-																)
-															}
+																	'noopener,noreferrer',
+																);
+															}}
 															className="cursor-pointer"
 														>
 															<ExternalLink className="mr-2 h-4 w-4" />

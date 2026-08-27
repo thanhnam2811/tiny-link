@@ -34,6 +34,7 @@ async function handleProxy(req: NextRequest, pathSegments: string[]) {
 
 	const headers = new Headers(req.headers);
 	headers.delete('host'); // Let fetch handle Host header
+	headers.delete(INTERNAL_AUTH.USER_ID_HEADER); // Prevent identity spoofing
 	headers.set(INTERNAL_AUTH.HEADER, INTERNAL_API_KEY || '');
 
 	if (session?.user?.sub) {

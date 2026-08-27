@@ -33,6 +33,15 @@
 		"packages/client/**/*.{js,jsx,ts,tsx}": [
 			"pnpm --filter @tiny-link/client exec eslint --fix"
 		],
+		"packages/admin/**/*.{js,jsx,ts,tsx}": [
+			"pnpm --filter @tiny-link/admin exec eslint --fix"
+		],
+		"packages/shared/**/*.{js,ts}": [
+			"pnpm --filter @tiny-link/shared exec eslint --fix"
+		],
+		"packages/db/**/*.{js,ts}": [
+			"pnpm --filter @tiny-link/db exec eslint --fix"
+		],
 		"*.{js,jsx,ts,tsx,json,md}": [
 			"prettier --write"
 		]

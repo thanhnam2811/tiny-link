@@ -94,4 +94,60 @@ describe('LinkShortenerForm', () => {
 			expect(api.links.create).not.toHaveBeenCalled();
 		});
 	});
+
+	it('rejects custom aliases containing underscores or invalid characters', async () => {
+		render(<LinkShortenerForm disabled={false} onSuccess={mockOnSuccess} />);
+		const input = screen.getByPlaceholderText('Paste long URL...');
+		fireEvent.change(input, { target: { value: 'https://example.com' } });
+
+		// Open accordion
+		fireEvent.click(screen.getByText('Advanced Options'));
+
+		const aliasInput = screen.getByPlaceholderText('custom-alias');
+		fireEvent.change(aliasInput, { target: { value: 'my_invalid_alias' } });
+
+		fireEvent.click(screen.getByRole('button', { name: /Shorten/i }));
+
+		await waitFor(() => {
+			expect(
+				screen.getByText(
+					'Custom alias must be 3-30 characters and can only contain letters, numbers, and hyphens',
+				),
+			).toBeInTheDocument();
+			expect(api.links.create).not.toHaveBeenCalled();
+		});
+	});
+
+	it('accepts valid custom alias with letters, numbers, and hyphens', async () => {
+		vi.mocked(api.links.create).mockResolvedValue({
+			id: 'custom-123',
+			shortCode: 'my-custom-2026',
+			shortUrl: 'http://localhost:3000/my-custom-2026',
+			originalUrl: 'https://example.com',
+			createdAt: new Date().toISOString(),
+			clicksCount: 0,
+			isActive: true,
+		});
+
+		render(<LinkShortenerForm disabled={false} onSuccess={mockOnSuccess} />);
+		const input = screen.getByPlaceholderText('Paste long URL...');
+		fireEvent.change(input, { target: { value: 'https://example.com' } });
+
+		// Open accordion
+		fireEvent.click(screen.getByText('Advanced Options'));
+
+		const aliasInput = screen.getByPlaceholderText('custom-alias');
+		fireEvent.change(aliasInput, { target: { value: 'my-custom-2026' } });
+
+		fireEvent.click(screen.getByRole('button', { name: /Shorten/i }));
+
+		await waitFor(() => {
+			expect(api.links.create).toHaveBeenCalledWith(
+				expect.objectContaining({
+					originalUrl: 'https://example.com',
+					customCode: 'my-custom-2026',
+				}),
+			);
+		});
+	});
 });

@@ -24,15 +24,27 @@ import {
 	ErrorResponseSchema,
 	ErrorResponseType,
 } from '@tiny-link/shared';
-import { getEnv } from '../../shared/env';
+import { AdminRepository } from './admin.repository';
+import { AdminService } from './admin.service';
+import { AdminController } from './admin.controller';
 
 export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
-	const { prisma, analyticsManager } = server;
+	const { prisma, analyticsManager, redis } = server;
+
+	const adminRepository = new AdminRepository(prisma);
+	const adminService = new AdminService(adminRepository, redis, analyticsManager);
+	const adminController = new AdminController(adminService);
 
 	// Public routes
 	server.post<{ Body: AdminLoginBodyType }>(
 		'/login',
 		{
+			config: {
+				rateLimit: {
+					max: 5,
+					timeWindow: 60000,
+				},
+			},
 			schema: {
 				body: AdminLoginBodySchema,
 				response: {
@@ -42,22 +54,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				description: 'Authenticate as admin using a password',
 			},
 		},
-		async (request, reply) => {
-			const { password } = request.body as AdminLoginBodyType;
-			const adminPassword = getEnv('ADMIN_PASSWORD', 'admin123');
-
-			if (password !== adminPassword) {
-				return reply.code(401).send({
-					error: 'Unauthorized',
-					message: 'Invalid admin password',
-				});
-			}
-
-			// Sign JWT token
-			const token = server.jwt.sign({ role: 'admin' });
-
-			return { token };
-		},
+		adminController.login,
 	);
 
 	// Protected routes (Encapsulated)
@@ -82,18 +79,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async () => {
-				const totalLinks = await prisma.link.count();
-				const aggregateResult = await prisma.link.aggregate({
-					_sum: { clicksCount: true },
-				});
-				const totalClicks = aggregateResult._sum.clicksCount || 0;
-
-				return {
-					totalLinks,
-					totalClicks,
-				};
-			},
+			adminController.getStats,
 		);
 
 		protectedServer.get<{ Reply: AdminHealthResponseType }>(
@@ -108,33 +94,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async () => {
-				const timed = async (check: () => Promise<unknown>) => {
-					const start = Date.now();
-					try {
-						await check();
-						return { status: 'up' as const, latencyMs: Date.now() - start };
-					} catch {
-						return { status: 'down' as const };
-					}
-				};
-
-				const [redisResult, postgresResult] = await Promise.all([
-					timed(() => server.redis.ping()),
-					timed(() => prisma.$queryRaw`SELECT 1`),
-				]);
-
-				const queueStats = analyticsManager.getQueueStats();
-
-				return {
-					redis: redisResult,
-					postgres: postgresResult,
-					queue: {
-						...queueStats,
-						processMemoryMb: Math.round(process.memoryUsage().rss / (1024 * 1024)),
-					},
-				};
-			},
+			adminController.getHealth,
 		);
 
 		protectedServer.get<{
@@ -153,49 +113,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async (request) => {
-				const {
-					page = 1,
-					limit = 10,
-					search,
-					sortBy = 'createdAt',
-					sortOrder = 'desc',
-				} = request.query as AdminGetLinksQueryType;
-				const skip = (page - 1) * limit;
-
-				const where = search
-					? {
-							OR: [
-								{ shortCode: { contains: search, mode: 'insensitive' as const } },
-								{ originalUrl: { contains: search, mode: 'insensitive' as const } },
-							],
-						}
-					: {};
-
-				const [links, totalCount] = await Promise.all([
-					prisma.link.findMany({
-						where,
-						skip,
-						take: limit,
-						orderBy: { [sortBy]: sortOrder } as Record<string, string>,
-					}),
-					prisma.link.count({ where }),
-				]);
-
-				return {
-					links: links.map((link: any) => ({
-						id: link.id,
-						originalUrl: link.originalUrl,
-						shortCode: link.shortCode,
-						createdAt: link.createdAt.toISOString(),
-						clicksCount: link.clicksCount,
-						isActive: link.isActive,
-					})),
-					totalCount,
-					totalPages: Math.ceil(totalCount / limit),
-					currentPage: page,
-				};
-			},
+			adminController.getLinks,
 		);
 
 		protectedServer.patch<{
@@ -217,25 +135,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async (request, reply) => {
-				const { id } = request.params as AdminLinkIdParamsType;
-				const { isActive } = request.body as AdminUpdateLinkStatusBodyType;
-
-				try {
-					await prisma.link.update({
-						where: { id },
-						data: { isActive },
-					});
-					return { success: true };
-				} catch {
-					return reply.code(404).send({
-						statusCode: 404,
-						error: 'Not Found',
-						code: 'LINK_NOT_FOUND',
-						message: 'Link not found',
-					});
-				}
-			},
+			adminController.updateLinkStatus,
 		);
 
 		protectedServer.delete<{
@@ -255,23 +155,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async (request, reply) => {
-				const { id } = request.params as AdminLinkIdParamsType;
-
-				try {
-					await prisma.link.delete({
-						where: { id },
-					});
-					return { success: true };
-				} catch {
-					return reply.code(404).send({
-						statusCode: 404,
-						error: 'Not Found',
-						code: 'LINK_NOT_FOUND',
-						message: 'Link not found',
-					});
-				}
-			},
+			adminController.deleteLink,
 		);
 
 		protectedServer.get<{
@@ -290,109 +174,7 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 					security: [{ bearerAuth: [] }],
 				},
 			},
-			async (request) => {
-				const { range = '7d' } = request.query as AdminAnalyticsQueryType;
-
-				// 1. Determine Date Range
-				const now = new Date();
-				let startDate = new Date();
-				if (range === '7d') startDate.setDate(now.getDate() - 7);
-				else if (range === '30d') startDate.setDate(now.getDate() - 30);
-				else startDate = new Date(0); // All time
-
-				startDate.setHours(0, 0, 0, 0);
-
-				// 2. Query Timeline using $queryRaw for performance
-				const timelineRaw = await prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-					SELECT DATE_TRUNC('day', "clickedAt") as date, COUNT(*) as count 
-					FROM "Click" 
-					WHERE "clickedAt" >= ${startDate}
-					GROUP BY DATE_TRUNC('day', "clickedAt") 
-					ORDER BY date ASC
-				`;
-
-				// 3. Zero-padding Timeline
-				const timelineMap = new Map<string, number>();
-				timelineRaw.forEach((row: { date: Date; count: bigint }) => {
-					timelineMap.set(row.date.toISOString().split('T')[0], Number(row.count));
-				});
-
-				const timeline: { date: string; clicks: number }[] = [];
-				if (range !== 'all') {
-					const days = range === '7d' ? 7 : 30;
-					for (let i = 0; i <= days; i++) {
-						const d = new Date(startDate);
-						d.setDate(d.getDate() + i);
-						if (d > now) break;
-						const dateStr = d.toISOString().split('T')[0];
-						timeline.push({ date: dateStr, clicks: timelineMap.get(dateStr) || 0 });
-					}
-				} else {
-					if (timelineRaw.length > 0) {
-						const firstDate = timelineRaw[0].date;
-						const diffTime = Math.abs(now.getTime() - firstDate.getTime());
-						const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-						for (let i = 0; i <= diffDays; i++) {
-							const d = new Date(firstDate);
-							d.setDate(d.getDate() + i);
-							if (d > now) break;
-							const dateStr = d.toISOString().split('T')[0];
-							timeline.push({ date: dateStr, clicks: timelineMap.get(dateStr) || 0 });
-						}
-					}
-				}
-
-				// 4. Query Grouped Data
-				const countryGroups = await prisma.click.groupBy({
-					by: ['country'],
-					where: { clickedAt: { gte: startDate } },
-					_count: { id: true },
-					orderBy: { _count: { id: 'desc' } },
-					take: 10,
-				});
-
-				const countryData = countryGroups.map((g: { country: string | null; _count: { id: number } }) => ({
-					name: g.country || 'Unknown',
-					count: g._count.id,
-				}));
-
-				const uaGroups = await prisma.click.groupBy({
-					by: ['userAgent'],
-					where: { clickedAt: { gte: startDate } },
-					_count: { id: true },
-				});
-
-				const osCount = new Map<string, number>();
-				const browserCount = new Map<string, number>();
-
-				const { UAParser } = await import('ua-parser-js');
-
-				uaGroups.forEach((g: { userAgent: string | null; _count: { id: number } }) => {
-					const parser = new UAParser(g.userAgent || '');
-					const osName = parser.getOS().name || 'Unknown';
-					const browserName = parser.getBrowser().name || 'Unknown';
-
-					osCount.set(osName, (osCount.get(osName) || 0) + g._count.id);
-					browserCount.set(browserName, (browserCount.get(browserName) || 0) + g._count.id);
-				});
-
-				const osData = Array.from(osCount.entries())
-					.map(([name, count]) => ({ name, count }))
-					.sort((a, b) => b.count - a.count)
-					.slice(0, 10);
-
-				const browserData = Array.from(browserCount.entries())
-					.map(([name, count]) => ({ name, count }))
-					.sort((a, b) => b.count - a.count)
-					.slice(0, 10);
-
-				return {
-					timeline,
-					os: osData,
-					browser: browserData,
-					country: countryData,
-				};
-			},
+			adminController.getAnalytics,
 		);
 	});
 };

@@ -17,7 +17,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LayoutDashboard, LogOut, Link as LinkIcon, User } from 'lucide-react';
 
+import { useTranslations } from 'next-intl';
+import { LocaleToggle } from '@/components/LocaleToggle';
+
 export function Header() {
+	const t = useTranslations('common');
 	const [scrolled, setScrolled] = useState(false);
 	const { user, isLoading } = useUser();
 
@@ -49,13 +53,14 @@ export function Header() {
 								href="/dashboard"
 								className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 							>
-								Dashboard
+								{t('dashboard')}
 							</Link>
 						</nav>
 					)}
 				</div>
 
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2 sm:gap-3">
+					<LocaleToggle />
 					<ThemeToggle />
 
 					{isLoading ? (
@@ -84,20 +89,20 @@ export function Header() {
 								<DropdownMenuSeparator />
 								<DropdownMenuItem render={<Link href="/dashboard" />}>
 									<LayoutDashboard className="h-4 w-4" />
-									<span>Dashboard</span>
+									<span>{t('dashboard')}</span>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								{/* Plain anchor: /auth/logout is handled by Auth0 middleware, not a Next.js route */}
 								{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
 								<DropdownMenuItem variant="destructive" render={<a href="/auth/logout?returnTo=/" />}>
 									<LogOut className="h-4 w-4" />
-									<span>Sign out</span>
+									<span>{t('signOut')}</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (
 						<Link href="/login">
-							<Button className="h-9 rounded-lg px-4 shadow-sm">Sign In</Button>
+							<Button className="h-9 rounded-lg px-4 shadow-sm">{t('signIn')}</Button>
 						</Link>
 					)}
 				</div>

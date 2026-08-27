@@ -9,11 +9,16 @@ export function parseImportCsv(buffer: Buffer): Record<string, string>[] {
 	}) as Record<string, string>[];
 }
 
-function escapeCsvField(field: string): string {
-	if (/[",\n\r]/.test(field)) {
-		return `"${field.replace(/"/g, '""')}"`;
+export function escapeCsvField(field: string): string {
+	let sanitized = field;
+	// Prefix formula trigger characters (=, +, -, @, \t, \r) with a single quote to prevent spreadsheet formula injection
+	if (/^[=+\-@\t\r]/.test(sanitized)) {
+		sanitized = `'${sanitized}`;
 	}
-	return field;
+	if (/[",\n\r]/.test(sanitized)) {
+		return `"${sanitized.replace(/"/g, '""')}"`;
+	}
+	return sanitized;
 }
 
 export function toCsv(rows: string[][]): string {

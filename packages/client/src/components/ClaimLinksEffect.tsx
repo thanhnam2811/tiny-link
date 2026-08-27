@@ -5,6 +5,7 @@ import { useUser } from '@auth0/nextjs-auth0';
 import { api } from '@/lib/api';
 import { getCookie } from 'cookies-next';
 import { toast } from 'sonner';
+import { clearGuestId } from '@/lib/guest-id';
 
 export function ClaimLinksEffect() {
 	const { user, isLoading } = useUser();
@@ -26,6 +27,7 @@ export function ClaimLinksEffect() {
 							console.log(`[ClaimLinksEffect] Successfully claimed ${res.claimedCount} links.`);
 							toast.success(`Welcome back! We've added ${res.claimedCount} links to your account.`);
 						}
+						clearGuestId();
 					})
 					.catch((err) => {
 						console.error('[ClaimLinksEffect] Failed to claim links:', err);

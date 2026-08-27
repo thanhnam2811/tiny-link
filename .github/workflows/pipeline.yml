@@ -71,8 +71,11 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Build
-              run: pnpm --filter @tiny-link/server... build
+            - name: Build All Packages
+              env:
+                  INTERNAL_API_URL: http://127.0.0.1:3001
+                  INTERNAL_API_KEY: ci-test-internal-key
+              run: pnpm build
 
             - name: Create test env file
               run: |
@@ -80,10 +83,14 @@ jobs:
                   DATABASE_URL=postgresql://admin:password@127.0.0.1:5432/tinylink
                   REDIS_URL=redis://127.0.0.1:6379
                   NODE_ENV=test
+                  CLIENT_URL=http://localhost:3000
+                  ADMIN_PASSWORD=test-admin-password
+                  JWT_SECRET=test-jwt-secret-key-at-least-32-chars-long
+                  INTERNAL_API_KEY=ci-test-internal-key
                   EOF
 
-            - name: Run tests
-              run: pnpm --filter @tiny-link/server test
+            - name: Run All Tests
+              run: pnpm test
 
     db_migrate:
         name: Database Migration
@@ -186,3 +193,8 @@ jobs:
                     docker compose -f docker-compose.prod.yml pull && \
                     docker compose -f docker-compose.prod.yml up -d && \
                     docker image prune -f"
+
+            - name: Verify Container Health
+              run: |
+                  ssh vps-deploy "cd /root/apps/tiny-link && \
+                    docker compose -f docker-compose.prod.yml exec -T app wget -q -O - http://localhost:3001/api/healthz || exit 1"

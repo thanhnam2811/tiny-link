@@ -2,11 +2,15 @@ import { logoutAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { LogOut, LayoutDashboard, Link as LinkIcon, BarChart3, Settings, Activity } from 'lucide-react';
 import Link from 'next/link';
+import { MobileNav } from '@/components/mobile-nav';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="flex h-screen bg-zinc-50 dark:bg-black font-sans overflow-hidden">
-			{/* Sidebar */}
+		<div className="flex flex-col md:flex-row h-screen bg-zinc-50 dark:bg-black font-sans overflow-hidden">
+			{/* Mobile Topbar & Drawer */}
+			<MobileNav />
+
+			{/* Desktop Sidebar */}
 			<aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 hidden md:flex flex-col bg-white dark:bg-black shrink-0">
 				<div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
 					<h2 className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-zinc-50">

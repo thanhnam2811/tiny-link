@@ -1,0 +1,42 @@
+{
+	"common": {
+		"appName": "TinyLink",
+		"dashboard": "Dashboard",
+		"signIn": "Sign In",
+		"signOut": "Sign out",
+		"themeToggle": "Toggle theme"
+	},
+	"home": {
+		"badge": "Modern URL Management",
+		"heroTitle1": "Shorten Links.",
+		"heroTitle2": "Track Reach.",
+		"heroSubtitle": "A lightning-fast, highly trackable URL shortener built for power users. Advanced link analytics, custom aliases, QR codes, and bulk import in seconds.",
+		"features": {
+			"lightning": {
+				"title": "Lightning Fast",
+				"description": "Sub-millisecond redirects powered by Redis caching and edge infrastructure."
+			},
+			"analytics": {
+				"title": "Deep Analytics",
+				"description": "Track clicks, geo-location, devices, and traffic trends in real time."
+			},
+			"security": {
+				"title": "Secure by Default",
+				"description": "Password protection, self-destruct links, and rate limiting built in."
+			},
+			"global": {
+				"title": "Global Reach",
+				"description": "Bot-aware traffic routing with OpenGraph previews for any platform."
+			}
+		}
+	},
+	"form": {
+		"inputPlaceholder": "Enter long URL (e.g., https://example.com)...",
+		"shortenButton": "Shorten URL",
+		"customAliasPlaceholder": "Custom alias (optional)",
+		"passwordPlaceholder": "Protection password (optional)",
+		"expiresPlaceholder": "Expiration date (optional)",
+		"maxClicksPlaceholder": "Max clicks limit (optional)",
+		"bulkImport": "Bulk Import"
+	}
+}
