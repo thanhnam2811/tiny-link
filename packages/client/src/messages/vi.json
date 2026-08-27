@@ -1,0 +1,42 @@
+{
+	"common": {
+		"appName": "TinyLink",
+		"dashboard": "Bảng điều khiển",
+		"signIn": "Đăng nhập",
+		"signOut": "Đăng xuất",
+		"themeToggle": "Đổi giao diện"
+	},
+	"home": {
+		"badge": "Quản lý liên kết hiện đại",
+		"heroTitle1": "Rút gọn liên kết.",
+		"heroTitle2": "Theo dõi tương tác.",
+		"heroSubtitle": "Công cụ rút gọn liên kết tốc độ cao, phân tích chuyên sâu cho người dùng. Thống kê chi tiết, tùy chỉnh alias, mã QR và import hàng loạt chỉ trong tích tắc.",
+		"features": {
+			"lightning": {
+				"title": "Tốc độ vượt trội",
+				"description": "Chuyển hướng dưới mili-giây với bộ nhớ đệm Redis và hạ tầng edge."
+			},
+			"analytics": {
+				"title": "Phân tích chuyên sâu",
+				"description": "Theo dõi lượt nhấp, vị trí địa lý, thiết bị và xu hướng truy cập theo thời gian thực."
+			},
+			"security": {
+				"title": "Bảo mật mặc định",
+				"description": "Tích hợp mật khẩu bảo vệ, liên kết tự hủy và giới hạn tần suất truy cập."
+			},
+			"global": {
+				"title": "Quy mô toàn cầu",
+				"description": "Tự động phân luồng bot và hiển thị preview OpenGraph chuẩn trên mọi nền tảng."
+			}
+		}
+	},
+	"form": {
+		"inputPlaceholder": "Nhập đường dẫn dài (ví dụ: https://example.com)...",
+		"shortenButton": "Rút gọn link",
+		"customAliasPlaceholder": "Tùy chỉnh alias (không bắt buộc)",
+		"passwordPlaceholder": "Mật khẩu bảo vệ (không bắt buộc)",
+		"expiresPlaceholder": "Ngày hết hạn (không bắt buộc)",
+		"maxClicksPlaceholder": "Giới hạn số lượt nhấp (không bắt buộc)",
+		"bulkImport": "Nhập hàng loạt"
+	}
+}

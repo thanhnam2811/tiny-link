@@ -23,23 +23,30 @@ export const metadata: Metadata = {
 import { Header } from '@/components/Header';
 import { ClaimLinksEffect } from '@/components/ClaimLinksEffect';
 import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const locale = await getLocale();
+	const messages = await getMessages();
+
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<Auth0Provider>
-						<SmoothScrollProvider>
-							<Header />
-							<ClaimLinksEffect />
-							{children}
-							<Toaster position="top-center" />
-						</SmoothScrollProvider>
+						<NextIntlClientProvider locale={locale} messages={messages}>
+							<SmoothScrollProvider>
+								<Header />
+								<ClaimLinksEffect />
+								{children}
+								<Toaster position="top-center" />
+							</SmoothScrollProvider>
+						</NextIntlClientProvider>
 					</Auth0Provider>
 				</ThemeProvider>
 			</body>
