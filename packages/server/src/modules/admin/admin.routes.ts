@@ -29,7 +29,7 @@ import { getEnv } from '../../shared/env';
 import crypto from 'node:crypto';
 
 export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
-	const { prisma, analyticsManager } = server;
+	const { prisma, analyticsManager, redis } = server;
 
 	// Public routes
 	server.post<{ Body: AdminLoginBodyType }>(
@@ -235,10 +235,13 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				const { isActive } = request.body as AdminUpdateLinkStatusBodyType;
 
 				try {
-					await prisma.link.update({
+					const updatedLink = await prisma.link.update({
 						where: { id },
 						data: { isActive },
 					});
+					if (redis) {
+						await redis.del(`link:${updatedLink.shortCode}`);
+					}
 					return { success: true };
 				} catch {
 					return reply.code(404).send({
@@ -272,9 +275,12 @@ export const adminRoutes: FastifyPluginAsyncTypebox = async (server) => {
 				const { id } = request.params as AdminLinkIdParamsType;
 
 				try {
-					await prisma.link.delete({
+					const deletedLink = await prisma.link.delete({
 						where: { id },
 					});
+					if (redis) {
+						await redis.del(`link:${deletedLink.shortCode}`);
+					}
 					return { success: true };
 				} catch {
 					return reply.code(404).send({
