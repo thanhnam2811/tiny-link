@@ -83,6 +83,10 @@ jobs:
                   DATABASE_URL=postgresql://admin:password@127.0.0.1:5432/tinylink
                   REDIS_URL=redis://127.0.0.1:6379
                   NODE_ENV=test
+                  CLIENT_URL=http://localhost:3000
+                  ADMIN_PASSWORD=test-admin-password
+                  JWT_SECRET=test-jwt-secret-key-at-least-32-chars-long
+                  INTERNAL_API_KEY=ci-test-internal-key
                   EOF
 
             - name: Run All Tests
