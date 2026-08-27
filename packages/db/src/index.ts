@@ -7,7 +7,7 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 // 🛠️ Prisma 7 Skill-Powered Instantiation
 const connectionString = process.env.DATABASE_URL;
 
-const pool = new pg.Pool({ connectionString });
+const pool = new pg.Pool({ connectionString, max: 10, idleTimeoutMillis: 30000 });
 const adapter = new PrismaPg(pool);
 
 export const prisma: PrismaClient =
