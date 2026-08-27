@@ -18,8 +18,7 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 	// PUBLIC LINK LOGIC
 	useEffect(() => {
 		if (!isProtected) {
-			// Simulate a small loading state for "Premium" UX feel as requested
-			const timer = setTimeout(async () => {
+			(async () => {
 				try {
 					const data = await api.links.track(code);
 
@@ -29,9 +28,7 @@ export default function RedirectHandler({ code, isProtected }: RedirectHandlerPr
 					toast.error('Network error during redirect');
 					setError('A network error occurred while resolving the link. Please try again.');
 				}
-			}, 800);
-
-			return () => clearTimeout(timer);
+			})();
 		}
 	}, [code, isProtected]);
 
