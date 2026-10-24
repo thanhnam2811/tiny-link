@@ -15,8 +15,8 @@ import type * as Prisma from './prismaNamespace';
 
 const config: runtime.GetPrismaClientConfig = {
 	previewFeatures: [],
-	clientVersion: '7.6.0',
-	engineVersion: '75cbdc1eb7150937890ad5465d861175c6624711',
+	clientVersion: '7.10.1',
+	engineVersion: 'd1b3f377ca835d73fd50954a5e22128b9ebdd6b8',
 	activeProvider: 'postgresql',
 	inlineSchema:
 		'generator client {\n  provider = "prisma-client"\n  output   = "../src/generated-client"\n}\n\ndatasource db {\n  provider = "postgresql"\n}\n\nmodel Link {\n  id           String    @id @default(uuid())\n  originalUrl  String\n  shortCode    String    @unique\n  redirectType Int       @default(302) // 301 or 302\n  createdAt    DateTime  @default(now())\n  expiresAt    DateTime?\n  maxClicks    Int?\n  passwordHash String?\n  isActive     Boolean   @default(true)\n  clicksCount  Int       @default(0)\n\n  metaTitle       String?\n  metaDescription String?\n  metaImage       String?\n\n  // Relations\n  userId  String?\n  guestId String?\n  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)\n\n  clicks Click[]\n\n  @@index([userId]) // Optimize dashboard queries\n  @@index([guestId]) // Optimize claiming logic\n}\n\nmodel Click {\n  id        String   @id @default(uuid())\n  linkId    String\n  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)\n  ipAddress String?\n  userAgent String?\n  country   String?\n  city      String?\n  clickedAt DateTime @default(now())\n\n  @@index([linkId, clickedAt]) // Optimize stats queries\n  @@index([clickedAt]) // Optimize timeline/aggregate queries not scoped to a single link\n}\n\n// ---------------------------------------------------------------------------------\n// User (identity owned by Auth0 — id is the Auth0 `sub` claim, synced on login)\n// ---------------------------------------------------------------------------------\n\nmodel User {\n  id      String   @id\n  name    String?\n  email   String   @unique\n  image   String?\n  role    String?  @default("user")\n  links   Link[]\n  apiKeys ApiKey[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\n// ---------------------------------------------------------------------------------\n// ApiKey (per-account public API credential — separate from the internal M2M channel)\n// ---------------------------------------------------------------------------------\n\nmodel ApiKey {\n  id         String    @id @default(uuid())\n  name       String\n  keyPrefix  String\n  keyHash    String    @unique\n  userId     String\n  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  createdAt  DateTime  @default(now())\n  lastUsedAt DateTime?\n  revokedAt  DateTime?\n\n  @@index([userId])\n}\n',
@@ -32,7 +32,7 @@ const config: runtime.GetPrismaClientConfig = {
 };
 
 config.runtimeDataModel = JSON.parse(
-	'{"models":{"Link":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"originalUrl","kind":"scalar","type":"String"},{"name":"shortCode","kind":"scalar","type":"String"},{"name":"redirectType","kind":"scalar","type":"Int"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"expiresAt","kind":"scalar","type":"DateTime"},{"name":"maxClicks","kind":"scalar","type":"Int"},{"name":"passwordHash","kind":"scalar","type":"String"},{"name":"isActive","kind":"scalar","type":"Boolean"},{"name":"clicksCount","kind":"scalar","type":"Int"},{"name":"metaTitle","kind":"scalar","type":"String"},{"name":"metaDescription","kind":"scalar","type":"String"},{"name":"metaImage","kind":"scalar","type":"String"},{"name":"userId","kind":"scalar","type":"String"},{"name":"guestId","kind":"scalar","type":"String"},{"name":"user","kind":"object","type":"User","relationName":"LinkToUser"},{"name":"clicks","kind":"object","type":"Click","relationName":"ClickToLink"}],"dbName":null},"Click":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"linkId","kind":"scalar","type":"String"},{"name":"link","kind":"object","type":"Link","relationName":"ClickToLink"},{"name":"ipAddress","kind":"scalar","type":"String"},{"name":"userAgent","kind":"scalar","type":"String"},{"name":"country","kind":"scalar","type":"String"},{"name":"city","kind":"scalar","type":"String"},{"name":"clickedAt","kind":"scalar","type":"DateTime"}],"dbName":null},"User":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"name","kind":"scalar","type":"String"},{"name":"email","kind":"scalar","type":"String"},{"name":"image","kind":"scalar","type":"String"},{"name":"role","kind":"scalar","type":"String"},{"name":"links","kind":"object","type":"Link","relationName":"LinkToUser"},{"name":"apiKeys","kind":"object","type":"ApiKey","relationName":"ApiKeyToUser"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"updatedAt","kind":"scalar","type":"DateTime"}],"dbName":null},"ApiKey":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"name","kind":"scalar","type":"String"},{"name":"keyPrefix","kind":"scalar","type":"String"},{"name":"keyHash","kind":"scalar","type":"String"},{"name":"userId","kind":"scalar","type":"String"},{"name":"user","kind":"object","type":"User","relationName":"ApiKeyToUser"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"lastUsedAt","kind":"scalar","type":"DateTime"},{"name":"revokedAt","kind":"scalar","type":"DateTime"}],"dbName":null}},"enums":{},"types":{}}',
+	'{"models":{"Link":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"originalUrl","kind":"scalar","type":"String"},{"name":"shortCode","kind":"scalar","type":"String"},{"name":"redirectType","kind":"scalar","type":"Int"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"expiresAt","kind":"scalar","type":"DateTime"},{"name":"maxClicks","kind":"scalar","type":"Int"},{"name":"passwordHash","kind":"scalar","type":"String"},{"name":"isActive","kind":"scalar","type":"Boolean"},{"name":"clicksCount","kind":"scalar","type":"Int"},{"name":"metaTitle","kind":"scalar","type":"String"},{"name":"metaDescription","kind":"scalar","type":"String"},{"name":"metaImage","kind":"scalar","type":"String"},{"name":"userId","kind":"scalar","type":"String"},{"name":"guestId","kind":"scalar","type":"String"},{"name":"user","kind":"object","type":"User","relationName":"LinkToUser"},{"name":"clicks","kind":"object","type":"Click","relationName":"ClickToLink"}],"dbName":null,"schema":null},"Click":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"linkId","kind":"scalar","type":"String"},{"name":"link","kind":"object","type":"Link","relationName":"ClickToLink"},{"name":"ipAddress","kind":"scalar","type":"String"},{"name":"userAgent","kind":"scalar","type":"String"},{"name":"country","kind":"scalar","type":"String"},{"name":"city","kind":"scalar","type":"String"},{"name":"clickedAt","kind":"scalar","type":"DateTime"}],"dbName":null,"schema":null},"User":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"name","kind":"scalar","type":"String"},{"name":"email","kind":"scalar","type":"String"},{"name":"image","kind":"scalar","type":"String"},{"name":"role","kind":"scalar","type":"String"},{"name":"links","kind":"object","type":"Link","relationName":"LinkToUser"},{"name":"apiKeys","kind":"object","type":"ApiKey","relationName":"ApiKeyToUser"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"updatedAt","kind":"scalar","type":"DateTime"}],"dbName":null,"schema":null},"ApiKey":{"fields":[{"name":"id","kind":"scalar","type":"String"},{"name":"name","kind":"scalar","type":"String"},{"name":"keyPrefix","kind":"scalar","type":"String"},{"name":"keyHash","kind":"scalar","type":"String"},{"name":"userId","kind":"scalar","type":"String"},{"name":"user","kind":"object","type":"User","relationName":"ApiKeyToUser"},{"name":"createdAt","kind":"scalar","type":"DateTime"},{"name":"lastUsedAt","kind":"scalar","type":"DateTime"},{"name":"revokedAt","kind":"scalar","type":"DateTime"}],"dbName":null,"schema":null}},"enums":{},"types":{}}',
 );
 config.parameterizationSchema = {
 	strings: JSON.parse(
@@ -89,7 +89,7 @@ export interface PrismaClientConstructor {
 			: Prisma.PrismaClientOptions['omit'],
 		ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 	>(
-		options: Prisma.Subset<Options, Prisma.PrismaClientOptions>,
+		options: Prisma.PrismaClientConstructorArgs<Options>,
 	): PrismaClient<LogOpts, OmitOpts, ExtArgs>;
 }
 
@@ -111,7 +111,7 @@ export interface PrismaClientConstructor {
 
 export interface PrismaClient<
 	in LogOpts extends Prisma.LogLevel = never,
-	in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = undefined,
+	in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = Prisma.PrismaClientOptions['omit'],
 	in out ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > {
 	[K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] };
@@ -192,7 +192,7 @@ export interface PrismaClient<
 	 */
 	$transaction<P extends Prisma.PrismaPromise<any>[]>(
 		arg: [...P],
-		options?: { isolationLevel?: Prisma.TransactionIsolationLevel },
+		options?: { maxWait?: number; timeout?: number; isolationLevel?: Prisma.TransactionIsolationLevel },
 	): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>;
 
 	$transaction<R>(
